@@ -1,6 +1,6 @@
 
 library(readr)
-# a useless comment
+
 world <- read_delim("www/country_list.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 choice <- read_delim("www/choice.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 #library(mailR)
@@ -909,7 +909,7 @@ shinyServer(function(input, output,session) {
     if ( input$PatIdentifier %in% datpat[,1] ) {
       
       output$datt=renderDataTable({
-        A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,4,5,7:8)]
+        A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:8)]
         DT::datatable(A, options = list(scrollX = TRUE,lengthMenu = c(1) ,pageLength = 1))
       })
       
@@ -981,12 +981,12 @@ shinyServer(function(input, output,session) {
             column("",textInput("idPattt","Patient DB Code (*)",placeholder = 'PPPLL****'), width = 4 ),
             column("",textInput("medfilenumber","Patient ID",""), width = 4 ),
             column("",selectInput("ConsPat","Consentment", c("", "Yes","No","N/A")), width = 4),
-            column("",textInput("prenomp","First name",""), width = 4),
+            #column("",textInput("prenomp","First name",""), width = 4),
             column("",dateInput("datenaissp","Birth date",value = "1900-01-01"), width = 4),
             column("",selectInput("nationalp","Nationality", c("", "TN","LB", "SY", "MA", "DZ", "other","N/A")), width = 4),
-            column("",textInput("nomp","Last name",""), width = 4 ),                         
+            #column("",textInput("nomp","Last name",""), width = 4 ),                         
             column("",selectInput("sexep","Gender", c("", "Female","Male","Other","N/A")), width = 4),
-            column("",textInput("phonenum","Phone number"), width = 4),
+            #column("",textInput("phonenum","Phone number"), width = 4),
             
             
             box(width = 12, status = "info",solidHeader = TRUE,
@@ -1012,7 +1012,7 @@ shinyServer(function(input, output,session) {
     
     queryIpfe <- paste0(
       "INSERT INTO patient
-      VALUES ('",toString(input$idPattt)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','",toString( input$prenomp) ,"','",toString( input$nomp) ,"','",toString( input$datenaissp) ,"','",toString( input$nationalp) ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','",toString(input$phonenum ),"') ")
+      VALUES ('",toString(input$idPattt)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','','','",toString( input$datenaissp) ,"','",toString( input$nationalp) ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','') ")
     validate(
       need(input$idPattt!="PPPLL****"  , "Error : Missing values")
     )
@@ -1915,21 +1915,21 @@ shinyServer(function(input, output,session) {
           width = 10,
           height = 4,
           tabPanel(h4(strong("Tables View")),
-                   uiOutput("viewtable2")),
+                   uiOutput("viewtable2"))#,
           
-          tabPanel(h4(strong("Patients Calendar")),
-                   div( htmlOutput("calendar2"),
-                        uiOutput("calendarDB2"))),
-          tabPanel(h4(strong("Monthly patients")),
-                   dygraphOutput("monthview2"),
-                   uiOutput("MPNuDB2")),
+          #tabPanel(h4(strong("Patients Calendar")),
+          #         div( htmlOutput("calendar2"),
+          #              uiOutput("calendarDB2"))),
+          #tabPanel(h4(strong("Monthly patients")),
+          #         dygraphOutput("monthview2"),
+          #         uiOutput("MPNuDB2")),
           
-          tabPanel(h4(strong("Partition")),
-                   uiOutput("PieChart2"),
-                   uiOutput("PieNvDB2")),
-          tabPanel(h4(strong("Patients map")),
-                   uiOutput("SpeciesMapViewN"),
-                   uiOutput("MapDB2"))
+          #tabPanel(h4(strong("Partition")),
+          #         uiOutput("PieChart2"),
+          #         uiOutput("PieNvDB2")),
+          #tabPanel(h4(strong("Patients map")),
+          #         uiOutput("SpeciesMapViewN"),
+          #         uiOutput("MapDB2"))
           
           
         )
@@ -1967,8 +1967,8 @@ shinyServer(function(input, output,session) {
     
     
     All=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttest2))
-    hhh= All[which(All[,"LOGINUSER"]==USER$name),]
-    hhh
+    #hhh= All[which(All[,"LOGINUSER"]==USER$name),]
+    #hhh=All
   })
   
   output$datas2= DT::renderDataTable ({
@@ -3159,12 +3159,12 @@ shinyServer(function(input, output,session) {
       #textInput("patientIDUP","patient DB Code",value =UPdatavaluePat()$PATIENT_IDENTIFIER),
       textInput("medfilenumberUP","Patient ID",value =UPdatavaluePat()$MEDICAL_FILE_NUMBER),
       textInput("ConsPatUP","Consentment", value =UPdatavaluePat()$CONSENT),
-      textInput("prenompUP","First name",value =UPdatavaluePat()$FIRST_NAME),
-      textInput("nompUP","Last name",value =UPdatavaluePat()$LAST_NAME),  
+      #textInput("prenompUP","First name",value =UPdatavaluePat()$FIRST_NAME),
+      #textInput("nompUP","Last name",value =UPdatavaluePat()$LAST_NAME),  
       dateInput("datenaisspUP","Birth date",value =UPdatavaluePat()$BIRTH_DATE),
       textInput("nationalpUP","Nationality", value =UPdatavaluePat()$NATIONALITY) ,
-      textInput("sexepUP","Gender", value =UPdatavaluePat()$GENDER),
-      textInput("phonenumUP","Phone number",value =UPdatavaluePat()$PHONE_NUMBER)
+      textInput("sexepUP","Gender", value =UPdatavaluePat()$GENDER)#,
+      #textInput("phonenumUP","Phone number",value =UPdatavaluePat()$PHONE_NUMBER)
     )
   })
   ########################################################################
