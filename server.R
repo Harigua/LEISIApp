@@ -1,6 +1,6 @@
 
 library(readr)
-
+# a useless comment
 world <- read_delim("www/country_list.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 choice <- read_delim("www/choice.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 #library(mailR)

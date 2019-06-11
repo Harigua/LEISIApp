@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+             <title>Javascript Slider</title>
+			 <link rel="stylesheet" href="style.css"/>
+    </head>
+		
+	<body>
+	     
+		 
+	     <img class="image" src="logo-IPT.png"/>
+	     
+		 
+	    <div id="container" >
+                <img class="slides" src="PEER.png"/>
+		<img class="slides" src="beut.jpeg"/>
+		<img class="slides" src="cont.jpg"/>
+		<img class="slides" src="vis.jpg"/>
+	        <img class="slides" src="main2.png"/>
+		<img class="slides" src="adnlove.png"/>
+		<button class="btn" onclick="plusindex(-1)" id="btn1">&#10094;
+		</button>
+		<button class="btn" onclick="plusindex(1)" id="btn2">&#10095;
+		</button>
+		</div>
+		</div>
+	
+	
+		<script>
+		  var index = 1;
+		  
+		  function plusindex(n){
+		  index= index  + n;
+		  showImage(index);
+		  }
+		  
+		  showImage(1)
+		  function showImage(n){
+		  var i;
+		   var x = document.getElementsByClassName("slides");
+		  if(n>x.length){index=1};
+		  if(n<1){index=x.length};
+		  for (i=0; i<x.length;i++){
+		                         x[i].style.display="none";
+		                            }
+		  x[index-1].style.display = "block";
+		  }
+		  
+		  autoSlide();
+		  function autoSlide(){
+		  var i;
+		   var x = document.getElementsByClassName("slides");
+		 
+		 for (i=0; i<x.length;i++){
+		                         x[i].style.display="none";
+		                            }
+        if(index > x.length){index=1};
+		  x[index-1].style.display = "block";
+		  index++;
+		  setTimeout(autoSlide,2000)
+		  }
+		  </script>
+	
+</html>
