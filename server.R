@@ -36,8 +36,8 @@ suppressPackageStartupMessages(library(googleVis))
 library(V8)
 #library(Sys)
 
-
-connect=odbcConnect("MyAppDB", uid='emna', pwd='16souemna')
+Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
+connect=odbcConnect("MyAppDB", uid='emna', pwd='16souemna' , DBMSencoding = "UTF-8")
 #connect=odbcConnect("ServeurDSN", uid='root', pwd='16souemna')
 #connect=odbcConnect("MyAppDBserver", uid='root', pwd='16souemna')
 
@@ -940,7 +940,7 @@ shinyServer(function(input, output,session) {
       if ( input$PatIdentifier %in% datpat[,1] ) {
         
         output$datt=renderDataTable({
-          A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,5,7:8)]
+          A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:8)]
           
           DT::datatable(A, options = list(scrollX = TRUE,lengthMenu = c(1) ,pageLength = 1))
         })
@@ -1793,11 +1793,11 @@ shinyServer(function(input, output,session) {
                      , width = 4 ),
               column("",numericInput("voll","Quantity in nanogramme",""), width = 4),
               
-              column("",selectInput("val","Type",choices = c('Azote','R80',"N/A")), width = 4),
-              column("",selectInput("RakPFE","Container",choices = c(1:4)), width = 4),
+              column("",selectInput("val","Type",choices = c('','Azote','R80',"N/A")), width = 4),
+              column("",selectInput("RakPFE","Container",choices = c('',1:4)), width = 4),
               column("",uiOutput("ttt"), width = 4),
-              column("",textInput("conserve","Boite",""), width = 4),
-              column("",selectInput("posPFE","Position",choices = c(1:100)), width = 12)
+              column("",textInput("","conserve","Boite","N/A"), width = 4),
+              column("",selectInput("posPFE","Position",choices = c('',1:100)), width = 12)
           ),
           actionButton("suballiquotQ","Submit"),
           actionButton("cansAddalliquot","Cancel")
