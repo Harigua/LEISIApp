@@ -1089,8 +1089,8 @@ shinyServer(function(input, output,session) {
               column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
               column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
              
-              column("",selectInput("locallesion","Lesion localisation",choices = c("",-1,1:45)) , width = 2),
-              column("",selectInput("extractDay","Sampling date",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+              column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2),
+              column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -1578,8 +1578,8 @@ shinyServer(function(input, output,session) {
              column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
              column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
              
-              column("",selectInput("locallesion","Lesion localisation",choices = c("",-1,1:45)) , width = 2),
-              column("",selectInput("extractDay","Sampling date",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+              column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2),
+              column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -1863,8 +1863,8 @@ shinyServer(function(input, output,session) {
              column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
              column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
              
-               column("",selectInput("locallesion","Lesion localisation",choices = c("",-1,1:45)) , width = 2 ),
-               column("",selectInput("extractDay","Sampling date",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+               column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2 ),
+               column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
                column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -3406,8 +3406,8 @@ shinyServer(function(input, output,session) {
         numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter) (*)",value =UPdatavalueSample()$DIAMETRE) , 
         numericInput("highlesionUP","lesion Hight(millimeter) (*)",value =UPdatavalueSample()$DIAMETRE) , 
         
-        textInput("locallesionUP","Lesion localisation",value = UPdatavalueSample()$LOCALISATION) , 
-        textInput("extractDayUP","Sampling date",value = UPdatavalueSample()$LESION_AGE ),
+        textInput("locallesionUP","Lesion localisation (*)",value = UPdatavalueSample()$LOCALISATION) , 
+        textInput("extractDayUP","Sampling date (*)",value = UPdatavalueSample()$LESION_AGE ),
         textInput("descriptionlesionUP","Lesion description",value = UPdatavalueSample()$DESCRIPTION) 
         
     )
