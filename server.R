@@ -978,7 +978,7 @@ shinyServer(function(input, output,session) {
         #datpat=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER from dbpfedev.patient  WHERE `LOGINUSER`="%s" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;",paste(USER$name)))
         
         box(width = 12, status = "info",solidHeader = TRUE,
-            column("",textInput("idPattt","Patient DB Code (*)",placeholder = 'PPPLL****'), width = 4 ),
+            column("",textInput("idPattt","Patient DB Code*",placeholder = 'PPPLL****'), width = 4 ),
             column("",textInput("medfilenumber","Patient ID",""), width = 4 ),
             column("",selectInput("ConsPat","Consentment", c("", "Yes","No","N/A")), width = 4),
             #column("",textInput("prenomp","First name",""), width = 4),
@@ -1085,12 +1085,12 @@ shinyServer(function(input, output,session) {
               column("",selectInput("abandance","Abundance on the smear", c("", "+","++","+++","++++","+++++","++++++","N/A")), width = 4),
               column("",dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , width = 4),
              
-              column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter) (*)","") , width = 4),
-              column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
-              column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
+              column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","") , width = 4),
+              column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","") , width = 4),
+              column("",numericInput("highlesion","lesion Hight(millimeter)*","") , width = 4),
              
-              column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2),
-              column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+              column("",selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) , width = 2),
+              column("",selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -1158,12 +1158,12 @@ shinyServer(function(input, output,session) {
             column("",selectInput("treattype","Treatment type",choices = c("","Antibiotics","Glucantime","No treatment","Other","N/A"),multiple = TRUE), width = 4 ), 
             column("",selectInput("prescribed","Prescribed for",choices = c("","Leishmania","Other","N/A")), width = 4 ), 
             column("",dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"), width = 4),
-            column("",textInput("datetreatend","Treatment Duration (in weeks)",""), width = 4),
+            column("",textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)",""), width = 4),
             
             column("",textInput("Posology","Posology",""), width = 4),
             column("",textInput("admin","Administaration Root",""), width = 4),
             
-            column("",numericInput("injectionnumber","Injection number (*)",""), width = 4)
+            column("",numericInput("injectionnumber","Injection number* (for Glucantime)",""), width = 4)
             
         ),
         actionButton("subtreatmentQ","Submit and Quit"),
@@ -1193,12 +1193,12 @@ shinyServer(function(input, output,session) {
             column("",selectInput("treattype","Treatment type",choices = c("","Antibiotics","Glucantime","No treatment","Other","N/A"),multiple = TRUE), width = 4 ), 
             column("",selectInput("prescribed","Prescribed for",choices = c("","Leishmania","Other","N/A")), width = 4 ), 
             column("",dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"), width = 4),
-            column("",textInput("datetreatend","Treatment Duration (in weeks)",""), width = 4),
+            column("",textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)",""), width = 4),
             
             column("",textInput("Posology","Posology",""), width = 4),
             column("",textInput("admin","Administaration Root",""), width = 4),
             
-            column("",numericInput("injectionnumber","Injection number (*)",""), width = 4),
+            column("",numericInput("injectionnumber","Injection number* (for Glucantime)",""), width = 4),
             column("",dateInput("healing","Healing Date",value = "1900-01-01"), width = 4)
             
         ),
@@ -1234,7 +1234,7 @@ shinyServer(function(input, output,session) {
             column("",selectizeInput("HhostR","Surrounding human cases", c("","Family","Neighbour","Colleague","Yes","No","N/A"), multiple = TRUE), width = 4),
             column("",selectizeInput("HhostL","Link with human cases", c("","Household","Neighborhood","Workplace","Travel","No","N/A"), multiple = TRUE), width = 4),
             column("",selectizeInput("Ahost","Possible animal contact", c("",  "Bovines","Ovins","Caprins","Camels","Equids","Hares","Cats","Dogs","Foxs","Other Canids","Sandrats","Meriones","Other rodents","Gondis","Hedgehogs","Bates","Hyrax","Cattle","Other","No","N/A"), multiple = TRUE), width = 4),
-            column("",numericInput("Lesion_Number","Number of Lesions (*)",value = ""), width = 4),
+            column("",numericInput("Lesion_Number","Number of Lesions*",value = ""), width = 4),
             column("",selectInput("Lesion_Sites","Lesion localisation",choices = c("","Face", "Upper limbs","Lower limbs","Trunc","Other","N/A"),multiple = TRUE), width = 4 )
             #column("",selectInput("Lesion_Sites","Lesion Sites",choices = c("",-1,1:45),multiple=TRUE), width = 4)
             
@@ -1574,12 +1574,12 @@ shinyServer(function(input, output,session) {
               column("",dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , width = 4),
         
              
-             column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter) (*)","") , width = 4),
-             column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
-             column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
+             column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","") , width = 4),
+             column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","") , width = 4),
+             column("",numericInput("highlesion","lesion Hight(millimeter)*","") , width = 4),
              
-              column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2),
-              column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+              column("",selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) , width = 2),
+              column("",selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -1859,12 +1859,12 @@ shinyServer(function(input, output,session) {
                column("",dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , width = 4),
       
              
-             column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter) (*)","") , width = 4),
-             column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter) (*)","") , width = 4),
-             column("",numericInput("highlesion","lesion Hight(millimeter) (*)","") , width = 4),
+             column("",numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","") , width = 4),
+             column("",numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","") , width = 4),
+             column("",numericInput("highlesion","lesion Hight(millimeter)*","") , width = 4),
              
-               column("",selectInput("locallesion","Lesion localisation (*)",choices = c("",-1,1:45)) , width = 2 ),
-               column("",selectInput("extractDay","Sampling date (*)",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
+               column("",selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) , width = 2 ),
+               column("",selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ), width = 2),
                column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 4)
         ),
         actionButton("subSampleQ","Submit and Quit"),
@@ -3219,7 +3219,7 @@ shinyServer(function(input, output,session) {
       textInput("HhostRUP","Surrounding human cases", value = UPdatavalueCheck()$POSSIBLE_HUMAN_HOSTS),
       textInput("HhostLUP","Link with human cases", value = UPdatavalueCheck()$LINK_HUMAN_HOSTS), 
       textInput("AhostUP","Possible animal contact" ,value = UPdatavalueCheck()$ANIMAL_AROUND),
-      numericInput("Lesion_NumberUP","Number of Lesions (*)",value = UPdatavalueCheck()$LESNUM ), 
+      numericInput("Lesion_NumberUP","Number of Lesions*",value = UPdatavalueCheck()$LESNUM ), 
       textInput("Lesion_SitesUP","Lesion Sites",value = UPdatavalueCheck()$LESPOSSS )
       #textInput("General_DescriptionUP","General Description",value = UPdatavalueCheck()$GENDESC)
       
@@ -3281,12 +3281,12 @@ shinyServer(function(input, output,session) {
         column("",textInput("treattypeUP","Treatment type",value = UPdatavalueTreat()$TREATMENT_TYPE), width = 4 ), 
         column("",textInput("prescribedUP","Prescribed for",value = UPdatavalueTreat()$PRESCRIBEDFOR), width = 4 ), 
         column("",dateInput("datetreatbegUP","Treatment start date",value = UPdatavalueTreat()$START_DATE), width = 4),
-        column("",textInput("datetreatendUP","Treatment Duration (in weeks)",value = UPdatavalueTreat()$DURATIONN), width = 4),
+        column("",textInput("datetreatendUP","Treatment Duration (in weeks, one year = 52 weeks)",value = UPdatavalueTreat()$DURATIONN), width = 4),
         
         column("",textInput("PosologyUP","Posology",value = UPdatavalueTreat()$POSOLOGY), width = 4),
         column("",textInput("adminUP","Administaration Root",value = UPdatavalueTreat()$ADMINROUTE), width = 4),
         
-        column("",numericInput("injectionnumberUP","Injection number (*)",value = UPdatavalueTreat()$INJECTION_NUMBER), width = 4),
+        column("",numericInput("injectionnumberUP","Injection number* (for Glucantime)",value = UPdatavalueTreat()$INJECTION_NUMBER), width = 4),
         column("",dateInput("healingUP","Healing Date",value = UPdatavalueTreat()$HEALING_DATE), width = 4)
     )
   })
@@ -3402,12 +3402,12 @@ shinyServer(function(input, output,session) {
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR), 
         dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$LESION_AGE) ,
 
-        numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter) (*)",value =UPdatavalueSample()$DIAMETRE) , 
-        numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter) (*)",value =UPdatavalueSample()$DIAMETRE) , 
-        numericInput("highlesionUP","lesion Hight(millimeter) (*)",value =UPdatavalueSample()$DIAMETRE) , 
+        numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
+        numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
+        numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
         
-        textInput("locallesionUP","Lesion localisation (*)",value = UPdatavalueSample()$LOCALISATION) , 
-        textInput("extractDayUP","Sampling date (*)",value = UPdatavalueSample()$LESION_AGE ),
+        textInput("locallesionUP","Lesion localisation*",value = UPdatavalueSample()$LOCALISATION) , 
+        textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$LESION_AGE ),
         textInput("descriptionlesionUP","Lesion description",value = UPdatavalueSample()$DESCRIPTION) 
         
     )
