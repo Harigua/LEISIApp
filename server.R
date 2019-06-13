@@ -836,8 +836,9 @@ shinyServer(function(input, output,session) {
   
   output$mail=renderUI({
     if(USER$Logged==FALSE ){
-      column("", actionButton("mail", "Email us ",width = 237, icon("paper-plane"), 
-                              style="yellow: #fff; background-color: white ; border-color: #2e6da4"),width = 3)
+      column("", actionButton("mail", "Contact us ",width = 237
+                              #,icon("paper-plane"), style="yellow: #fff; background-color: white ; border-color: #2e6da4"
+             ),width = 3)
     } 
   })
   
@@ -853,7 +854,7 @@ shinyServer(function(input, output,session) {
                div(
                  column("", textInput("usermail","Please enter your E-mail adress",""),width = 3),
                  column("", textInput("userwork","Institution",""),width = 3),
-                 column("",selectInput("topic","Please precise your mail topic",choices = c("","Report problem","Join Leisionia network")),width = 3),
+                 column("",selectInput("topic","Please precise your mail topic",choices = c("","Report problem","Join Lesionia network")),width = 3),
                  column("", textAreaInput("Content1","Mail body",""),width = 3),
                  column("", actionButton("sendthemail","Send the mail"),width = 2),
                  column("", actionButton("cancelmail","Cancel") ,width = 2 ))))
