@@ -697,15 +697,15 @@ shinyServer(function(input, output,session) {
                    id="formDiagnos",
                    fluidRow(
                      box(width = 12,height = 300, status = "info",solidHeader = TRUE,
-                         column("",selectInput("chemtest","Molecular test",choices = c("",as.character(datatestech()[,1]))),width = 3),
-                         column("",selectInput("labname","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory")))$LABORATORY_NAME)))),width = 3),
-                         column("",selectInput("sample","Sample",choices = c("",as.character(dataech()[,1]))),width = 3),
+                         column("",selectInput("chemtest","Molecular test*",choices = c("",as.character(datatestech()[,1]))),width = 3),
+                         column("",selectInput("labname","Laboratory*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory")))$LABORATORY_NAME)))),width = 3),
+                         column("",selectInput("sample","Sample*",choices = c("",as.character(dataech()[,1]))),width = 3),
                          
                          column("",dateInput("dattest","Test date",value = "1900-01-01"),width = 6),
-                         column("",textInput("quantity","DNA volume (in micoL)",""),width = 6),
-                         column("",selectInput("restest","Test result",choices = c("","+","-","N/A")),width = 6),
+                         column("",textInput("quantity","DNA volume (in micoL)*",""),width = 6),
+                         column("",selectInput("restest","Test result*",choices = c("","+","-","N/A")),width = 6),
                          #column("",selectInput("susSpec","Suspected Species",choices = c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from dbpfedev.leishmania_species")))$SPECIES))),multiple=TRUE),width = 6)
-                         column("",selectInput("susSpec","Suspected Species",choices = c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from dbpfedev.leishmania_species")))$SPECIES)))),width = 6)
+                         column("",selectInput("susSpec","Suspected Species*",choices = c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from dbpfedev.leishmania_species")))$SPECIES)))),width = 6)
                      ),
                      actionButton("submitDiag", "Submit Data",  class = "btn-primary"),
                      actionButton("editDiag", "Edit",  class = "btn-primary")
@@ -732,10 +732,10 @@ shinyServer(function(input, output,session) {
                      id="forminv",
                      box(width = 12, status = "info",solidHeader = TRUE,
                          
-                         column("",textInput("cini","Identity Card number",  ""),width = 3),
-                         column("",textInput("nomi","Last name",""),width = 3),
-                         column("",textInput("prenomi","First name",""),width = 3),
-                         column("",selectInput("qual","Quality",c("","Doctor","Nurse","Researcher","Resident doctor","Technicien","N/A")),width = 3)
+                         column("",textInput("cini","Identity number*",  ""),width = 3),
+                         column("",textInput("nomi","Last name*",""),width = 3),
+                         column("",textInput("prenomi","First name*",""),width = 3),
+                         column("",selectInput("qual","Quality*",c("","Doctor","Nurse","Researcher","Resident doctor","Technicien","N/A")),width = 3)
                          
                      ),
                      actionButton("submitIDpfe", "Submit Data",  class = "btn-primary"),
@@ -747,8 +747,8 @@ shinyServer(function(input, output,session) {
                  div(
                    id="formlaab",
                    fluidRow(
-                     column("",textInput("labnamo","Laboratory Complete name",""),width=3),
-                     column("",selectInput("counlab","Country",choices = c("",world[-1,1])),width=3)
+                     column("",textInput("labnamo","Laboratory*",""),width=3),
+                     column("",selectInput("counlab","Country*",choices = c("",world[-1,1])),width=3)
                    ),
                    actionButton("subpfelab", "Submit",  class = "btn-primary"),
                    actionButton("editlab", "Edit",  class = "btn-primary")
@@ -1609,7 +1609,19 @@ shinyServer(function(input, output,session) {
     queryinterrpfe <- paste0(
       "INSERT INTO  interrogator
       VALUES ('", input$cini ,"', '",toString( USER$name ) ,"', '",toString( input$nomi ) ,"', '",toString(input$prenomi) ,"','",toString( input$qual) ,"') ")
-    
+    validate(
+      need(toString( input$cini)!="" , "Error : Missing data")
+    )
+    validate(
+      need(toString( input$nomi )!="" , "Error : Missing data")
+    )
+    validate(
+      need(toString(input$prenomi)!="" , "Error : Missing data")
+    )
+    validate(
+      need( toString( input$qual)!="", "Error : Missing data")
+    )
+
     validate(
       need(try(       sqlExecute(connect,query = queryinterrpfe)), "Error : Row already exists")
     )
@@ -1625,6 +1637,24 @@ shinyServer(function(input, output,session) {
       "INSERT INTO  diognosis
       VALUES ( '", toString(paste0("Diagnosis",length(datadiagnosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
     
+    validate(       
+      need(input$quantity!="", "You must choose a quantity")    
+    )    
+    validate(       
+      need(input$sample!="", "You must choose a sample from list")    
+    )    
+    validate(       
+      need(input$labname!="", "You must choose a laboratory name")    
+    )  
+    validate(       
+      need(input$chemtest!="", "You must choose a test")    
+    )  
+    validate(       
+      need(input$restest!="", "You must choose a result")    
+    )  
+    validate(       
+      need(input$susSpec!="", "You must choose a suspected specie")    
+    )
     validate(
       need(try(      sqlExecute(connect,query = querydiagpfe)), "Error : Row already exists")
     )
@@ -1638,6 +1668,12 @@ shinyServer(function(input, output,session) {
       "INSERT INTO laboratory
       VALUES ('", toString( input$labnamo ) ,"', '",toString( USER$name ) ,"', '",toString( input$counlab ) ,"') ")
     
+    validate(
+      need(input$labnamo!="", "Error : Missing data")
+    )
+    validate(
+      need(input$counlab!="", "Error : Missing data")
+    )
     validate(
       need(try(       sqlExecute(connect, querylabpfe)), "Error : Row already exists")
     )
@@ -3160,7 +3196,7 @@ shinyServer(function(input, output,session) {
   })
   
   UPdatavaluePat=reactive({
-    ddddddd=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",paste(USER$name),paste(input$DUPpatient) )))
+    ddddddd=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",paste(input$DUPpatient) )))
     ddddddd
   })
   output$testpat=renderUI({
@@ -3182,8 +3218,8 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$okpatient,{
     querypatientUPpfe <- sprintf("
-                                 UPDATE patient SET PATIENT_IDENTIFIER='%s' ,MEDICAL_FILE_NUMBER='%s',FIRST_NAME='%s',LAST_NAME='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' ,PHONE_NUMBER='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s%s",
-                                 paste(as.character(input$patientIDUP)),paste(as.character(input$medfilenumberUP)),paste(as.character(input$prenompUP)),paste(as.character(input$nompUP)) ,paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)) ,paste(input$phonenumUP)  ,paste(USER$name),paste(as.character(input$DUPpatient),collapse = ", " ),paste("'",collapse = " ,"))
+                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s%s",
+                                 paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient),collapse = ", " ),paste("'",collapse = " ,"))
     sqlExecute(connect,query = querypatientUPpfe)
     info("Patient successfully Updated")
     removeModal()
@@ -3197,7 +3233,7 @@ shinyServer(function(input, output,session) {
   
   dataModalUPMEdCheck <- function(failed = FALSE) {
     modalDialog(
-      selectInput("DUPcheck", "Select checkUp date",
+      selectInput("DUPcheck", "Select checkup date",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$DATE_MED))
                   )),
       
@@ -3404,16 +3440,16 @@ shinyServer(function(input, output,session) {
   })
   output$testsamFFFFFF=renderUI({
     box(width = 12,
-        textInput("LesionsiteUP","Lesion site sampled",value = UPdatavalueSample()$LESION_SITE_SAMPLED), 
+        #textInput("LesionsiteUP","Lesion site sampled",value = UPdatavalueSample()$LESION_SITE_SAMPLED), 
         textInput("samplsupportUP","Type of sample support",value = UPdatavalueSample()$TYPE_OF_SAMPLE_SUPPORT_), 
         textInput("sammethUP","Sampling Method",value = UPdatavalueSample()$SAMPLING_METHOD), 
         textInput("directexamUP","Direct examination result",value = UPdatavalueSample()$DIRECT_EXAMINATION),
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR), 
         dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$LESION_AGE) ,
 
-        numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
-        numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
-        numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$DIAMETRE) , 
+        numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETREMax) , 
+        numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETREMin) , 
+        numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$HIGHT) , 
         
         textInput("locallesionUP","Lesion localisation*",value = UPdatavalueSample()$LOCALISATION) , 
         textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$LESION_AGE ),
@@ -3429,14 +3465,14 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$okDUPsample,{
     querySamplepfe <- sprintf("
-                              UPDATE sample SET LESION_SITE_SAMPLED='%s' ,SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
+                              UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
                               DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', LESION_AGE='%s', 
                               DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',
                               LOCALISATION='%s', DATE_EXTRACTION='%s',DESCRIPTION='%s' where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s%s",
-                              paste(as.character(input$LesionsiteUP)),paste(as.character(input$sammethUP)),paste(as.character(input$samplsupportUP)),
-                              paste(as.character(input$directexamUP)) ,paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),
-                              paste(as.character(input$diamlesionMaxUP)),paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),
-                              paste(as.character(input$locallesionUP)) ,paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
+                              paste(as.character(input$sammethUP)),paste(as.character(input$samplsupportUP)),paste(as.character(input$directexamUP)) ,
+                              paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),paste(as.character(input$diamlesionMaxUP)),
+                              paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),paste(as.character(input$locallesionUP)) ,
+                              paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
                               paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample),collapse = ", " ),paste("'",collapse = " ,"))
     sqlExecute(connect,query = querySamplepfe )
     info("Sample successfully Updated")
@@ -3452,8 +3488,8 @@ shinyServer(function(input, output,session) {
   dataModalUDiagnosis <- function(failed = FALSE) {
     modalDialog(
       
-      column("", selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from diognosis where ID_SAMPLE=(SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s')",paste(input$PatIdentifier) )))[,1])))),width = 3),
-      column("",selectInput("testupdiag","Molecular est",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from diognosis where ID_SAMPLE=(SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s')",paste(input$PatIdentifier)  )))[,1])))),width = 3),
+      column("", selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier) )))[,1])))),width = 3),
+      column("",selectInput("testupdiag","Molecular est",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from molecularl_test")))[,1])))),width = 3),
       column("",selectInput("labupDiag","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory " )))[,1])))),width = 3),
       
       uiOutput("testdiagFFFFFF"),
@@ -3469,8 +3505,21 @@ shinyServer(function(input, output,session) {
   })
   
   UPdatavalueDiagnosis=reactive({
-    dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
-    dddddddDiag
+    
+    if(toString(input$testupdiag)=="N/A" && toString(input$labupDiag)=="N/A"){
+      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
+      dddddddDiag
+    }else if(toString(input$labupDiag)=="N/A"){
+      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
+      dddddddDiag
+    }else if(toString(input$testupdiag)=="N/A"){
+      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
+      dddddddDiag
+    }else{
+      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
+      dddddddDiag
+    }
+    
   })
   output$testdiagFFFFFF=renderUI({
     box(width = 12,
