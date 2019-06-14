@@ -933,7 +933,7 @@ shinyServer(function(input, output,session) {
   
   observeEvent( input$gotofirst, {
     output$firsttimeID=renderUI({
-      textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'XXXNNN******')
+      textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
     })
     output$patdataout=renderUI ({
       
@@ -976,7 +976,7 @@ shinyServer(function(input, output,session) {
       })
       div(
         
-        id="formPat1",
+        id="formInsertPatient",
         #SELECT  FROM `patient` WHERE `LOGINUSER`="maaoui" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;
         #datpat=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER from dbpfedev.patient  WHERE `LOGINUSER`="%s" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;",paste(USER$name)))
         
@@ -1028,18 +1028,18 @@ shinyServer(function(input, output,session) {
     )
     
     
-    datatrav=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
     
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$idPatient,"-",length(datatrav[,1])+1)) ,"', '",input$regvisitPA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
+      VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisitPA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
     
     validate(
       need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : row already exists")
     )
     
     info("Patient successfully stored")
-    shinyjs::reset("formPat1")
+    shinyjs::reset("formInsertPatient")
     
     output$firsttimeID=renderUI({
       textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
@@ -1098,9 +1098,9 @@ shinyServer(function(input, output,session) {
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 3),
               column("",textInput("otherdescriptionlesion","If other please specify") , width = 3)
         ),
-        actionButton("subSampleQ","Submit and Quit"),
+        actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("subballiq","Enter Alliquot data"),
-        actionButton("otherSampleAdd"," Submit and add other samples"),
+        actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("editsample","Edit"),
         actionButton("cansAddinfo","Cancel")
       )
@@ -1123,7 +1123,7 @@ shinyServer(function(input, output,session) {
       
       div(
         
-        id="formtravel",
+        id="formInsertTR",
         
         box(width = 12, status = "info",solidHeader = TRUE,
             #column("",selectInput("regvisit","City",choices =c("",as.character(datareg()[,1]))), width = 3),
@@ -1411,7 +1411,7 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$otherregionAdd, {
     
-    datatrav=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
     #validate(need( input$datedatevisit < input$dateleavevisit  ,"Incorrect dates"))
     #validate(need(as.character(input$dateleavevisit) !="","Incorrect dates"))
     if((!as.character(input$datedatevisit) <= Sys.Date()) && (as.character(input$datedatevisit) !=""))
@@ -1420,7 +1420,7 @@ shinyServer(function(input, output,session) {
     validate(need(as.character(input$datedatevisit) !="","Incorrect dates"))
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(datatrav[,1])+1)) ,"', '",input$regvisit ,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit ,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
     
     
@@ -1430,12 +1430,12 @@ shinyServer(function(input, output,session) {
     
     
     info(" successfully added")
-    shinyjs::reset("formtravel")
+    shinyjs::reset("formInsertTR")
   })
   
   observeEvent(input$subregionQ, {
     
-    datatrav=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
     #validate(need(as.character(input$dateleavevisit) !="","Incorrect dates"))
     if((!as.character(input$datedatevisit) <= Sys.Date()) && (as.character(input$datedatevisit) !=""))
     {info("Incorrect dates")}
@@ -1444,14 +1444,14 @@ shinyServer(function(input, output,session) {
     
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER`, `PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(datatrav[,1])+1)) ,"','",input$regvisit ,"', '",paste0(USER$name),"','",toString( input$PatIdentifier ) ,"', '",as.character( input$datedatevisit ) ,"', '",as.character( input$dateleavevisit ) ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"','",input$regvisit ,"', '",paste0(USER$name),"','",toString( input$PatIdentifier ) ,"', '",as.character( input$datedatevisit ) ,"', '",as.character( input$dateleavevisit ) ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
     
     validate(
       need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : Row already exists")
     )
     info(" successfully added")
-    #shinyjs::reset("formtravel")
+    #shinyjs::reset("formInsertTR")
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("datt"),
@@ -1478,10 +1478,10 @@ shinyServer(function(input, output,session) {
   
   
   
-  observeEvent(input$subSampleQ, {
+  observeEvent(input$btnAddSampleAndQuit, {
     
     #
-    datasample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
+    querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
     
     validate(
       need(input$diamlesionMax>=-1, "Error : Missing values")
@@ -1492,15 +1492,13 @@ shinyServer(function(input, output,session) {
     validate(
       need(input$highlesion>=-1, "Error : Missing values")
     )
-    #############################################################""
-    ###########################################################""
-    ############################################################""
-    datasample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
-    querysampleinpfe <- paste0(
+    
+    querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
+    queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('", paste0(paste0(input$PatIdentifier,"-",length(datasample[,1])+1)) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+      VALUES ('", paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
     validate(
-      need(try(     sqlExecute(connect,query = querysampleinpfe)), "Error : Row already exists")
+      need(try(     sqlExecute(connect,query = queryInsertSample)), "Error : Row already exists")
     )
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
     
@@ -1524,15 +1522,15 @@ shinyServer(function(input, output,session) {
     })
     output$AdddRegion=renderUI({
     })
-    alert(paste0(paste0(input$PatIdentifier,"-",length(datasample[,1])+1)))
+    alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
     
   })
   
-  observeEvent(input$otherSampleAdd, {
+  observeEvent(input$btnAddSampleAndOther, {
     
     
     
-    datasample=sqlQuery(connect,paste("SELECT * from dbpfedev.sample "))
+    querySelectDataSample=sqlQuery(connect,paste("SELECT * from dbpfedev.sample "))
     
     validate(
       need(input$diamlesionMax>=-1, "Error : Missing values")
@@ -1544,18 +1542,18 @@ shinyServer(function(input, output,session) {
       need(input$highlesion>=-1, "Error : Missing values")
     )
     
-    querysampleinpfe <- paste0(
+    queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(datasample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
+      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
     
     validate(
-      need(try(     sqlExecute(connect,query = querysampleinpfe)), "Error : Row already exists")
+      need(try(     sqlExecute(connect,query = queryInsertSample)), "Error : Row already exists")
     )
     info("Sample successfully added")
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
     
     #
-    alert(paste0("Sample Added",length(datasample[,1])+1))
+    alert(paste0("Sample Added",length(querySelectDataSample[,1])+1))
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
@@ -1564,7 +1562,7 @@ shinyServer(function(input, output,session) {
       
       output$patdataout=renderUI ({
       })
-      alert(paste0(paste0(input$PatIdentifier,"-",length(datasample[,1])+1)))
+      alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
       
       
       
@@ -1593,9 +1591,9 @@ shinyServer(function(input, output,session) {
               column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular","Other","N/A"),multiple=TRUE) , width = 3),
               column("",textInput("otherdescriptionlesion","If other please specify") , width = 3)
         ),
-        actionButton("subSampleQ","Submit and Quit"),
+        actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("subballiq","Enter Alliquot data"),
-        actionButton("otherSampleAdd"," Submit and add other samples"),
+        actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("editsample","Edit"),
         actionButton("cansAddinfo","Cancel")
       )
@@ -1841,7 +1839,7 @@ shinyServer(function(input, output,session) {
       
       if (USER$Logged == TRUE) {
         div(
-          id="formAlliquote",
+          id="formAddAlliquote",
           box(width = 12, status = "info",solidHeader = TRUE,
               column("",selectInput("sampleIDD","Sample",
                                     
@@ -1872,7 +1870,7 @@ shinyServer(function(input, output,session) {
   #      need(try(       sqlExecute(connect,query = queryall)), "Error : Missing values or User already exists")
   #    )
   #    info("Alliquot successfully stored")
-  #    shinyjs::reset("formAlliquote")
+  #    shinyjs::reset("formAddAlliquote")
   #  })
   
   observeEvent(input$suballiquotQ, {
@@ -1884,7 +1882,7 @@ shinyServer(function(input, output,session) {
       need(try(       sqlExecute(connect,query = queryall)), "Error : Row already exists")
     )
     info("Alliquot successfully stored")
-    shinyjs::reset("formAlliquote")
+    shinyjs::reset("formAddAlliquote")
   })
   
   observeEvent(input$cansAddalliquot, {
@@ -1899,11 +1897,11 @@ shinyServer(function(input, output,session) {
       
       output$patdataout=renderUI ({
       })
-      alert(paste0(paste0(input$PatIdentifier,"-",length(datasample[,1])+1)))
+      alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
       
       div(
         
-        id="formSample2",
+        id="formAddSample",
         
         box( width = 12, status = "info",solidHeader = TRUE,
               #column("",selectInput("Lesionsite","Lesion site sampled",choices = c("","Face", "Upper limbs","Lower limbs","Trunc","Other","N/A"),multiple = TRUE), width = 3 ),
@@ -1925,9 +1923,9 @@ shinyServer(function(input, output,session) {
                column("",selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) , width = 3),
               column("",textInput("otherdescriptionlesion","If other please specify") , width = 3)
         ),
-        actionButton("subSampleQ","Submit and Quit"),
+        actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("subballiq","Enter Alliquot data"),
-        actionButton("otherSampleAdd"," Submit and add other samples"),
+        actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("editsample","Edit"),
         actionButton("cansAddinfo","Cancel")
       )
@@ -3249,12 +3247,12 @@ shinyServer(function(input, output,session) {
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$DATE_MED))
                   )),
       
-      uiOutput("testCheckFFFFFF"),
+      uiOutput("formUpdateMedicalcheckup"),
       
       
       footer = tagList(
         modalButton("Cancel"),
-        actionButton("okCheck", "OK")
+        actionButton("btnUpdateMedicalcheckup", "OK")
       )
     )
   }
@@ -3263,10 +3261,9 @@ shinyServer(function(input, output,session) {
   })
   
   UPdatavalueCheck=reactive({
-    dddddddC=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
-    dddddddC
+    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
   })
-  output$testCheckFFFFFF=renderUI({
+  output$formUpdateMedicalcheckup=renderUI({
     box(
       textInput("interrIDUP","Interrogator ID",value = UPdatavalueCheck()$ID_INTERROGATOR), 
       textInput("hospitalUP","Hospital",value = UPdatavalueCheck()$HOSPITAL),
@@ -3288,7 +3285,7 @@ shinyServer(function(input, output,session) {
   # button update CheckUp                                                #
   ########################################################################
   
-  observeEvent(input$okCheck,{
+  observeEvent(input$btnUpdateMedicalcheckup,{
     
     validate(
       need(input$Lesion_NumberUP>= -1, info("Error : Missing values"))
