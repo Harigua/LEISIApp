@@ -42,10 +42,10 @@ mydashboardHeader <- function(..., title = NULL, disable = FALSE,title.navbar=NU
 shinyUI(
   dashboardPage(skin = "black",
                 
-                title="Leisionia",
+                title="Lesionia",
                 
                 
-                mydashboardHeader(title= "Leisionia", tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;") ),
+                mydashboardHeader(title= "Lesionia", tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;") ),
                 
                 
                 
