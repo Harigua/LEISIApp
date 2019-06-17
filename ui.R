@@ -40,12 +40,24 @@ mydashboardHeader <- function(..., title = NULL, disable = FALSE,title.navbar=NU
 }
 
 shinyUI(
-  dashboardPage(skin = "black",
-                
+  dashboardPage(
+                skin = "black",
                 title="Lesionia",
                 
                 
-                mydashboardHeader(title= "Lesionia", tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;") ),
+                mydashboardHeader(
+                      title= "Lesionia",
+                      
+                      tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;"), 
+                      
+                      tags$li(
+                        class = "dropdown",
+                        actionLink("selecthome2","Home page"
+                                   #,icon = icon("list-alt")
+                        )
+                      )
+                      
+                      ),
                 
                 
                 
@@ -87,6 +99,8 @@ shinyUI(
                              menuSubItem("Analyse Data",tabName = "AnD")),
                     menuItem(h4("Professionals recommand"),tabName = "doc",
                              menuSubItem("upload publication",tabName = "UP"))
+                    
+                    , disable = FALSE
                     
                     
                   )),
@@ -131,9 +145,10 @@ shinyUI(
                     tabItem(tabName = "VD",
                             
                             
-                            column("", uiOutput("visualisation"),style="margin:5px 400px 5px 5px",width = 12),
-                            column("",uiOutput("appkey2"),style="margin:5px 50px 100px 1065px",width = 6)
-                            
+                            column("", uiOutput("visualisation"),style="margin:5px 400px 5px 5px",width = 12)
+                            # ,
+                            # column("",uiOutput("appkey2"),style="margin:5px 50px 100px 1065px",width = 6)
+                            # 
                             
                             
                             
@@ -145,8 +160,9 @@ shinyUI(
                             
                             
                             fluidRow (
-                              uiOutput("Managementall",style="margin:5px 400px 5px 5px",width = 12),
-                              uiOutput("appkey5",style="margin:5px 50px 100px 1065px",width = 6)
+                              uiOutput("Managementall",style="margin:5px 400px 5px 5px",width = 12)
+                               ,
+                               uiOutput("appkey5",style="margin:5px 50px 100px 1065px",width = 6)
                             )
                     ),
                     
@@ -176,17 +192,20 @@ shinyUI(
                     ),
                     
                     tabItem("OTD",
-                            column("",uiOutput("Patient"),style="margin:50px 400px 5px 105px",width = 12),
-                            column("",uiOutput("appkey"),style="margin:390px 400px 5px 105px",width = 12)
+                            column("",uiOutput("Patient"),style="margin:50px 400px 5px 105px",width = 12)
+                            # ,
+                            # column("",uiOutput("appkey"),style="margin:390px 400px 5px 105px",width = 12)
                             
                             
                     ),
                     tabItem("AnD",
-                            column("", uiOutput("DataAnalysis"),style="margin:5px 400px 5px 5px",width = 12),
-                            column("",uiOutput("appkey3"),style="margin:5px 50px 5px 1065px",width = 6)
+                            column("", uiOutput("DataAnalysis"),style="margin:5px 400px 5px 5px",width = 12)
+                            # ,
+                            # column("",uiOutput("appkey3"),style="margin:5px 50px 5px 1065px",width = 6)
                             
                             
-                    ),
+                    )
+                    ,
                     
                     
                     tabItem("UP",
