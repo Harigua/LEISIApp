@@ -143,7 +143,7 @@ shinyServer(function(input, output,session) {
   })
   
   
-  
+ 
   
   
   output$sum= renderPrint ({
@@ -996,7 +996,8 @@ shinyServer(function(input, output,session) {
             
             
             box(width = 12, status = "info",solidHeader = TRUE,
-                column("",selectInput("regvisitPA","City of Residency (The last 6 months)",choices = c('',cities[,3])), width = 3),
+                column("",selectInput("countryState_PA","Country and state of Residency (The last 6 months)*",choices = c('',cities[,3])), width = 3),
+                column("",textInput("city_PA","City"), width = 3),
                 column("",selectInput("TypePA","Urban/Rural",choices =  c("", "Urban","Rural","N/A")), width = 3),
                 
                 #column("",selectInput("resedent","Residency ",choices =  c("", "Yes","No","N/A")), width = 3),
@@ -1034,7 +1035,7 @@ shinyServer(function(input, output,session) {
     
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisitPA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
+      VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$countryState_PA,", ",input$city_PA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
     
     validate(
       need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : row already exists")
@@ -1129,7 +1130,8 @@ shinyServer(function(input, output,session) {
         
         box(width = 12, status = "info",solidHeader = TRUE,
             #column("",selectInput("regvisit","City",choices =c("",as.character(datareg()[,1]))), width = 3),
-            column("", textInput("regvisit","City",placeholder = 'Country, State, City'), width = 3),
+            column("",selectInput("regvisit","Country and state",choices = c('',cities[,3])), width = 3),
+            column("",textInput("regvisitc","City"), width = 3),
             column("",selectInput("Type","Urban/Rural",choices =  c("", "Urban","Rural","N/A")), width = 3),
             column("",selectInput("resedent","Residency ",choices =  c("", "Yes","No","N/A")), width = 3),
             
@@ -1422,7 +1424,7 @@ shinyServer(function(input, output,session) {
     validate(need(as.character(input$datedatevisit) !="","Incorrect dates"))
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit ,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",toString(input$regvisit,", ",input$regvisitc),"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
     
     
@@ -1446,7 +1448,7 @@ shinyServer(function(input, output,session) {
     
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER`, `PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"','",input$regvisit ,"', '",paste0(USER$name),"','",toString( input$PatIdentifier ) ,"', '",as.character( input$datedatevisit ) ,"', '",as.character( input$dateleavevisit ) ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"','",toString(input$regvisit,", ",input$regvisitc) ,"', '",paste0(USER$name),"','",toString( input$PatIdentifier ) ,"', '",as.character( input$datedatevisit ) ,"', '",as.character( input$dateleavevisit ) ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
     
     validate(
