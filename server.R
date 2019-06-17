@@ -2,6 +2,10 @@
 library(readr)
 
 world <- read_delim("www/country_list.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
+cities <- read_delim("www/worldcities.csv",  ",", escape_double = FALSE, trim_ws = TRUE)[,c('iso2','city','city')]
+for(i in 1:nrow(cities)){
+  cities[i,3] <-  paste(cities[i,1],cities[i,2], sep = ", ")
+}
 choice <- read_delim("www/choice.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 #library(mailR)
 library(Hmisc)
@@ -750,7 +754,7 @@ shinyServer(function(input, output,session) {
                    id="formAddLab",
                    fluidRow(
                      column("",textInput("nameLab","Laboratory*",""),width=3),
-                     column("",selectInput("countryLab","Country*",choices = c("",world[-1,1])),width=3)
+                     column("",selectInput("countryLab","Country*",choices = c("",world[,1])),width=3)
                    ),
                    actionButton("btnInsertLab", "Submit",  class = "btn-primary"),
                    actionButton("editlab", "Edit",  class = "btn-primary")
@@ -992,7 +996,7 @@ shinyServer(function(input, output,session) {
             
             
             box(width = 12, status = "info",solidHeader = TRUE,
-                column("", textInput("regvisitPA","City of Residency (The last 6 months)",placeholder = 'Country, State, City'), width = 3),
+                column("",selectInput("regvisitPA","City of Residency (The last 6 months)",choices = c('',cities[,3])), width = 3),
                 column("",selectInput("TypePA","Urban/Rural",choices =  c("", "Urban","Rural","N/A")), width = 3),
                 
                 #column("",selectInput("resedent","Residency ",choices =  c("", "Yes","No","N/A")), width = 3),
