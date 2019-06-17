@@ -1295,10 +1295,12 @@ shinyServer(function(input, output,session) {
     #
     datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
     
-    validate(
-      need(input$Lesion_Number>= -1, info("Error : Missing values"))
-    )
-    if(input$Lesion_Number>= -1){
+    # validate(
+    #   need(input$Lesion_Number>= -1, info("Error : Missing values"))
+    # )
+    
+    # if(input$Lesion_Number< (-1)){info("ERROR : Missing values") }
+    
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$Hhost) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','NULL') ")
@@ -1309,7 +1311,6 @@ shinyServer(function(input, output,session) {
     
     info("Medical checkUp successfully added")
     shinyjs::reset("formCh")
-    }else{ info("ERROR : Missing values")}
     
   })
   
@@ -1318,19 +1319,28 @@ shinyServer(function(input, output,session) {
     #
     datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
     
-    validate(
-      need(input$Lesion_Number>= -1, "Error : Missing values")
-    )
+    # validate(
+    #   need(input$Lesion_Number>= -1, "Error : Missing values")
+    # )
 
-        querycheckinpfe <- paste0(
-      "INSERT INTO  medical_checkup
+   
+    # validate(
+    #   need(try(   sqlExecute(connect,query = querycheckinpfe) ), info("Error : Row already exists"))
+    # )
+    
+   # info("Medical checkUp successfully added")
+   # if(input$Lesion_Number< (-1)){info("ERROR : Missing values") }
+    
+      querycheckinpfe <- paste0(
+        "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otheClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',NULL) ") 
-    
-    validate(
-      need(try(   sqlExecute(connect,query = querycheckinpfe) ), info("Error : Row already exists"))
-    )
-    
-    info("Medical checkUp successfully added")
+      
+      # validate(
+      #   need(try(  sqlExecute(connect,query = querycheckinpfe)  ), info("Error : Row already exists"))
+      # )
+      
+      info("Medical checkUp successfully added")
+     
     
     output$patdataout=renderUI ({
       div(
@@ -1425,7 +1435,7 @@ shinyServer(function(input, output,session) {
     validate(need(as.character(input$datedatevisit) !="","Incorrect dates"))
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",toString(input$regvisit,", ",input$regvisitc),"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit,", ",input$regvisitc,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
     
     
