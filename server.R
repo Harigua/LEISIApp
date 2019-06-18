@@ -1954,7 +1954,10 @@ shinyServer(function(input, output,session) {
     querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from dbpfedev.alliquot"))
     queryInsertAlliquot= paste0("INSERT INTO alliquot
                      VALUES ('", toString(paste0(input$sampleIDD,"-",length(querySelectDataAlliquot)+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
-    if(is.na(input$voll)){
+    input$sampleIDD
+    if(input$sampleIDD==""){
+      info("Error : Missing value Sample id")
+    }else if(is.na(input$voll)){
       info("Error : Missing value Quantity")
     }else if(input$voll<(-1)){
       info("Error : Wrong value Quantity")
