@@ -896,6 +896,7 @@ shinyServer(function(input, output,session) {
   
   observe({
     if (is.null(input$idInterrogator) || input$idInterrogator ==0 || input$idInterrogator < 0 ) {
+      #info(text = "ERROR : Please enter a valid interrogator id")
       shinyjs::disable("submitID")
     } else {
       shinyjs::enable("submitID")
@@ -1020,28 +1021,34 @@ shinyServer(function(input, output,session) {
     queryIpfe <- paste0(
       "INSERT INTO patient
       VALUES ('",toString(input$idPatient)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','','','",toString( input$datenaissp) ,"','",if(toString( input$nationalp)=="other"){toString( toupper(input$othernationalp))}else{toString( input$nationalp)} ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','') ")
-    validate(
-      need(input$idPatient!="PPPLL****"  , "Error : Missing values")
-    )
-    validate(
-      need(input$idPatient!=""  , "Error : Missing values")
-    )
-    validate(
-      need(try( sqlExecute(connect,query = queryIpfe)  ), "Error : Row already exists")
-    )
     
-    
-    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
-    
-    querytravinpfe <- paste0(
-      "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
+    if (input$idPatient=="" || input$idPatient=="PPPLL****"){
+      info("Error : Missing data Patient DB Id")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, queryIpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Patient already exists")
+      }else{
+        querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+        
+        querytravinpfe <- paste0(
+          "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
       VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$countryState_PA,", ",input$city_PA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
-    
-    validate(
-      need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : row already exists")
-    )
-    
-    info("Patient successfully stored")
+        
+        tryCatch( {sqlExecute(connect, querytravinpfe)}
+                  , error = function(e) {an.error.occured <<- TRUE}
+        )
+        if(an.error.occured){
+          info("Error : INSERT INTO  travel_residency from patient")
+        }
+        
+        info("Patient successfully stored")
+      }
+    }
+
     shinyjs::reset("formInsertPatient")
     
     output$firsttimeID=renderUI({
@@ -1130,14 +1137,14 @@ shinyServer(function(input, output,session) {
         
         box(width = 12, status = "info",solidHeader = TRUE,
             #column("",selectInput("regvisit","City",choices =c("",as.character(datareg()[,1]))), width = 3),
-            column("",selectInput("regvisit","Country and state",choices = c('',cities[,3])), width = 3),
+            column("",selectInput("regvisit","Country and state*",choices = c('',cities[,3])), width = 3),
             column("",textInput("regvisitc","City"), width = 3),
             column("",selectInput("Type","Urban/Rural",choices =  c("", "Urban","Rural","N/A")), width = 3),
             column("",selectInput("resedent","Residency ",choices =  c("", "Yes","No","N/A")), width = 3),
             
             column("",selectInput("bybyte","Bite Notion",choices =  c("", "Yes","No","N/A")), width = 3),
-            column("",dateInput("datedatevisit","Visit Date",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE), width = 3) ,
-            column("",textInput("dateleavevisit","Duration (In week)",""), width = 3)
+            column("",dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE), width = 3) ,
+            column("",textInput("dateleavevisit","Duration (In weeks)*",""), width = 3)
             
         ),
         actionButton("subregionQ","Submit and Quit"),
@@ -1292,54 +1299,53 @@ shinyServer(function(input, output,session) {
   })
   
   observeEvent(input$othercheckAdd, {
-    #
+    
     datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
-    
-    # validate(
-    #   need(input$Lesion_Number>= -1, info("Error : Missing values"))
-    # )
-    
-    # if(input$Lesion_Number< (-1)){info("ERROR : Missing values") }
-    
+
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$Hhost) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','NULL') ")
     
-    # validate(
-    #   need(try(  sqlExecute(connect,query = querycheckinpfe)  ), info("Error : Row already exists"))
-    # )
+    if(is.na(input$Lesion_Number)){
+      info("Error : Missing value Number of Lesions")
+    }else if(input$Lesion_Number<(-1)){
+      info("Error : Wrong value Number of Lesions")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,  querycheckinpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  Medical checkUp")
+      }else{info("Medical checkUp successfully added")}
+    }
     
-    info("Medical checkUp successfully added")
     shinyjs::reset("formCh")
     
   })
   
   
   observeEvent(input$subchekupQ, {
-    #
+  
     datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
-    
-    # validate(
-    #   need(input$Lesion_Number>= -1, "Error : Missing values")
-    # )
 
-   
-    # validate(
-    #   need(try(   sqlExecute(connect,query = querycheckinpfe) ), info("Error : Row already exists"))
-    # )
-    
-   # info("Medical checkUp successfully added")
-   # if(input$Lesion_Number< (-1)){info("ERROR : Missing values") }
-    
       querycheckinpfe <- paste0(
         "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otheClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',NULL) ") 
       
-      # validate(
-      #   need(try(  sqlExecute(connect,query = querycheckinpfe)  ), info("Error : Row already exists"))
-      # )
-      
-      info("Medical checkUp successfully added")
+      if(is.na(input$Lesion_Number)){
+        info("Error : Missing value Number of Lesions")
+      }else if(input$Lesion_Number<(-1)){
+        info("Error : Wrong value Number of Lesions")
+      }else{
+        an.error.occured <- FALSE
+        tryCatch( {sqlExecute(connect,  querycheckinpfe)}
+                  , error = function(e) {an.error.occured <<- TRUE}
+        )
+        if(an.error.occured){
+          info("Error : INSERT INTO  Medical checkUp")
+        }else{info("Medical checkUp successfully added")}
+      }
      
     
     output$patdataout=renderUI ({
@@ -1368,36 +1374,53 @@ shinyServer(function(input, output,session) {
   observeEvent(input$otheryreatmentAdd, {
     
     ############
-    validate( need(input$injectionnumber>=-1, info("Error : Missing values")) )
     datamytreatment2=sqlQuery(connect,paste("SELECT * from dbpfedev.treatmenthistory"))
     
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
       VALUES ( '", toString(paste0("Treatment",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
     
-    validate(
-      need(try(   sqlExecute(connect,query = querytreatpfe) ), "Error : row already exists")
-    )
-    info("Treatment successfully stored")
+    if(is.na(input$injectionnumber)){
+      info("Error : Missing value Injection number")
+    }else if(input$injectionnumber<(-1)){
+      info("Error : Wrong value Injection number")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,querytreatpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  treatmenthistory")
+      }else{info("Treatment successfully stored")}
+    }
+
     shinyjs::reset("formInsertTreatment")
   })
   
   observeEvent(input$subtreatmentQ, {
     
     ############
-    validate(
-      need(input$injectionnumber>=-1, "Error : Missing values")
-    )
+
     treatmenthistory=sqlQuery(connect,paste("SELECT * from dbpfedev.treatmenthistory"))
     
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
       VALUES ( '", toString(paste0("Treatment",length(treatmenthistory[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
     
-    validate(
-      need(try(   sqlExecute(connect,query = querytreatpfe)), "Error : Row already exists")
-    )
-    info("Treatment successfully stored")
+    if(is.na(input$injectionnumber)){
+      info("Error : Missing value Injection number")
+    }else if(input$injectionnumber<(-1)){
+      info("Error : Wrong value Injection number")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,querytreatpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  treatmenthistory")
+      }else{info("Treatment successfully stored")}
+    }
+    
     shinyjs::reset("formInsertTreatment")
     ################
     
@@ -1427,45 +1450,54 @@ shinyServer(function(input, output,session) {
   observeEvent(input$otherregionAdd, {
     
     querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
-    #validate(need( input$datedatevisit < input$dateleavevisit  ,"Incorrect dates"))
-    #validate(need(as.character(input$dateleavevisit) !="","Incorrect dates"))
-    if((!as.character(input$datedatevisit) <= Sys.Date()) && (as.character(input$datedatevisit) !=""))
-    {info("Incorrect dates")}
-    validate(need(as.character(input$datedatevisit) <= Sys.Date(),"Incorrect dates"))
-    validate(need(as.character(input$datedatevisit) !="","Incorrect dates"))
+        
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
       VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit,", ",input$regvisitc,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
-    
-    
-    validate(
-      need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : Row already exists")
-    )
-    
-    
-    info(" successfully added")
+    if( as.character(input$regvisit) ==""){
+      info("Error : Missing value Country and state")
+    }else if( !(as.character(input$datedatevisit) <= Sys.Date() && as.character(input$datedatevisit) !="")){
+      info("Error : Incorrect date Visit Date")
+    }else if( input$dateleavevisit < -1 || input$dateleavevisit == ""){
+      info("Error : Incorrect value duration")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, querytravinpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  travel_residency")
+      }else{info(" successfully added")}
+    }
+  
     shinyjs::reset("formInsertT_R")
   })
   
   observeEvent(input$subregionQ, {
     
     querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
-    #validate(need(as.character(input$dateleavevisit) !="","Incorrect dates"))
-    if((!as.character(input$datedatevisit) <= Sys.Date()) && (as.character(input$datedatevisit) !=""))
-    {info("Incorrect dates")}
-    validate(need(as.character(input$datedatevisit) <= Sys.Date(),"Incorrect dates"))
-    validate(need(as.character(input$datedatevisit) !="","Incorrect dates"))
-    
+
     querytravinpfe <- paste0(
-      "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER`, `PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"','",input$regvisit,", ",input$regvisitc ,"', '",paste0(USER$name),"','",toString( input$PatIdentifier ) ,"', '",as.character( input$datedatevisit ) ,"', '",as.character( input$dateleavevisit ) ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
+      "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit,", ",input$regvisitc,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
     
+    if( as.character(input$regvisit) ==""){
+      info("Error : Missing value Country and state")
+    }else if( !(as.character(input$datedatevisit) <= Sys.Date() && as.character(input$datedatevisit) !="")){
+      info("Error : Incorrect date Visit Date")
+    }else if( input$dateleavevisit < -1 || input$dateleavevisit == ""){
+      info("Error : Incorrect value duration")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, querytravinpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  travel_residency")
+      }else{info(" successfully added")}
+    }
     
-    validate(
-      need(try(    sqlExecute(connect,query = querytravinpfe)), "Error : Row already exists")
-    )
-    info(" successfully added")
     #shinyjs::reset("formInsertT_R")
     output$patdataout=renderUI ({
       div(
@@ -1495,26 +1527,38 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$btnAddSampleAndQuit, {
     
-    #
     querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
+    idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     
-    validate(
-      need(input$diamlesionMax>=-1, "Error : Missing values")
-    )
-    validate(
-      need(input$diamlesionMin>=-1, "Error : Missing values")
-    )
-    validate(
-      need(input$highlesion>=-1, "Error : Missing values")
-    )
-    
-    querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('", paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
-    validate(
-      need(try(     sqlExecute(connect,query = queryInsertSample)), "Error : Row already exists")
-    )
+      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+    
+    if(toString(input$locallesion)==""){
+      info("Error : Wrong value lesion Lesion location")
+    }else if(toString(input$extractDay)==""){
+      info("Error : Wrong value lesion Sampling date")
+    }else if(is.na(input$diamlesionMax)){
+      info("Error : Missing value lesion Diameter Maximal")
+    }else if(input$diamlesionMax<(-1)){
+      info("Error : Wrong value lesion Diameter Maximal")
+    }else if(is.na(input$diamlesionMin)){
+      info("Error : Missing value lesion Diameter Minimal")
+    }else if(input$diamlesionMin<(-1)){
+      info("Error : Wrong value lesion Diameter Minimal")
+    }else if(is.na(input$highlesion)){
+      info("Error : Missing value lesion Hight")
+    }else if(input$highlesion<(-1)){
+      info("Error : Wrong value lesion Hight")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryInsertSample)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  sample")
+      }else{info(paste0("Sample successfully stored ", idSample))}
+    }
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
     
     output$patdataout=renderUI ({
@@ -1537,38 +1581,46 @@ shinyServer(function(input, output,session) {
     })
     output$AdddRegion=renderUI({
     })
-    alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
+    #alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
     
   })
   
   observeEvent(input$btnAddSampleAndOther, {
-    
-    
-    
+ 
     querySelectDataSample=sqlQuery(connect,paste("SELECT * from dbpfedev.sample "))
-    
-    validate(
-      need(input$diamlesionMax>=-1, "Error : Missing values")
-    )
-    validate(
-      need(input$diamlesionMin>=-1, "Error : Missing values")
-    )
-    validate(
-      need(input$highlesion>=-1, "Error : Missing values")
-    )
-    
+    idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
       VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
     
-    validate(
-      need(try(     sqlExecute(connect,query = queryInsertSample)), "Error : Row already exists")
-    )
-    info("Sample successfully added")
+    if(input$locallesion==""){
+      info("Error : Wrong value lesion Lesion location")
+    }else if(input$extractDay==""){
+      info("Error : Wrong value lesion Sampling date")
+    }else if(is.na(input$diamlesionMax)){
+      info("Error : Missing value lesion Diameter Maximal")
+    }else if(input$diamlesionMax<(-1)){
+      info("Error : Wrong value lesion Diameter Maximal")
+    }else if(is.na(input$diamlesionMin)){
+      info("Error : Missing value lesion Diameter Minimal")
+    }else if(input$diamlesionMin<(-1)){
+      info("Error : Wrong value lesion Diameter Minimal")
+    }else if(is.na(input$highlesion)){
+      info("Error : Missing value lesion Hight")
+    }else if(input$highlesion<(-1)){
+      info("Error : Wrong value lesion Hight")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryInsertSample)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO  sample")
+      }else{info(paste0("Sample successfully stored",idSample))}
+    }
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
     
-    #
-    alert(paste0("Sample Added",length(querySelectDataSample[,1])+1))
+    #alert(paste0("Sample Added",length(querySelectDataSample[,1])+1))
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
@@ -1577,7 +1629,7 @@ shinyServer(function(input, output,session) {
       
       output$patdataout=renderUI ({
       })
-      alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
+      #alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
       
       
       
@@ -1625,23 +1677,25 @@ shinyServer(function(input, output,session) {
     queryAddInterrogator <- paste0(
       "INSERT INTO  interrogator
       VALUES ('", input$idInterrogator ,"', '",toString( USER$name ) ,"', '",toString( input$nameInterrogator ) ,"', '",toString(input$lastNameInterrogator) ,"','",toString( input$qualityInterrogator) ,"') ")
-    validate(
-      need(toString( input$idInterrogator)!="" , "Error : Missing data")
-    )
-    validate(
-      need(toString( input$nameInterrogator )!="" , "Error : Missing data")
-    )
-    validate(
-      need(toString(input$lastNameInterrogator)!="" , "Error : Missing data")
-    )
-    validate(
-      need( toString( input$qualityInterrogator)!="", "Error : Missing data")
-    )
 
-    validate(
-      need(try(       sqlExecute(connect,query = queryAddInterrogator)), "Error : Row already exists")
-    )
-    info("Interrogator successfully added")
+    if(toString(input$idInterrogator)==""){
+      info("Error : Missing data id interrogator")
+    }else if(toString(input$nameInterrogator) == ""){
+      info("Error : Missing data first name")
+    }else if(toString(input$lastNameInterrogator) == ""){
+      info("Error : Missing data last name")
+    }else if(toString(input$qualityInterrogator) == ""){
+      info("Error : Missing data quality")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryAddInterrogator)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO Interrogator")
+      }else{info("Interrogator successfully stored")}
+    }
+    
     updateSelectInput (session,"interrID",label="Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from dbpfedev.interrogator")))$ID_INTERROGATOR))))
     
     
@@ -1652,30 +1706,28 @@ shinyServer(function(input, output,session) {
     queryInsertDiognosis <- paste0(
       "INSERT INTO  diognosis
       VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
-    
-    validate(       
-      need(input$quantity!="", "You must choose a quantity")    
-    )    
-    validate(       
-      need(input$sample!="", "You must choose a sample from list")    
-    )    
-    validate(       
-      need(input$labname!="", "You must choose a laboratory name")    
-    )  
-    validate(       
-      need(input$chemtest!="", "You must choose a test")    
-    )  
-    validate(       
-      need(input$restest!="", "You must choose a result")    
-    )  
-    validate(       
-      need(input$susSpec!="", "You must choose a suspected specie")    
-    )
-    validate(
-      need(try(      sqlExecute(connect,query = queryInsertDiognosis)), "Error : Row already exists")
-    )
-    
-    info("Diagnosis successfully added")
+
+    if(toString(input$chemtest) == ""){
+      info("Error : Missing data test")
+    }else if(toString(input$labname)==""){
+      info("Error : Missing data laboratory name")
+    }else if(toString(input$sample)==""){
+      info("Error : Missing data sample")
+    }else if(toString(input$quantity)==""){
+      info("Error : Missing data quantity")
+    }else if(toString(input$restest) == ""){
+      info("Error : Missing data result")
+    }else if(toString(input$susSpec) == ""){
+      info("Error : Missing suspected specie")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryInsertDiognosis)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO Diagnosis ")
+      }else{info("Diagnosis successfully added")}
+    }
     shinyjs::reset("formInsertDiagnos")
   })
   
@@ -1683,17 +1735,24 @@ shinyServer(function(input, output,session) {
     queryInsertLab <- paste0(
       "INSERT INTO laboratory
       VALUES ('", toString( input$nameLab ) ,"', '",toString( USER$name ) ,"', '",toString( input$countryLab ) ,"') ")
+
+    if (input$nameLab==""){
+      info("Error : Missing data laboratory name")
+    }else if(input$countryLab==""){
+      info("Error : Missing data country")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, queryInsertLab)}
+                , error = function(e) {an.error.occured <<- TRUE}
+              )
+      if(an.error.occured){
+        info("Error : laboratory already exists")
+      }else{
+        info("laboratory successfully added")
+      }
+    }
     
-    validate(
-      need(input$nameLab!="", "Error : Missing data")
-    )
-    validate(
-      need(input$countryLab!="", "Error : Missing data")
-    )
-    validate(
-      need(try(       sqlExecute(connect, queryInsertLab)), "Error : Row already exists")
-    )
-    info("Laboratory successfully added" )
+    #
     shinyjs::reset("formAddLab")
     updateSelectInput(session,"labname","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory")))$LABORATORY_NAME))))
     
@@ -1866,7 +1925,7 @@ shinyServer(function(input, output,session) {
               column("",selectInput("val","Type",choices = c('','Azote','R80',"N/A")), width = 3),
               column("",selectInput("RakPFE","Container",choices = c('',1:4)), width = 3),
               column("",uiOutput("ttt"), width = 3),
-              column("",selectInput("","conserve",choices = c('',"Boite","N/A")), width = 3),
+              column("",selectInput("conserve","conserve",choices = c('',"Boite","N/A")), width = 3),
               column("",selectInput("Position","Position",choices = c('',1:100)), width = 12)
           ),
           actionButton("btnInsertAlliquot","Submit"),
@@ -1881,23 +1940,35 @@ shinyServer(function(input, output,session) {
   #    queryInsertAlliquot= paste0("INSERT INTO alliquot
   #                     VALUES ('", toString(paste0("Alliquot",length(querySelectDataAlliquot[,1])+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
   #    
-  #    validate(
-  #      need(try(       sqlExecute(connect,query = queryInsertAlliquot)), "Error : Missing values or User already exists")
-  #    )
-  #    info("Alliquot successfully stored")
+  # an.error.occured <- FALSE
+  # tryCatch( {sqlExecute(connect,queryInsertAlliquot)}
+  #           , error = function(e) {an.error.occured <<- TRUE}
+  # )
+  # if(an.error.occured){
+  #   info("Error : INSERT INTO alliquit ")
+  # }else{info("Alliquot successfully stored")}
   #    shinyjs::reset("FormInsertAlliquotAndQuit")
   #  })
   
   observeEvent(input$btnInsertAlliquot, {
     querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from dbpfedev.alliquot"))
     queryInsertAlliquot= paste0("INSERT INTO alliquot
-                     VALUES ('", toString(paste0(input$sampleIDD,length(querySelectDataAlliquot[,1])+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
-    
-    validate(
-      need(try(       sqlExecute(connect,query = queryInsertAlliquot)), "Error : Row already exists")
-    )
-    info("Alliquot successfully stored")
-    shinyjs::reset("FormInsertAlliquotAndQuit")
+                     VALUES ('", toString(paste0(input$sampleIDD,"-",length(querySelectDataAlliquot)+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
+    if(is.na(input$voll)){
+      info("Error : Missing value Quantity")
+    }else if(input$voll<(-1)){
+      info("Error : Wrong value Quantity")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryInsertAlliquot)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : INSERT INTO alliquit ")
+      }else{info("Alliquot successfully stored")}
+    }
+
+    #shinyjs::reset("FormInsertAlliquotAndQuit")
   })
   
   observeEvent(input$cansAddalliquot, {
