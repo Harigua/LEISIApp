@@ -3194,12 +3194,15 @@ shinyServer(function(input, output,session) {
     queryuseraddpfe <- paste0(
       "INSERT INTO  userdata
       VALUES ('",as.character( input$userLogin ) ,"','",toString( USER$name ) ,"', '",as.character( input$userpass) ,"', '",as.character( input$NivSec ) ,"', '",as.character( input$userIns ) ,"') ")
+
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, queryuseraddpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Insert USER")
+      }else{info("User successfully added")}
     
-    validate(
-      need(try(sqlExecute(connect,query = queryuseraddpfe)  ), "Error : row already exists")
-    )
-    
-    info("User successfully added")
     shinyjs::reset("formUser")
     observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )})
     observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )
@@ -3224,14 +3227,20 @@ shinyServer(function(input, output,session) {
   ##################################################################################################### 
   observeEvent(input$btnUpdateIdentifiedSpecies,{
     queryUpdateIdentifiedSpecies <- sprintf("UPDATE sample SET SPECIES='%s' WHERE ID_SAMPLE='%s'",paste(as.character(input$spece)),paste(as.character(input$upsample),collapse = ", " ))
-    validate(
-      need(input$upsample!="", "You must choose a sample from list")
-    )
-    validate(
-      need(input$spece!="", "You must specify specy from list")
-    )
-    sqlExecute(connect,query = queryUpdateIdentifiedSpecies)
-    info("Species successfully Updated")
+    
+    if(toString(input$upsample)==""){
+      info("You must choose a sample from list")
+    }else if(toString(input$spece)==""){
+      info("You must specify specy from list")
+    }else {
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryUpdateIdentifiedSpecies)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Updated species")
+      }else{info("Species successfully Updated ")}
+    }
     observe({updateSelectInput(session,"upsample","Choose Sample",choices = c("",as.character(dataech()[,1])))})
     
   })
