@@ -1339,7 +1339,7 @@ shinyServer(function(input, output,session) {
 
       querycheckinpfe <- paste0(
         "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otheClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',NULL) ") 
+      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',NULL) ") 
       
       if(is.na(input$Lesion_Number)){
         info("Error : Missing value Number of Lesions")
@@ -3545,11 +3545,6 @@ shinyServer(function(input, output,session) {
                            TODATE='",as.character(input$dateleavevisitUP),"',TYPE='",as.character(input$TypeUP),"', FROMDATE='",as.character(input$datedatevisitUP),"' where 
                            PATIENT_IDENTIFIER='",as.character(input$PatIdentifier),"' and FROMDATE='",as.character(input$DUPmvt),"' and IDMVT='",UPdatavalueMvt()$IDMVT,"'  ;" )
     
-    if(is.na(input$dateleavevisitUP)){
-      info("Error : Missing value duration ")
-    }else if(input$dateleavevisitUP<(-1)){
-      info("Error : Wrong value duration ")
-    }else{
       an.error.occured <- FALSE
       tryCatch( {sqlExecute(connect,querymvtpfe)}
                 , error = function(e) {an.error.occured <<- TRUE}
@@ -3557,7 +3552,7 @@ shinyServer(function(input, output,session) {
       if(an.error.occured){
         info("Error : Update Mouvement ")
       }else{info("Mouvement successfully Updated")}
-    }
+
 
     
     removeModal()
