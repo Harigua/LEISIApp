@@ -1035,8 +1035,8 @@ shinyServer(function(input, output,session) {
         querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
         
         querytravinpfe <- paste0(
-          "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
-      VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$countryState_PA,", ",input$city_PA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"') ")
+          "INSERT INTO travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`,`TODATE`)
+      VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$countryState_PA,", ",input$city_PA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"','-1') ")
         
         tryCatch( {sqlExecute(connect, querytravinpfe)}
                   , error = function(e) {an.error.occured <<- TRUE}
@@ -3194,12 +3194,15 @@ shinyServer(function(input, output,session) {
     queryuseraddpfe <- paste0(
       "INSERT INTO  userdata
       VALUES ('",as.character( input$userLogin ) ,"','",toString( USER$name ) ,"', '",as.character( input$userpass) ,"', '",as.character( input$NivSec ) ,"', '",as.character( input$userIns ) ,"') ")
+
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect, queryuseraddpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Insert USER")
+      }else{info("User successfully added")}
     
-    validate(
-      need(try(sqlExecute(connect,query = queryuseraddpfe)  ), "Error : row already exists")
-    )
-    
-    info("User successfully added")
     shinyjs::reset("formUser")
     observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )})
     observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )
@@ -3212,8 +3215,15 @@ shinyServer(function(input, output,session) {
   observeEvent(input$subusernewUp,{
     queryuserUPpfe <- sprintf("
                               UPDATE userdata SET MOTDPASS='%s',LEVELSECURE='%s',FROMINST='%s',USE_LOGINUSER='%s' WHERE LOGINUSER ='%s%s",paste(as.character(input$userpassF)),paste(as.character(input$NivSecF)),paste(as.character(input$userInsF)),paste(as.character(USER$name)),paste(as.character(input$userLoginF),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = queryuserUPpfe)
-    info("User successfully Updated")
+    
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect, queryuserUPpfe)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      info("Error : Update USER")
+    }else{info("User successfully Updated")}
+  
     observe({updateSelectInput(session,"userLoginF","",choices =  c(" ",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER)))  
       
     })
@@ -3224,14 +3234,20 @@ shinyServer(function(input, output,session) {
   ##################################################################################################### 
   observeEvent(input$btnUpdateIdentifiedSpecies,{
     queryUpdateIdentifiedSpecies <- sprintf("UPDATE sample SET SPECIES='%s' WHERE ID_SAMPLE='%s'",paste(as.character(input$spece)),paste(as.character(input$upsample),collapse = ", " ))
-    validate(
-      need(input$upsample!="", "You must choose a sample from list")
-    )
-    validate(
-      need(input$spece!="", "You must specify specy from list")
-    )
-    sqlExecute(connect,query = queryUpdateIdentifiedSpecies)
-    info("Species successfully Updated")
+    
+    if(toString(input$upsample)==""){
+      info("You must choose a sample from list")
+    }else if(toString(input$spece)==""){
+      info("You must specify specy from list")
+    }else {
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryUpdateIdentifiedSpecies)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Updated species")
+      }else{info("Species successfully Updated ")}
+    }
     observe({updateSelectInput(session,"upsample","Choose Sample",choices = c("",as.character(dataech()[,1])))})
     
   })
@@ -3321,8 +3337,15 @@ shinyServer(function(input, output,session) {
     queryUpdatePatient <- sprintf("
                                  UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s%s",
                                  paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = queryUpdatePatient)
-    info("Patient successfully Updated")
+    
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect, queryUpdatePatient)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      info("Error : Update patient ")
+    }else{info("Patient successfully Updated")}
+    
     removeModal()
     
   })
@@ -3355,7 +3378,7 @@ shinyServer(function(input, output,session) {
     querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
   })
   output$formUpdateMedicalcheckup=renderUI({
-    box(
+    box( 
       textInput("interrIDUP","Interrogator ID",value = UPdatavalueCheck()$ID_INTERROGATOR), 
       textInput("hospitalUP","Hospital",value = UPdatavalueCheck()$HOSPITAL),
       textInput("pysicienUP","Physician",value = UPdatavalueCheck()$PHYSICIAN ), 
@@ -3377,19 +3400,28 @@ shinyServer(function(input, output,session) {
   ########################################################################
   
   observeEvent(input$btnUpdateMedicalcheckup,{
+  
+    queryCheckUPpfe <- paste0("
+                               UPDATE medical_checkup SET ID_INTERROGATOR='",input$interrIDUP,"' ,HOSPITAL='",input$hospitalUP,"',PHYSICIAN='",input$pysicienUP,"',
+                               SAMPLER='",input$samplerUP,"',CLINICAL_STATE='",input$clinstateUP,"',POSSIBLE_HUMAN_HOSTS='",input$HhostRUP,"',
+                               LINK_HUMAN_HOSTS='",input$HhostLUP,"',ANIMAL_AROUND='",input$AhostUP,"' ,LESPOSSS ='",input$Lesion_SitesUP,"',
+                               LESNUM ='",input$Lesion_NumberUP,"',GENDESC='",input$General_DescriptionUP,"'
+                               where PATIENT_IDENTIFIER='",input$PatIdentifier,"' and DATE_MED='",input$DUPcheck,"' and ID_MED='",UPdatavalueCheck()$ID_MED,"' ;" )
     
-    validate(
-      need(input$Lesion_NumberUP>= -1, info("Error : Missing values"))
-    )
+    if(is.na(input$Lesion_NumberUP)){
+      info("Error : Wrong value lesion number")
+    }else if(input$Lesion_NumberUP<(-1)){
+      info("Error : Wrong value lesion number")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryCheckUPpfe )}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Update medical checkup")
+      }else{info("Medical Checkup successfully Updated")}
+    }
     
-    queryCheckUPpfe <- sprintf("
-                               UPDATE medical_checkup SET ID_INTERROGATOR='%s' ,HOSPITAL='%s',PHYSICIAN='%s',SAMPLER='%s',CLINICAL_STATE='%s',POSSIBLE_HUMAN_HOSTS='%s',LINK_HUMAN_HOSTS='%s',ANIMAL_AROUND='%s' ,LESPOSSS ='%s',LESNUM ='%s',GENDESC='%s'where PATIENT_IDENTIFIER='%s' and DATE_MED='%s%s",
-                               paste(as.character(input$interrIDUP)),paste(as.character(input$hospitalUP)),paste(as.character(input$pysicienUP)),
-                               paste(as.character(input$samplerUP)) ,paste(as.character(input$clinstateUP)),paste(as.character(input$HhostRUP)),
-                               paste(as.character(input$HhostLUP)),paste(as.character(input$AhostUP)) , toString(input$Lesion_SitesUP) ,paste(input$Lesion_NumberUP)  ,paste(as.character(input$General_DescriptionUP)),
-                               paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPcheck),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = queryCheckUPpfe )
-    info("CheckUp successfully Updated")
     removeModal()
   })
   
@@ -3408,7 +3440,7 @@ shinyServer(function(input, output,session) {
       
       footer = tagList(
         modalButton("Cancel"),
-        actionButton("btnUpdateTratment", "OK")
+        actionButton("btnUpdateTreatment", "OK")
       )
     )
   }
@@ -3422,16 +3454,15 @@ shinyServer(function(input, output,session) {
   
   output$formUpdateTreatment=renderUI({
     box(width = 12,
-        column("",textInput("treattypeUP","Treatment type",value = UPdatavalueTreat()$TREATMENT_TYPE), width = 3 ), 
-        column("",textInput("prescribedUP","Prescribed for",value = UPdatavalueTreat()$PRESCRIBEDFOR), width = 3 ), 
-        column("",dateInput("datetreatbegUP","Treatment start date",value = UPdatavalueTreat()$START_DATE), width = 3),
-        column("",textInput("datetreatendUP","Treatment Duration (in weeks, one year = 52 weeks)",value = UPdatavalueTreat()$DURATIONN), width = 3),
+        textInput("treattypeUP","Treatment type",value = UPdatavalueTreat()$TREATMENT_TYPE),
+        textInput("prescribedUP","Prescribed for",value = UPdatavalueTreat()$PRESCRIBEDFOR),  
+        dateInput("datetreatbegUP","Treatment start date",value = UPdatavalueTreat()$START_DATE), 
+        textInput("datetreatendUP","Treatment Duration (in weeks, one year = 52 weeks)",value = UPdatavalueTreat()$DURATIONN), 
         
-        column("",textInput("PosologyUP","Posology",value = UPdatavalueTreat()$POSOLOGY), width = 3),
-        column("",textInput("adminUP","Administaration Root",value = UPdatavalueTreat()$ADMINROUTE), width = 3),
-        
-        column("",numericInput("injectionnumberUP","Injection number* (for Glucantime)",value = UPdatavalueTreat()$INJECTION_NUMBER), width = 3),
-        column("",dateInput("healingUP","Healing Date",value = UPdatavalueTreat()$HEALING_DATE), width = 3)
+        textInput("PosologyUP","Posology",value = UPdatavalueTreat()$POSOLOGY), 
+        textInput("adminUP","Administaration Root",value = UPdatavalueTreat()$ADMINROUTE), 
+        numericInput("injectionnumberUP","Injection number* (for Glucantime)",value = UPdatavalueTreat()$INJECTION_NUMBER),
+        dateInput("healingUP","Healing Date",value = UPdatavalueTreat()$HEALING_DATE)
     )
   })
   
@@ -3440,16 +3471,19 @@ shinyServer(function(input, output,session) {
   # button update treatment                                              #
   ########################################################################
   
-  observeEvent(input$btnUpdateTratment,{
-    queryUpdateTratment <- sprintf("
-                                 UPDATE treatmenthistory SET TREATMENT_TYPE='%s' ,PRESCRIBEDFOR='%s',START_DATE='%s',DURATIONN='%s',POSOLOGY='%s',
-                                 ADMINROUTE='%s',INJECTION_NUMBER='%s',HEALING_DATE='%s' where PATIENT_IDENTIFIER='%s' and START_DATE='%s%s",
-                                 paste(as.character(input$treattypeUP)),paste(as.character(input$prescribedUP)),paste(as.character(input$datetreatbegUP)),
-                                 paste(as.character(input$datetreatendUP)) ,paste(as.character(input$PosologyUP)),paste(as.character(input$adminUP)),
-                                 paste(as.character(input$injectionnumberUP)),paste(as.character(input$healingUP)) ,
-                                 paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPtreat),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = queryUpdateTratment )
-    info("Treatment successfully Updated")
+  observeEvent(input$btnUpdateTreatment,{
+    queryUpdateTreatment <- paste0("
+                                    UPDATE treatmenthistory SET TREATMENT_TYPE='",input$treattypeUP,"' ,PRESCRIBEDFOR='",input$prescribedUP,"',DURATIONN='",input$datetreatendUP,"',
+                                    POSOLOGY='",input$PosologyUP,"', ADMINROUTE='",input$adminUP,"',INJECTION_NUMBER='",input$injectionnumberUP,"',HEALING_DATE='",input$healingUP,"',START_DATE='",input$datetreatbegUP,"' 
+                                    where PATIENT_IDENTIFIER='",input$PatIdentifier,"' and START_DATE='",input$DUPtreat,"' and IDTREATMENT='",UPdatavalueTreat()$IDTREATMENT,"' ;")
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect,queryUpdateTreatment)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      info("Error : Update treatment")
+    }else{info("Treatment successfully Updated")}
+    
     removeModal()
   })
   
@@ -3479,17 +3513,17 @@ shinyServer(function(input, output,session) {
   
   
   UPdatavalueMvt=reactive({
-    querySelectDateTR=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.travel_residency where PATIENT_IDENTIFIER='%s' and FROMDate='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
+    querySelectDateTR=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.travel_residency where PATIENT_IDENTIFIER='%s' and FROMDATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
   })
   output$formUpdateTR=renderUI({
     box(width = 12,
-        column("",textInput("regvisitUP","City", value=UPdatavalueMvt()$CITY), width = 3),
-        column("",selectInput("TypeUP","Urban/Rural",choices =  c("", "Urban","Rural","N/A")), width = 3),
-        column("",textInput("resedentUP","Residency ",value=UPdatavalueMvt()$RESIDENCY), width = 3),
+        textInput("regvisitUP","City", value=UPdatavalueMvt()$CITY), 
+        textInput("TypeUP","Urban/Rural",value=UPdatavalueMvt()$TYPE),
+        textInput("resedentUP","Residency ",value=UPdatavalueMvt()$RESIDENCY), 
         
-        column("",textInput("bybyteUP","Bite Notion",value=UPdatavalueMvt()$BYTENOT), width = 3),
-        column("",dateInput("datedatevisitUP","Visit Date",value = UPdatavalueMvt()$FROMDATE), width = 3) ,
-        column("",textInput("dateleavevisitUP","Duration (In wek)",value = UPdatavalueMvt()$TODATE), width = 3)
+        textInput("bybyteUP","Bite Notion",value=UPdatavalueMvt()$BYTENOT), 
+        dateInput("datedatevisitUP","Visit Date",value = UPdatavalueMvt()$FROMDATE),
+        textInput("dateleavevisitUP","Duration (In wek)",value = UPdatavalueMvt()$TODATE)
         
     )
   })
@@ -3500,14 +3534,26 @@ shinyServer(function(input, output,session) {
   ########################################################################
   
   observeEvent(input$btnUpdateT_R,{
-    querymvtpfe <- sprintf("
-                           UPDATE travel_residency SET 	CITY='%s' ,RESIDENCY='%s',BYTENOT='%s',FROMDATE='%s', TODATE='%s',TYPE='%s' where 
-                           PATIENT_IDENTIFIER='%s' and FROMDate='%s%s",
-                           paste(as.character(input$regvisitUP)),paste(as.character(input$resedentUP)),paste(as.character(input$bybyteUP)),
-                           paste(as.character(input$datedatevisitUP)),paste(as.character(input$dateleavevisitUP)),paste(as.character(input$TypeUP)),
-                           paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPmvt),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = querymvtpfe)
-    info("Mouvement successfully Updated")
+    
+    querymvtpfe <- paste0("UPDATE travel_residency SET 	CITY='",as.character(input$regvisitUP),"' ,RESIDENCY='",as.character(input$resedentUP),"',BYTENOT='",as.character(input$bybyteUP),"', 
+                           TODATE='",as.character(input$dateleavevisitUP),"',TYPE='",as.character(input$TypeUP),"', FROMDATE='",as.character(input$datedatevisitUP),"' where 
+                           PATIENT_IDENTIFIER='",as.character(input$PatIdentifier),"' and FROMDATE='",as.character(input$DUPmvt),"' and IDMVT='",UPdatavalueMvt()$IDMVT,"'  ;" )
+    
+    if(is.na(input$dateleavevisitUP)){
+      info("Error : Missing value duration ")
+    }else if(input$dateleavevisitUP<(-1)){
+      info("Error : Wrong value duration ")
+    }else{
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,querymvtpfe)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Update Mouvement ")
+      }else{info("Mouvement successfully Updated")}
+    }
+
+    
     removeModal()
   })
   

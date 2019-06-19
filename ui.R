@@ -161,8 +161,8 @@ shinyUI(
                             
                             fluidRow (
                               uiOutput("Managementall",style="margin:5px 400px 5px 5px",width = 12)
-                               ,
-                               uiOutput("appkey5",style="margin:5px 50px 100px 1065px",width = 6)
+                               # ,
+                               # uiOutput("appkey5",style="margin:5px 50px 100px 1065px",width = 6)
                             )
                     ),
                     
