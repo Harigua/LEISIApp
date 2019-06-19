@@ -613,9 +613,17 @@ shinyServer(function(input, output,session) {
     if (USER$Logged == TRUE) {
       fluidRow(
         column(2,
-               span("User: ", USER$name , style="color:blue")
+               span("User: ", USER$name 
+                    #, style="color:blue"
+                    )
         ),
         column(1, actionLink("logout", "Logout"))
+        #,
+        # column(1, actionLink("selecthome2","Home page"
+        #                      ,icon = icon("list-alt")
+        #                     )
+        #       )
+        
       )
     }  
   })
