@@ -3156,7 +3156,7 @@ shinyServer(function(input, output,session) {
   #                                           button DELETE DATA                                      #
   #####################################################################################################  
   observeEvent(input$subuserDell, {
-    querydeleteuser <-sprintf("DELETE from userdata where LOGINUSER='%s%s",paste(as.character(input$Loguserdelete),collapse = ", "),paste("'",collapse = " ,"))
+    querydeleteuser <-sprintf("DELETE from userdata where LOGINUSER='%s'",paste(as.character(input$Loguserdelete)))
     sqlQuery(connect,querydeleteuser)
     info("User Deleted")
     observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )})
@@ -3164,7 +3164,7 @@ shinyServer(function(input, output,session) {
   })
   
   observeEvent(input$DatadelDone, {
-    querydeleteuser <-sprintf("DELETE from %s where %s='%s%s",paste(as.character(input$tableNameDelete)),paste(as.character(input$filNameDelete),collapse = ", " )   ,paste(as.character(input$valNameDelete),collapse = ", "),paste("'",collapse = " ,"))
+    querydeleteuser <-sprintf("DELETE from %s where %s='%s'; ",paste(as.character(input$tableNameDelete)),paste(as.character(input$filNameDelete) )   ,paste(as.character(input$valNameDelete)))
     sqlQuery(connect,querydeleteuser)
     info("Data successfully Deleted")
     observe({
@@ -3213,8 +3213,10 @@ shinyServer(function(input, output,session) {
   #                                             button update user                                    #
   ##################################################################################################### 
   observeEvent(input$subusernewUp,{
-    queryuserUPpfe <- sprintf("
-                              UPDATE userdata SET MOTDPASS='%s',LEVELSECURE='%s',FROMINST='%s',USE_LOGINUSER='%s' WHERE LOGINUSER ='%s%s",paste(as.character(input$userpassF)),paste(as.character(input$NivSecF)),paste(as.character(input$userInsF)),paste(as.character(USER$name)),paste(as.character(input$userLoginF),collapse = ", " ),paste("'",collapse = " ,"))
+    queryuserUPpfe <- sprintf(" UPDATE userdata SET MOTDPASS='%s',LEVELSECURE='%s',FROMINST='%s',USE_LOGINUSER='%s' 
+                                WHERE LOGINUSER ='%s';"
+                                ,paste(as.character(input$userpassF)),paste(as.character(input$NivSecF)),paste(as.character(input$userInsF)),paste(as.character(USER$name)),
+                              paste(as.character(input$userLoginF)))
     
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryuserUPpfe)}
@@ -3335,8 +3337,8 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$btnUpdatePatient,{
     queryUpdatePatient <- sprintf("
-                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s%s",
-                                 paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient),collapse = ", " ),paste("'",collapse = " ,"))
+                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
+                                 paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient)))
     
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryUpdatePatient)}
@@ -3401,8 +3403,7 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$btnUpdateMedicalcheckup,{
   
-    queryCheckUPpfe <- paste0("
-                               UPDATE medical_checkup SET ID_INTERROGATOR='",input$interrIDUP,"' ,HOSPITAL='",input$hospitalUP,"',PHYSICIAN='",input$pysicienUP,"',
+    queryCheckUPpfe <- paste0("UPDATE medical_checkup SET ID_INTERROGATOR='",input$interrIDUP,"' ,HOSPITAL='",input$hospitalUP,"',PHYSICIAN='",input$pysicienUP,"',
                                SAMPLER='",input$samplerUP,"',CLINICAL_STATE='",input$clinstateUP,"',POSSIBLE_HUMAN_HOSTS='",input$HhostRUP,"',
                                LINK_HUMAN_HOSTS='",input$HhostLUP,"',ANIMAL_AROUND='",input$AhostUP,"' ,LESPOSSS ='",input$Lesion_SitesUP,"',
                                LESNUM ='",input$Lesion_NumberUP,"',GENDESC='",input$General_DescriptionUP,"'
@@ -3472,8 +3473,7 @@ shinyServer(function(input, output,session) {
   ########################################################################
   
   observeEvent(input$btnUpdateTreatment,{
-    queryUpdateTreatment <- paste0("
-                                    UPDATE treatmenthistory SET TREATMENT_TYPE='",input$treattypeUP,"' ,PRESCRIBEDFOR='",input$prescribedUP,"',DURATIONN='",input$datetreatendUP,"',
+    queryUpdateTreatment <- paste0("UPDATE treatmenthistory SET TREATMENT_TYPE='",input$treattypeUP,"' ,PRESCRIBEDFOR='",input$prescribedUP,"',DURATIONN='",input$datetreatendUP,"',
                                     POSOLOGY='",input$PosologyUP,"', ADMINROUTE='",input$adminUP,"',INJECTION_NUMBER='",input$injectionnumberUP,"',HEALING_DATE='",input$healingUP,"',START_DATE='",input$datetreatbegUP,"' 
                                     where PATIENT_IDENTIFIER='",input$PatIdentifier,"' and START_DATE='",input$DUPtreat,"' and IDTREATMENT='",UPdatavalueTreat()$IDTREATMENT,"' ;")
     an.error.occured <- FALSE
@@ -3607,18 +3607,24 @@ shinyServer(function(input, output,session) {
   ########################################################################
   
   observeEvent(input$btnUpdateSample,{
-    queryUpdateSample <- sprintf("
-                              UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
-                              DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', LESION_AGE='%s', 
-                              DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',
-                              LOCALISATION='%s', DATE_EXTRACTION='%s',DESCRIPTION='%s' where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s%s",
-                              paste(as.character(input$sammethUP)),paste(as.character(input$samplsupportUP)),paste(as.character(input$directexamUP)) ,
-                              paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),paste(as.character(input$diamlesionMaxUP)),
-                              paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),paste(as.character(input$locallesionUP)) ,
-                              paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
-                              paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query = queryUpdateSample )
-    info("Sample successfully Updated")
+    queryUpdateSample <- sprintf("UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
+                                  DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', LESION_AGE='%s', 
+                                  DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',
+                                  LOCALISATION='%s', DATE_EXTRACTION='%s',DESCRIPTION='%s' where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s';",
+                                  paste(as.character(input$sammethUP)),paste(as.character(input$samplsupportUP)),paste(as.character(input$directexamUP)) ,
+                                  paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),paste(as.character(input$diamlesionMaxUP)),
+                                  paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),paste(as.character(input$locallesionUP)) ,
+                                  paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
+                                  paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample)) )
+
+      an.error.occured <- FALSE
+      tryCatch( {sqlExecute(connect,queryUpdateSample)}
+                , error = function(e) {an.error.occured <<- TRUE}
+      )
+      if(an.error.occured){
+        info("Error : Update Sample  ")
+      }else{info("Sample successfully Updated")}
+
     removeModal()
   })
   
@@ -3631,10 +3637,10 @@ shinyServer(function(input, output,session) {
   dataModalUDiagnosis <- function(failed = FALSE) {
     modalDialog(
       
-      column("", selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier) )))[,1])))),width = 3),
-      column("",selectInput("testupdiag","Molecular est",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from molecularl_test")))[,1])))),width = 3),
-      column("",selectInput("labupDiag","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory " )))[,1])))),width = 3),
+    selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier) )))[,1])))),
+
       
+      uiOutput("testdiagTestAndLabName"),      
       uiOutput("testdiagFFFFFF"),
       
       footer = tagList(
@@ -3649,27 +3655,33 @@ shinyServer(function(input, output,session) {
   
   UPdatavalueDiagnosis=reactive({
     
-    if(toString(input$testupdiag)=="N/A" && toString(input$labupDiag)=="N/A"){
-      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
-      dddddddDiag
-    }else if(toString(input$labupDiag)=="N/A"){
-      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
-      dddddddDiag
-    }else if(toString(input$testupdiag)=="N/A"){
-      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
-      dddddddDiag
-    }else{
-      dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
-      dddddddDiag
-    }
+    # if(toString(input$testupdiag)=="N/A" && toString(input$labupDiag)=="N/A"){
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
+    # }else if(toString(input$labupDiag)=="N/A"){
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
+    # }else if(toString(input$testupdiag)=="N/A"){
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
+    # }else{
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
+    # }
     
+    ddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
+    
+    
+  })  
+  output$testdiagTestAndLabName=renderUI({
+    box(width = 12,
+        column("",selectInput("testupdiag","Molecular est",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)))))[,1])))),width = 6),
+        column("",selectInput("labupDiag","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from diognosis where ID_SAMPLE='%s' ",paste(as.character(input$sampleUPDiag)) )))[,1])))),width = 6)
+        
+    )
   })
   output$testdiagFFFFFF=renderUI({
     box(width = 12,
-        column("",textInput("dattestUP","Test date",value = UPdatavalueDiagnosis()$DIAGNOSIS_DATE),width = 6),
-        column("",numericInput("quantityUP","Quantity",value = UPdatavalueDiagnosis()$QUANTITE),width = 6),
-        column("",textInput("restestUP","Test result",value = UPdatavalueDiagnosis()$RESULT),width = 6),
-        column("",textInput("susSpecUP","Suspected Species",value = UPdatavalueDiagnosis()$LEISHSUSPECT),width = 6)
+        textInput("dattestUP","Test date",value = UPdatavalueDiagnosis()$DIAGNOSIS_DATE),
+        numericInput("quantityUP","Quantity",value = UPdatavalueDiagnosis()$QUANTITE),
+        textInput("restestUP","Test result",value = UPdatavalueDiagnosis()$RESULT),
+        textInput("susSpecUP","Suspected Species",value = UPdatavalueDiagnosis()$LEISHSUSPECT)
         
     )
   })
@@ -3678,13 +3690,21 @@ shinyServer(function(input, output,session) {
   ########################################################################
   
   observeEvent(input$okDiagnosis,{
-    queryUpdateDiognosis <- sprintf("
-                            UPDATE diognosis SET 	DIAGNOSIS_DATE='%s' ,QUANTITE='%s',RESULT='%s',	LEISHSUSPECT='%s' where 
-                            ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s%s",
-                            paste(as.character(input$dattestUP)),paste(as.character(input$quantityUP)),paste(as.character(input$restestUP)),
-                            paste(as.character(input$susSpecUP)) ,paste(as.character(input$sampleUPDiag)) ,paste(as.character(input$testupdiag)) , paste(as.character(input$labupDiag),collapse = ", " ),paste("'",collapse = " ,"))
-    sqlExecute(connect,query =queryUpdateDiognosis)
-    info("Diagnosis successfully Updated")
+    queryUpdateDiognosis <- sprintf(" UPDATE diognosis SET 	DIAGNOSIS_DATE='%s' ,QUANTITE='%s',
+                                      RESULT='%s',	LEISHSUSPECT='%s' where 
+                                      ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s' and IDDIAGNOSIS='%s' ;",
+                                      paste(as.character(input$dattestUP)),paste(as.character(input$quantityUP)),
+                                      paste(as.character(input$restestUP)),paste(as.character(input$susSpecUP)) ,
+                                      paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)),paste(as.character(input$labupDiag)),paste(as.character(UPdatavalueDiagnosis()$IDDIAGNOSIS)) )
+    
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect,queryUpdateDiognosis)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      info("Error : Update Diagnosis   ")
+    }else{info("Diagnosis successfully Updated")}
+
     observe({updateSelectInput(session,"upsample","Choose Sample",choices = c("",as.character(dataech()[,1])))})
     removeModal()
   })
@@ -3727,9 +3747,9 @@ shinyServer(function(input, output,session) {
   observeEvent(input$btnUpdateInterrogator,{
     queryUpdateInterrogator <- sprintf("
                              UPDATE interrogator SET 	ID_INTERROGATOR='%s' ,LAST_NAME_INTERROGATOR='%s',FIRST_NAME_INTERROGATOR='%s',QUALITY='%s' where 
-                             ID_INTERROGATOR='%s%s",
+                             ID_INTERROGATOR='%s' ;",
                              paste(as.character(input$idInterrogatorUP)),paste(as.character(input$nameInterrogatorUP)),paste(as.character(input$lastNameInterrogatorUP)),
-                             paste(as.character(input$qualityInterrogatorUP)) , paste(as.character(input$DUPInterrogator),collapse = ", " ),paste("'",collapse = " ,"))
+                             paste(as.character(input$qualityInterrogatorUP)) , paste(as.character(input$DUPInterrogator)))
     sqlExecute(connect,query = queryUpdateInterrogator)
     info("Interrogator successfully Updated")
     removeModal()
@@ -3770,9 +3790,9 @@ shinyServer(function(input, output,session) {
   observeEvent(input$okDUPLaboratory,{
     queryUpdateLab <- sprintf("
                            UPDATE laboratory SET 	LABORATORY_NAME='%s' ,COUNTRY='%s' where 
-                           LABORATORY_NAME='%s%s",
+                           LABORATORY_NAME='%s' ;",
                            paste(as.character(input$nameLabUP)),paste(as.character(input$countryLabUP)),
-                           paste(as.character(input$DUPLaboratory),collapse = ", " ),paste("'",collapse = " ,"))
+                           paste(as.character(input$DUPLaboratory)))
     sqlExecute(connect,query = queryUpdateLab )
     info("Laboratory successfully Updated")
     removeModal()
