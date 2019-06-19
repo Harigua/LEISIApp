@@ -1467,7 +1467,7 @@ shinyServer(function(input, output,session) {
       info("Error : Missing value Country and state")
     }else if( !(as.character(input$datedatevisit) <= Sys.Date() && as.character(input$datedatevisit) !="")){
       info("Error : Incorrect date Visit Date")
-    }else if( input$dateleavevisit < -1 || input$dateleavevisit == ""){
+    }else if( input$dateleavevisit < (-1) || is.na(input$dateleavevisit)){
       info("Error : Incorrect value duration")
     }else{
       an.error.occured <- FALSE
