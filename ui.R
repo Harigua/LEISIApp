@@ -46,13 +46,18 @@ shinyUI(
                 
                 
                 mydashboardHeader(
-                      title= "Lesionia",
+                      title= 
+                      #   "Lesionia"
+                      # ,
                       
-                      tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;"), 
+                      
                       
                       tags$li(
-                        class = "dropdown",
-                        actionLink("selecthome2","Home page"
+                        #class = "dropdown",
+                        actionLink("selecthome2"
+                                   ,"Lesionia"
+                                   # ,tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;")
+                                   #, "Home page"
                                    #,icon = icon("list-alt")
                         )
                       )
