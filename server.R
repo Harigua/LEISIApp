@@ -1467,10 +1467,6 @@ shinyServer(function(input, output,session) {
       info("Error : Missing value Country and state")
     }else if( !(as.character(input$datedatevisit) <= Sys.Date() && as.character(input$datedatevisit) !="")){
       info("Error : Incorrect date Visit Date")
-    }else if(is.na(input$dateleavevisit)){
-      info("Error : Missing value duration")
-    }else if( input$dateleavevisit < (-1)){
-      info("Error : Wrong value duration")
     }else{
       an.error.occured <- FALSE
       tryCatch( {sqlExecute(connect, querytravinpfe)}
@@ -1498,10 +1494,6 @@ shinyServer(function(input, output,session) {
       info("Error : Missing value Country and state")
     }else if( !(as.character(input$datedatevisit) <= Sys.Date()) && as.character(input$datedatevisit) ==""){
       info("Error : Incorrect date Visit Date")
-    }else if(is.na(input$dateleavevisit)){
-      info("Error : Missing value duration")
-    }else if( input$dateleavevisit < (-1)){
-      info("Error : Wrong value duration")
     }else{
       an.error.occured <- FALSE
       tryCatch( {sqlExecute(connect, querytravinpfe)}
