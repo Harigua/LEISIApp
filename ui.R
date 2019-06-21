@@ -52,7 +52,7 @@ shinyUI(
                       
                       
                       
-                      tags$li(
+                      # tags$li(
                         #class = "dropdown",
                         actionLink("selecthome2"
                                    ,"Lesionia"
@@ -60,7 +60,7 @@ shinyUI(
                                    #, "Home page"
                                    #,icon = icon("list-alt")
                         )
-                      )
+                      # )
                       
                       ),
                 
@@ -114,7 +114,7 @@ shinyUI(
                 
                 dashboardBody(
                   tags$style(".nav-tabs {
-                             background-color: 	#B0C4DE;
+                             background-color: #B0C4DE;
                              
                              }
                              .tabs-above > .nav > li[class=active] > a {
@@ -129,17 +129,20 @@ shinyUI(
                              
                              .nav-tabs-custom .nav-tabs li.active {
                              border-top-color: light-blue;
-                             }"),
+                             }
+
+                                  
+                             "),
        
                   
-                  tags$style(HTML("
+                  tags$head(tags$style(HTML("
                                   .content-wrapper,
                                   .right-side {
-                                  background-color: #2F4F4F ;
+                                  background-color: transparent ;
                                   }
                                   
                                   
-                                  ")),
+                                  "))),
                   
                   useShinyjs(),
                   
@@ -176,7 +179,14 @@ shinyUI(
                             div(class = "login",
                                 uiOutput("uiLogin"),
                                 textOutput("pass"),
-                                tags$head(tags$style("#pass{color: red;")),
+                                tags$head(tags$style(HTML('
+                                  .main-header .logo {
+                                  font-family: "Georgia", Times, "Times New Roman", serif;
+                                  font-weight: bold;
+                                  font-size: 24px;
+                                }
+                                ')))
+                                ,
                                 
                                 column(10, uiOutput("mail",style="margin:0px 0px 5px 140px;")),
                                 column(10,uiOutput("mailcontent",style="margin:0px 0px 5px 120px;")),
