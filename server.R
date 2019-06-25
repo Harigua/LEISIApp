@@ -930,10 +930,54 @@ shinyServer(function(input, output,session) {
                id="mail",
                div(
                  box( width = 12,status = "info",solidHeader = TRUE,
-                      p("Lesionia description paragraph"),
-                      
-                      h4("For more informations please contact HARIGA Emna Resercher at Pasteur Institute of Tunis (IPT) :"),
-                      h3("emna.harigua@pasteur.utm.tn")
+                      h1("Contact us", align="center"),
+                      h3("What is lesionia :"),
+                      p("   Lesionia is an open-source software/Web applications for the collection, management and 
+                             analysis of clinical and epidemiological data related to patients suspected for cutaneous 
+                             leishmaniasis. It was developed in the frame of the PEER518 project. It is conceived to enable 
+                             researchers within the PEER518 consortium that are based in different countries and acting at 
+                             different stages of the data life cycle to enter and access the data with respect to the FAIR 
+                             criteria.
+                         "),
+                        br(),
+                      h3(" What is the PER518 project :"),
+                      p("  PER518: Diagnosis of Cutaneous Leishmaniasis: Development 
+                            and Evaluation of Multiplex POC DNA Assays. "),
+                      p("  Objectives: Our aim is to develop species specific and multiplex DNA assays for the 
+                             identification of the Leishmania species: L. infantum/L. donovani, L. major and L. tropica, which 
+                             are the main causal agents of leishmaniases encountered in the Old World (Africa, MENA, 
+                             Europe and Asia). Such diseases are also of global relevance in more than 98 countries 
+                             affected. "),
+                      p("   Methodology: We use novel technologies for the isothermal amplification and detection of DNA 
+                             that are well adapted to point of care (POC) centres. They do not need specialized equipment, 
+                             are prone to multiplexing and are rapid in delivering results (<1h). "),
+                      p("    Impact: Our DNA assays will serve the CL diagnosis in limited resources environment. In fact,     
+                             accurate species-specific diagnoses also allows for rapid diagnosis, efficient patient 
+                             management and follow up and accurate reporting to leishmaniasis control programs. 
+                             Availability of the diagnostics POC tools we aim for would change diagnosis algorithms and
+                             improve patient management in Tunisia and many endemic countries, and in travel medicine. It 
+                             is also well known that the species differently react to the different treatments available. So far 
+                             reporting does not precise the causal species, so enlarged use of such tools would improve 
+                             disease epidemiology and burden estimates. Likewise, with more popular DNA tests it becomes 
+                             possible to adequately and timely react in emerging foci Clinical trials will be needed to improve 
+                             robustness of the recommendations. "),
+                        br(),
+                      h3("Who are we :"),
+                        p("  Laboratory of Molecular Epidemiology and Experimental Pathology at Institut Pasteur de Tunis
+                             is the central node of the PEER518 consortium that includes partners from Tunisia, Morrocco, 
+                             Lebanon, Mali and the USA. "),
+                        br(),
+                      h3("How to collaborate :"),
+                        p(" If you are interested in collaborating with us, please send an email to Dr. Ikram Guizani( ",a("ikram.Guizani@pasteur.tn"), 
+                        " ) and/or to Dr. Insaf Bel Hadj Ali ( ",a(" insaf.belhadjali@pasteur.tn")," ), with the object: “Collaboration proposal on CL diagnosis”."),
+                        br(),
+                      h3("Get in touch :"),
+                        p("  For more information on Lesionia and the data system management, please contact Dr. Emna HARIGUA at ",a("emna.harigua@pasteur.utm.tn")),
+                        br(),
+                      p("please note : We will get back to you shortly, usually within 2-3 days. Also note that if you send an email on a Friday,
+                        we may get back to you only on the following Monday or Tuesday.",style="color:gray;"),
+                      p("If you are contacting us for a collaboration proposal please mention it in your message.",style="color:gray;"),
+                      br()
                       ),
                  # column("", ,width = 12 ),
                  
@@ -2012,7 +2056,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$btnUploadImage, {
     querySelectDataImg=sqlQuery(connect,paste("SELECT * from dbpfedev.Img"))
     inFile  <- input$MyImage
-    fileName  <- paste0(input$PatIdentifier,"/",input$sampleIDD,"/",length(querySelectDataImg)+1)
+    fileName  <- paste0(input$PatIdentifier,"_",input$sampleIDD,"_",length(querySelectDataImg)+1)
   queryInsertImg= paste0("INSERT INTO Img
                      VALUES ('",fileName,"','",input$PatIdentifier,"','",input$sampleIDD  ,"', '",USER$name ,"') ")
                          
