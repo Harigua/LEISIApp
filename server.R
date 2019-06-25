@@ -714,7 +714,7 @@ shinyServer(function(input, output,session) {
                  div(
                    id="formInsertDiagnos",
                    fluidRow(
-                     box(width = 12,height = 300, status = "info",solidHeader = TRUE,
+                     box(width = 12, status = "info",solidHeader = TRUE,
                          p("feilds with asterisk(*) are mandatory", style = "color:red"),
                          
                          selectInput("chemtest","Molecular test*",choices = c("",as.character(datatestech()[,1]))),
@@ -1104,8 +1104,11 @@ shinyServer(function(input, output,session) {
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
             
-            textInput("idPatient","Patient DB Code *",placeholder = 'PPPLL****'), textInput("medfilenumber","Patient ID",""), selectInput("ConsPat","Consentment", c("", "Yes","No","N/A","YES from IBA")), 
+            textInput("idPatient","Patient DB Code *",placeholder = 'PPPLL****'),
+            textInput("medfilenumber","Patient ID",""),
+            selectInput("ConsPat","Consentment", c("", "Yes","No","N/A","YES from IBA")), 
             dateInput("datenaissp","Birth date",value = "1900-01-01"), 
+            numericInput("AgePatient","Or Age", ""), 
             selectInput("nationalp","Nationality", c("", "TN","LB", "SY", "MA", "DZ", "other","N/A")),
             textInput("othernationalp","If other please specify") ,                          
             selectInput("sexep","Gender", c("", "Female","Male","Other","N/A")), 
@@ -1130,7 +1133,7 @@ shinyServer(function(input, output,session) {
     
     queryIpfe <- paste0(
       "INSERT INTO patient
-      VALUES ('",toString(input$idPatient)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','','','",toString( input$datenaissp) ,"','",if(toString( input$nationalp)=="other"){toString( toupper(input$othernationalp))}else{toString( input$nationalp)} ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','') ")
+      VALUES ('",toString(input$idPatient)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','','','",toString( input$datenaissp) ,"','",toString( input$AgePatient) ,"','",if(toString( input$nationalp)=="other"){toString( toupper(input$othernationalp))}else{toString( input$nationalp)} ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','') ")
     
     if (input$idPatient=="" || input$idPatient=="PPPLL****"){
       info("Error : Missing data Patient DB Id")
@@ -1207,6 +1210,7 @@ shinyServer(function(input, output,session) {
               selectInput("directexam","Direct examination result",choices = c("","Positive","Negative","N/A")), 
               selectInput("abandance","Abundance on the smear", c("", "+","++","+++","++++","+++++","++++++","N/A")), 
               dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , 
+              numericInput("Lesion_Age","Or leision age","") ,
               numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","") ,
               numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","") , 
               numericInput("highlesion","lesion Hight(millimeter)*","") ,
@@ -1658,7 +1662,7 @@ shinyServer(function(input, output,session) {
     
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','",toString( input$locallesion) ,"','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
     
     if(toString(input$locallesion)==""){
       info("Error : Wrong value lesion Lesion location")
@@ -1828,7 +1832,7 @@ shinyServer(function(input, output,session) {
     querySelectDataDiognosis=sqlQuery(connect,paste("SELECT * from dbpfedev.diognosis"))
     queryInsertDiognosis <- paste0(
       "INSERT INTO  diognosis
-      VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
+      VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"','", toString(USER$name) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
 
     if(toString(input$chemtest) == ""){
       info("Error : Missing data test")
@@ -2726,8 +2730,8 @@ shinyServer(function(input, output,session) {
     
     
     PAITIENT_AGE=as.numeric(round((as.Date(cordataall$DATE_EXTRACTION ) - as.Date(cordataall$BIRTH_DATE))/365))
-    LESION_AGE=as.numeric(abs(round((as.Date(cordataall$DATE_EXTRACTION ) - as.Date(cordataall$LESION_AGE)))))
-    datatot=data.frame(cordataall,PAITIENT_AGE,LESION_AGE)
+    Date_First_Apeard=as.numeric(abs(round((as.Date(cordataall$DATE_EXTRACTION ) - as.Date(cordataall$Date_First_Apeard)))))
+    datatot=data.frame(cordataall,PAITIENT_AGE,Date_First_Apeard)
     datatot$LOCALISATION=as.factor(datatot$LOCALISATION)
     datatot
     
@@ -2771,7 +2775,7 @@ shinyServer(function(input, output,session) {
     Totlalacm1=cordata()[,-c(1,2,4,6,10,12,13,14,15,16)]
     Age_Class <- cut(round(as.numeric(cordata()$PAITIENT_AGE)), c(0,10,20,30,40,50,60,70,80,120),
                      labels = c("Moins de 10 ans","11-20 ans","21-30 ans","31-40 ans","41-50 ans","51-60 ans", "61-70ans","71-80 ans ","plus de 80 ans" ))
-    Lesion_Age_Class <- cut(as.numeric(cordata()$LESION_AGE.1), c(0, 15, 30, 45, 60, 75,90,105),
+    Lesion_Age_Class <- cut(as.numeric(cordata()$Date_First_Apeard.1), c(0, 15, 30, 45, 60, 75,90,105),
                             labels = c("moins de deux semaines", "2 - 4 semaines ", "4 - 6 semaines","6 - 8 semaines", 
                                        "8- 10 semaines","10 - 12 semaines", "plus de 3 mois"))
     
@@ -2998,11 +3002,11 @@ shinyServer(function(input, output,session) {
   output$WC=renderPlot({
     
     one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup WHERE DATE_MED!='1900-01-01' "))     
-    two=sqlQuery(connect,paste("SELECT LESION_AGE,PATIENT_IDENTIFIER from dbpfedev.sample WHERE LESION_AGE!='1900-01-01' "))
-    three= sqldf("select DATE_MED,LESION_AGE from  one, two
+    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from dbpfedev.sample WHERE Date_First_Apeard!='1900-01-01' "))
+    three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
                  
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-    days=    three$DATE_MED-three$LESION_AGE
+    days=    three$DATE_MED-three$Date_First_Apeard
     Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 15, 30, 45, 60, 75,90,105),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ", 
                                           "8 to 10 ","10 to 12 ", "more than 3 weeks"))
@@ -3497,6 +3501,7 @@ shinyServer(function(input, output,session) {
       #textInput("prenompUP","First name",value =UPdatavaluePat()$FIRST_NAME),
       #textInput("nompUP","Last name",value =UPdatavaluePat()$LAST_NAME),  
       dateInput("datenaisspUP","Birth date",value =UPdatavaluePat()$BIRTH_DATE),
+      numericInput("AgePatientUP","Or Age",value =UPdatavaluePat()$AGE), 
       textInput("nationalpUP","Nationality", value =UPdatavaluePat()$NATIONALITY) ,
       textInput("sexepUP","Gender", value =UPdatavaluePat()$GENDER)#,
       #textInput("phonenumUP","Phone number",value =UPdatavaluePat()$PHONE_NUMBER)
@@ -3508,8 +3513,8 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$btnUpdatePatient,{
     queryUpdatePatient <- sprintf("
-                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
-                                 paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient)))
+                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',Age='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
+                                 paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$AgePatientUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient)))
     
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryUpdatePatient)}
@@ -3756,14 +3761,15 @@ shinyServer(function(input, output,session) {
         textInput("sammethUP","Sampling Method",value = UPdatavalueSample()$SAMPLING_METHOD), 
         textInput("directexamUP","Direct examination result",value = UPdatavalueSample()$DIRECT_EXAMINATION),
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR), 
-        dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$LESION_AGE) ,
+        dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$Date_First_Apeard) ,
+        numericInput("Lesion_AgeUP","Or leision age",value = UPdatavalueSample()$Lesion_Age) ,
 
         numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETREMax) , 
         numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETREMin) , 
         numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$HIGHT) , 
         
         textInput("locallesionUP","Lesion localisation*",value = UPdatavalueSample()$LOCALISATION) , 
-        textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$LESION_AGE ),
+        textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$DATE_EXTRACTION),
         textInput("descriptionlesionUP","Lesion description",value = UPdatavalueSample()$DESCRIPTION) 
         
     )
@@ -3776,13 +3782,13 @@ shinyServer(function(input, output,session) {
   
   observeEvent(input$btnUpdateSample,{
     queryUpdateSample <- sprintf("UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
-                                  DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', LESION_AGE='%s', 
+                                  DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', Date_First_Apeard='%s',  Lesion_Age='%s', 
                                   DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',
                                   LOCALISATION='%s', DATE_EXTRACTION='%s',DESCRIPTION='%s' where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s';",
                                   paste(as.character(input$sammethUP)),paste(as.character(input$samplsupportUP)),paste(as.character(input$directexamUP)) ,
-                                  paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),paste(as.character(input$diamlesionMaxUP)),
-                                  paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),paste(as.character(input$locallesionUP)) ,
-                                  paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
+                                  paste(as.character(input$abandanceUP)),paste(as.character(input$apparitionlesionUP)),paste(as.character(input$Lesion_AgeUP)),
+                                  paste(as.character(input$diamlesionMaxUP)),paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),
+                                  paste(as.character(input$locallesionUP)) , paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
                                   paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample)) )
 
       an.error.occured <- FALSE
@@ -4208,11 +4214,11 @@ shinyServer(function(input, output,session) {
     pdf(paste(input$label_PAD2,".pdf"),width = 3,height = 5)
     
     one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup"))     
-    two=sqlQuery(connect,paste("SELECT LESION_AGE,PATIENT_IDENTIFIER from dbpfedev.sample"))
-    three= sqldf("select DATE_MED,LESION_AGE from  one, two
+    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from dbpfedev.sample"))
+    three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
                  
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-    days=    three$DATE_MED-three$LESION_AGE
+    days=    three$DATE_MED-three$Date_First_Apeard
     Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 15, 30, 45, 60, 75,90,105),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ", 
                                           "8 to 10 ","10 to 12 ", "more than 3 weeks"))
