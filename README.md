@@ -12,7 +12,7 @@ countries and acting at different stages of the data life cycle.
 - LEMP software stack (i.e. a variation on the LAMP software bundle that uses Nginx rather than Apache, also known as LNMP : Linux Nginx MySql Php)
 - R (why not Rstudio or any other R IDE)
 - Shiny and Shiny-server
-- Basic knowlage of linux comand lines 
+- Basic knowledge of linux command lines 
 
 #### Installation using Rstudio (graphical mode) suitable for both Linux and Windows [Coming soon]
 
