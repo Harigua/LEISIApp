@@ -45,7 +45,6 @@ connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna' , DBMSencoding = "UTF
 #connect=odbcConnect("ServeurDSN", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 #connect=odbcConnect("MyAppDBserver", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 
-
 js.png <- '
 shinyjs.exportPNG = function(params) {
 var defaultParams = {
@@ -963,8 +962,9 @@ shinyServer(function(input, output,session) {
                              robustness of the recommendations. "),
                       br(),
                       h3("Who are we :"),
-                      p("  Laboratory of Molecular Epidemiology and Experimental Pathology at Institut Pasteur de Tunis
-                             is the central node of the PEER518 consortium that includes partners from Tunisia, Morocco,
+                     
+                        p("  Laboratory of Molecular Epidemiology and Experimental Pathology at Institut Pasteur de Tunis
+                             is the central node of the PEER518 consortium that includes partners from Tunisia, Morocco, 
                              Lebanon, Mali and the USA. "),
                       br(),
                       h3("How to collaborate :"),
@@ -1106,20 +1106,21 @@ shinyServer(function(input, output,session) {
 
             textInput("idPatient","Patient DB Code *",placeholder = 'PPPLL****'),
             textInput("medfilenumber","Patient ID",""),
-            selectInput("ConsPat","Consentment", c("N/A","Yes","No","YES from IBA")),
-            dateInput("datenaissp","Birth date",value = "1900-01-01"),
-            numericInput("AgePatient","Or Age","-1"),
+
+            selectInput("ConsPat","Consentment", c("N/A","No","Yes","YES from IBA")), 
+            dateInput("datenaissp","Birth date",value = "1900-01-01"), 
+            numericInput("AgePatient","Or Age","-1"), 
             selectInput("nationalp","Nationality", c("N/A","other","TN","LB", "SY", "MA", "DZ")),
-            textInput("othernationalp","If other please specify") ,
-            selectInput("sexep","Gender", c("N/A","Other","Female","Male")),
-
-
+            textInput("othernationalp","If other please specify") ,                          
+            selectInput("sexep","Gender", c("N/A","Other","Female","Male")), 
+            
+            
             box(width = 12, status = "info",solidHeader = TRUE,
                 selectInput("countryState_PA","Country and state of Residency (The last 6 months)*",choices = c('',cities[,3])),
-                textInput("city_PA","City"),
-                selectInput("TypePA","Urban/Rural",choices =  c("N/A", "Urban","Rural")),
+                textInput("city_PA","City"), 
+                selectInput("TypePA","Urban/Rural",choices =  c("N/A", "Urban","Rural")), 
                 selectInput("bitePA","Bite Notion",choices =  c("N/A", "Yes","No"))
-
+                
             )
 
         ),
@@ -1283,16 +1284,16 @@ shinyServer(function(input, output,session) {
 
 
         box(width = 12, status = "info",solidHeader = TRUE,
-            selectInput("treattype","Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE),
-            textInput("otherTreattype","If other please specify") ,
-            selectInput("prescribed","Prescribed for",choices = c("N/A","Other","Leishmania")),
+            selectInput("treattype","Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE), 
+            textInput("otherTreattype","If other please specify") ,  
+            selectInput("prescribed","Prescribed for",choices = c("N/A","Other","Leishmania")), 
             textInput("otherPrescribed","If other please specify") ,
-            dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"),
-            textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)","-1"),
-            textInput("Posology","Posology",""),
+            dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"), 
+            textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)","-1"), 
+            textInput("Posology","Posology",""), 
             textInput("admin","Administration Root",""),
             numericInput("injectionnumber","Number of injections* (for Glucantime)","-1")
-
+            
         ),
         actionButton("subtreatmentQ","Submit and Quit"),
         actionButton("othertreatmentAdd"," Submit and Add Treatment"),
@@ -1318,16 +1319,16 @@ shinyServer(function(input, output,session) {
 
 
         box(width = 12, status = "info",solidHeader = TRUE,
-            selectInput("treattype","historical Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE),
-            textInput("otherTreattype","If other please specify") ,
-            selectInput("prescribed","Prescribed for",choices = c("N/A","Other","Leishmania")),
-            textInput("otherPrescribed","If other please specify") ,
-            dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"),
-            textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)","-1"),
-            textInput("Posology","Posology",""),
-            textInput("admin","Administration Root",""),
+            selectInput("treattype","historical Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE), 
+            textInput("otherTreattype","If other please specify") , 
+            selectInput("prescribed","Prescribed for",choices = c("N/A","Other","Leishmania")), 
+            textInput("otherPrescribed","If other please specify") , 
+            dateInput("datetreatbeg","Treatment start date",value = "1900-01-01"), 
+            textInput("datetreatend","Treatment Duration (in weeks, one year = 52 weeks)","-1"), 
+            textInput("Posology","Posology",""), 
+            textInput("admin","Administration Root",""), 
             numericInput("injectionnumber","Number of injections* (for Glucantime)","-1")
-
+            
         ),
         actionButton("subtreatmentQ","Submit and Quit"),
         actionButton("othertreatmentHistoryAdd"," Submit and Add Treatment"),
@@ -1664,6 +1665,7 @@ shinyServer(function(input, output,session) {
       "INSERT INTO  sample
       VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
 
+   
     if(toString(input$extractDay)==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1721,6 +1723,7 @@ shinyServer(function(input, output,session) {
       "INSERT INTO  sample
       VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
 
+    
     if(input$extractDay==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1765,20 +1768,21 @@ shinyServer(function(input, output,session) {
       div(
 
         box( width = 12, status = "info",solidHeader = TRUE,
-             p("feilds with asterisk(*) are mandatory", style = "color:red"),
+              p("feilds with asterisk(*) are mandatory", style = "color:red"),
+              
+              selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE), 
+              selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE), 
+              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")), 
+              selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")), 
+              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , 
+              numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") , 
+              numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") , 
+              numericInput("highlesion","lesion Hight(millimeter)*","-1") , 
+              # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) , 
+              selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
+              selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular"),multiple=TRUE) , 
+              textInput("otherdescriptionlesion","If other please specify")
 
-             selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE),
-             selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE),
-             selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
-             selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")),
-             dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
-             numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") ,
-             numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") ,
-             numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
-             # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) ,
-             selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
-             selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular"),multiple=TRUE) ,
-             textInput("otherdescriptionlesion","If other please specify")
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
@@ -3160,11 +3164,13 @@ shinyServer(function(input, output,session) {
 
       box(width = 10, status = "info",solidHeader = TRUE,
           textInput("userLogin","Create Login",""),
-          textInput("userpass","Create Password",""),
+
+          textInput("userpass","Create Password",""),  
           selectInput("NivSec","Data access",choices =  c("normal", "super")),
-          textInput("userIns","Institution",""),
-
-
+          textInput("userIns","Institution",""), 
+          
+          
+          
 
           actionButton("subusernew","Submit user")
       ))
@@ -3187,13 +3193,11 @@ shinyServer(function(input, output,session) {
 
       box(width = 11, status = "info",solidHeader = TRUE,
           id="useraddid",
-
-          textInput("userpassF","Change Password",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$MOTDPASS))),
+          
+          textInput("userpassF","Change Password",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$MOTDPASS))),  
           selectInput("NivSecF","Choose access level",choices =  c("normal", "super")),
-          textInput("userInsF","Change Institution",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$FROMINST))),
-
-
-
+          textInput("userInsF","Change Institution",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$FROMINST))), 
+          
           actionButton("subusernewUp","Update user data")
       ))
   })
@@ -3759,11 +3763,9 @@ shinyServer(function(input, output,session) {
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR),
         dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$Date_First_Apeard) ,
         numericInput("Lesion_AgeUP","Or leision age",value = UPdatavalueSample()$Lesion_Age) ,
-
         numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETREMax) ,
         numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETREMin) ,
         numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$HIGHT) ,
-
         # textInput("locallesionUP","Lesion localisation*",value = UPdatavalueSample()$LOCALISATION) ,
         textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$DATE_EXTRACTION),
         textInput("descriptionlesionUP","Lesion description",value = UPdatavalueSample()$DESCRIPTION)
@@ -3778,6 +3780,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$btnUpdateSample,{
     queryUpdateSample <- sprintf("UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
+
                                   DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', Date_First_Apeard='%s',  Lesion_Age='%s',
                                   DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',DATE_EXTRACTION='%s',DESCRIPTION='%s'
                                   where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s';",
@@ -3786,6 +3789,7 @@ shinyServer(function(input, output,session) {
                                  paste(as.character(input$diamlesionMaxUP)),paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),
                                  paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
                                  paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample)) )
+    
 
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect,queryUpdateSample)}
