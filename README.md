@@ -16,6 +16,9 @@ countries and acting at different stages of the data life cycle.
 
 #### Installation using Rstudio (graphical mode) suitable for both Linux and Windows [Coming soon]
 
+
+
+
 #### Installation using command-lines under Ubuntu 16.04. This section also includes the R packages and their dependencies
 
 1. Supposing that you have a linux base OS (you can Download UBUNTU 16.04 from [here](http://releases.ubuntu.com/16.04/)).
@@ -98,5 +101,4 @@ countries and acting at different stages of the data life cycle.
 If you have used Lesionia or parts of it in the course of your research, 
 we ask that you cite us as follows:
 XXXXXXX
-
 
