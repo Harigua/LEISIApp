@@ -41,7 +41,7 @@ library(V8)
 #library(Sys)
 
 Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
-connect=odbcConnect("MyAppDB", uid='emna', pwd='16souemna' , DBMSencoding = "UTF-8")
+connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
 #connect=odbcConnect("ServeurDSN", uid='root', pwd='16souemna')
 #connect=odbcConnect("MyAppDBserver", uid='root', pwd='16souemna')
 
