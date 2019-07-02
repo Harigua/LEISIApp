@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 10, 2019 at 12:30 PM
+-- Generation Time: Jul 02, 2019 at 01:13 PM
 -- Server version: 5.7.26-0ubuntu0.16.04.1
 -- PHP Version: 7.0.33-0ubuntu0.16.04.5
 
@@ -44,14 +44,13 @@ CREATE TABLE `diognosis` (
   `IDDIAGNOSIS` char(20) NOT NULL,
   `TEST` char(20) NOT NULL,
   `LABORATORY_NAME` char(20) NOT NULL,
+  `LogInUser` char(50) NOT NULL,
   `ID_SAMPLE` char(50) NOT NULL,
   `DIAGNOSIS_DATE` date DEFAULT NULL,
   `QUANTITE` decimal(5,0) DEFAULT NULL,
   `RESULT` char(10) DEFAULT NULL,
   `LEISHSUSPECT` char(50) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `interrogator`
@@ -65,8 +64,6 @@ CREATE TABLE `interrogator` (
   `QUALITY` char(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
 --
 -- Table structure for table `laboratory`
 --
@@ -76,6 +73,20 @@ CREATE TABLE `laboratory` (
   `LOGINUSER` char(100) NOT NULL,
   `COUNTRY` char(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `laboratory`
+--
+
+INSERT INTO `laboratory` (`LABORATORY_NAME`, `LOGINUSER`, `COUNTRY`) VALUES
+('IPT', 'super', 'Tunisia'),
+('IPM', 'super', 'Morrocco'),
+('IPA', 'super', 'Algeria'),
+('Rabta', 'super', 'Tunisia-Tunis'),
+('RHO', 'super', 'Lebanon'),
+('FHS', 'super', 'Tunisia-Sousse'),
+('Other', 'super', 'N/A'),
+('N/A', 'super', 'N/A');
 
 -- --------------------------------------------------------
 
@@ -125,8 +136,6 @@ CREATE TABLE `medical_checkup` (
   `GENDESC` char(200) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
 --
 -- Table structure for table `molecularl_test`
 --
@@ -160,13 +169,12 @@ CREATE TABLE `patient` (
   `FIRST_NAME` char(20) DEFAULT NULL,
   `LAST_NAME` char(20) DEFAULT NULL,
   `BIRTH_DATE` date DEFAULT NULL,
+  `AGE` int(3) DEFAULT NULL,
   `NATIONALITY` char(6) DEFAULT NULL,
   `GENDER` char(10) DEFAULT NULL,
   `CONSENT` char(3) DEFAULT NULL,
   `PHONE_NUMBER` char(15) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `region`
@@ -194,7 +202,8 @@ CREATE TABLE `sample` (
   `TYPE_OF_SAMPLE_SUPPORT_` char(30) DEFAULT NULL,
   `DIRECT_EXAMINATION` char(20) DEFAULT NULL,
   `ABUDANCE_ON_THE_SMEAR` char(6) DEFAULT NULL,
-  `LESION_AGE` date DEFAULT NULL,
+  `Date_First_Apeard` date DEFAULT NULL,
+  `Lesion_Age` int(11) DEFAULT NULL,
   `DIAMETREMax` int(5) DEFAULT NULL,
   `DIAMETREMin` int(5) DEFAULT NULL,
   `HIGHT` int(5) DEFAULT NULL,
@@ -202,8 +211,6 @@ CREATE TABLE `sample` (
   `DESCRIPTION` mediumtext,
   `DATE_EXTRACTION` date DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `travel_residency`
@@ -220,8 +227,6 @@ CREATE TABLE `travel_residency` (
   `RESIDENCY` char(10) DEFAULT NULL,
   `TYPE` char(5) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `treatment`
@@ -251,8 +256,6 @@ CREATE TABLE `treatmenthistory` (
   `HEALING_DATE` char(50) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
 --
 -- Table structure for table `userdata`
 --
@@ -270,7 +273,7 @@ CREATE TABLE `userdata` (
 --
 
 INSERT INTO `userdata` (`LOGINUSER`, `USE_LOGINUSER`, `MOTDPASS`, `LEVELSECURE`, `FROMINST`) VALUES
-('super', 'super', 'super1234', 'super', 'IPT');
+('super', 'super', 'superuser', 'super', 'IPT');
 
 --
 -- Indexes for dumped tables
