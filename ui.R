@@ -43,26 +43,15 @@ shinyUI(
   dashboardPage(
                 skin = "black",
                 title="Lesionia",
-                
+#tags$link(rel='icon' type='image/gif/png' href='www/logologo.png'),
+                #tags$img(src="logologo.png",height=30,widht=100),
+
+
                 
                 mydashboardHeader(
-                      title= 
-                      #   "Lesionia"
-                      # ,
-                      
-                      
-                      
-                      # tags$li(
-                        #class = "dropdown",
-                        actionLink("selecthome2"
-                                   ,"Lesionia"
-                                   # ,tags$img(src="logologo.png",height=40,widht=70,style="margin:5px 1300px 5px 3px;")
-                                   #, "Home page"
-                                   #,icon = icon("list-alt")
-                        )
-                      # )
-                      
-                      ),
+                      title= tags$div(  tags$img(src="logologo.png",height=30,widht=100)
+                                        ,actionLink("selecthome2","Lesionia") )
+                ),
                 
                 
                 

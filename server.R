@@ -1721,7 +1721,7 @@ shinyServer(function(input, output,session) {
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
+      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
 
     
     if(input$extractDay==""){
@@ -1774,7 +1774,8 @@ shinyServer(function(input, output,session) {
               selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE), 
               selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")), 
               selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")), 
-              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") , 
+              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
+              numericInput("Lesion_Age","Or leision age","-1") ,
               numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") , 
               numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") , 
               numericInput("highlesion","lesion Hight(millimeter)*","-1") , 
@@ -2180,6 +2181,7 @@ shinyServer(function(input, output,session) {
              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
              selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")),
              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
+             numericInput("Lesion_Age","Or leision age","-1") ,
              numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") ,
              numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") ,
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
@@ -3513,7 +3515,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$btnUpdatePatient,{
     queryUpdatePatient <- sprintf("
-                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',Age='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
+                                 UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',AGE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
                                   paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$AgePatientUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient)))
 
     an.error.occured <- FALSE
@@ -3762,7 +3764,7 @@ shinyServer(function(input, output,session) {
         textInput("directexamUP","Direct examination result",value = UPdatavalueSample()$DIRECT_EXAMINATION),
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR),
         dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$Date_First_Apeard) ,
-        numericInput("Lesion_AgeUP","Or leision age",value = UPdatavalueSample()$Lesion_Age) ,
+        numericInput("Lesion_AgeUP","Or leision age(in weeks)",value = UPdatavalueSample()$Lesion_Age) ,
         numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETREMax) ,
         numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETREMin) ,
         numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$HIGHT) ,
@@ -3811,7 +3813,7 @@ shinyServer(function(input, output,session) {
   dataModalUDiagnosis <- function(failed = FALSE) {
     modalDialog(
 
-      selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier) )))[,1])))),
+      selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,paste("SELECT ID_SAMPLE from sample", if(toString(input$PatIdentifier)!=""){paste0("where PATIENT_IDENTIFIER='",input$PatIdentifier,"';" )} ) ))[,1])))),
 
 
       uiOutput("testdiagTestAndLabName"),
@@ -3845,8 +3847,8 @@ shinyServer(function(input, output,session) {
   })
   output$testdiagTestAndLabName=renderUI({
     box(width = 12,
-        column("",selectInput("testupdiag","Molecular est",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)))))[,1])))),width = 6),
-        column("",selectInput("labupDiag","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from diognosis where ID_SAMPLE='%s' ",paste(as.character(input$sampleUPDiag)) )))[,1])))),width = 6)
+        column("",selectInput("testupdiag","Molecular test",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT TEST from diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)))))[,1])))),width = 6),
+        column("",selectInput("labupDiag","Laboratory name",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from diognosis where ID_SAMPLE='%s' ",paste(as.character(input$sampleUPDiag)) )))[,1])))),width = 6)
 
     )
   })
