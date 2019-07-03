@@ -1,12 +1,7 @@
 # LEISIApp
 
 ## About us
-Lesionia is an open-source software/Web applications for the collection, management and analysis 
-of clinical and epidemiological data related to patients suspected for cutaneous leishmaniasis.
-Initially conceived and developed in the frame of the PEER518 project, it is meant to enable 
-researchers within the project consortium to enter and access the data with respect to the FAIR criteria.
-It offers a remote and secured access via a web-based interface to all users that are based in different 
-countries and acting at different stages of the data life cycle.
+Lesionia is an open-source software/Web applications for the collection, management and analysis of clinical and epidemiological data related to patients suspected for cutaneous leishmaniasis (CL). It was initially conceived and developed in the frame of the PEER518 project, funded by the USAID-NAS. It is meant to enable researchers within the project consortium to enter and access the data with respect to the FAIR criteria. It offers a remote and secured access via a web-based interface to all users that are based in different countries and acting at different stages of the data life cycle. Lesionia can be useful for researchers working on CL cases and who need a data management system for their research activities. The system can easily be tuned to be used for other diseases correlated to cutaneous lesions.
 
 ### Requirements:
 - LEMP software stack (i.e. a variation on the LAMP software bundle that uses Nginx rather than Apache, also known as LNMP : Linux Nginx MySql Php)
