@@ -1222,7 +1222,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
@@ -1787,7 +1787,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
@@ -2125,7 +2125,7 @@ shinyServer(function(input, output,session) {
   # )
   # if(an.error.occured){
   #   info("Error : INSERT INTO alliquit ")
-  # }else{info("Alliquot successfully stored")}
+  # }else{info("Aliquot successfully stored")}
   #    shinyjs::reset("FormInsertAlliquotAndQuit")
   #  })
 
@@ -2147,7 +2147,7 @@ shinyServer(function(input, output,session) {
       )
       if(an.error.occured){
         info("Error : INSERT INTO alliquit ")
-      }else{info("Alliquot successfully stored")}
+      }else{info("Aliquot successfully stored")}
     }
 
     #shinyjs::reset("FormInsertAlliquotAndQuit")
@@ -2192,7 +2192,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
