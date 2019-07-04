@@ -2277,7 +2277,7 @@ shinyServer(function(input, output,session) {
                       catalog = NULL, schema = NULL, tableName = NULL,
                       tableType = NULL, literal = FALSE)
     opt=taables[,3]
-    cho=opt[c(1,3,4,6,8,10,11)]
+    cho=opt[c(2,3,8,10,12,13,15)]
     selectInput("ttest2", "",choices=cho)
 
   })
