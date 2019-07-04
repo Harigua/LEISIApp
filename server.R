@@ -41,9 +41,9 @@ library(V8)
 #library(Sys)
 
 Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
-connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
-#connect=odbcConnect("ServeurDSN", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
-#connect=odbcConnect("MyAppDBserver", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
+connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
+#connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
+#connect=odbcConnect("MyAppDB_CIC", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 
 js.png <- '
 shinyjs.exportPNG = function(params) {
@@ -69,43 +69,43 @@ shinyServer(function(input, output,session) {
   img(id = 'plot-static')
 
   dataalliq=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.alliquot"))
+    sqlQuery(connect,paste("SELECT * from alliquot"))
   })
 
   datatestech=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.molecularl_test"))
+    sqlQuery(connect,paste("SELECT * from molecularl_test"))
   })
 
   datalab=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.laboratory"))
+    sqlQuery(connect,paste("SELECT * from laboratory"))
   })
 
   pat=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.patient"))
+    sqlQuery(connect,paste("SELECT * from patient"))
   })
 
   ChUp=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    sqlQuery(connect,paste("SELECT * from medical_checkup"))
   })
 
   datareg=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.region"))
+    sqlQuery(connect,paste("SELECT * from region"))
   })
 
   dataech=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.sample"))
+    sqlQuery(connect,paste("SELECT * from sample"))
   })
 
   useee=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    sqlQuery(connect,paste("SELECT * from userdata"))
   })
 
   dataetab=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.laboratory"))
+    sqlQuery(connect,paste("SELECT * from laboratory"))
   })
 
   datainvv=reactive({
-    sqlQuery(connect,paste("SELECT * from dbpfedev.interrogator"))
+    sqlQuery(connect,paste("SELECT * from interrogator"))
   })
 
 
@@ -131,7 +131,7 @@ shinyServer(function(input, output,session) {
 
 
   datas= reactive({
-    AAll=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttest))
+    AAll=sqlQuery(connect,paste("SELECT * from ",input$ttest))
     AAll
   })
 
@@ -208,7 +208,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -223,7 +223,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -238,7 +238,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -253,7 +253,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -268,7 +268,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -283,7 +283,7 @@ shinyServer(function(input, output,session) {
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from dbpfedev.userdata"))
+    security=sqlQuery(connect,paste("SELECT * from userdata"))
     security=security[which(security[,1]==USER$name),3]
     validate(
       need(security!="normal", "You have to be a super user to access")
@@ -717,12 +717,12 @@ shinyServer(function(input, output,session) {
                          p("feilds with asterisk(*) are mandatory", style = "color:red"),
 
                          selectInput("chemtest","Molecular test*",choices = c("",as.character(datatestech()[,1]))),
-                         selectInput("labname","Laboratory*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory")))$LABORATORY_NAME)))),
+                         selectInput("labname","Laboratory*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory")))$LABORATORY_NAME)))),
                          selectInput("sample","Sample*",choices = c("",as.character(dataech()[,1]))),
                          dateInput("dattest","Test date",value = "1900-01-01"),
                          textInput("quantity","DNA volume (in micoL)*","-1"),
                          selectInput("restest","Test result*",choices = c("N/A","+","-")),
-                         selectInput("susSpec","Suspected Species*",choices = c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from dbpfedev.leishmania_species")))$SPECIES))))
+                         selectInput("susSpec","Suspected Species*",choices = c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from leishmania_species")))$SPECIES))))
                      ),
                      actionButton("btnInsertDiognosis", "Submit Data",  class = "btn-primary"),
                      actionButton("editDiag", "Edit",  class = "btn-primary")
@@ -736,7 +736,7 @@ shinyServer(function(input, output,session) {
                          column("", selectInput("upsample","Choose Sample",choices = c("",as.character(dataech()[,1]))),width = 3),
                          tableOutput("testsDone")
                      ),
-                     column("",selectInput("spece","Identified Species",choices =c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from dbpfedev.leishmania_species")))$SPECIES)))),width = 3),
+                     column("",selectInput("spece","Identified Species",choices =c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from leishmania_species")))$SPECIES)))),width = 3),
 
                      actionButton("btnUpdateIdentifiedSpecies","Update Leishmania species")
                    ))),
@@ -786,7 +786,7 @@ shinyServer(function(input, output,session) {
                      box(width = 12, status = "info",solidHeader = TRUE,
                          p("feilds with asterisk(*) are mandatory", style = "color:red"),
 
-                         selectInput("idPatientDisc","patient DB Code*",choices = c("",as.character(data.frame(sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from dbpfedev.patient")))$PATIENT_IDENTIFIER))),
+                         selectInput("idPatientDisc","patient DB Code*",choices = c("",as.character(data.frame(sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from patient")))$PATIENT_IDENTIFIER))),
                          uiOutput("idMedDiscrepancy"),
 
                          #textAreaInput("text_Disc", "Discrepancy*", height= "100px")
@@ -811,7 +811,7 @@ shinyServer(function(input, output,session) {
   })
   observeEvent(input$btnInsertDiscrepancy , {
     queryInserDiscrepancy  <- paste0(
-      "INSERT INTO dbpfedev.discrepancy(idDiscrepancy,PATIENT_IDENTIFIER,DATE_MED,Description,user)
+      "INSERT INTO discrepancy(idDiscrepancy,PATIENT_IDENTIFIER,DATE_MED,Description,user)
       VALUES ('",paste0(input$idPatientDisc),"/",input$Med_check,"','",input$idPatientDisc,"','",input$Med_check,"','",input$text_Disc,"','",USER$name,"') ")
 
     if (input$idPatientDisc==""){
@@ -1023,9 +1023,9 @@ shinyServer(function(input, output,session) {
   output$patdataout=renderUI ({
     if(paste(USER$name)=='super')
     {
-      quer=sprintf("SELECT * from dbpfedev.patient")
+      quer=sprintf("SELECT * from patient")
     }else{
-      quer=sprintf("SELECT * from dbpfedev.patient where LOGINUSER='%s'",paste(USER$name))
+      quer=sprintf("SELECT * from patient where LOGINUSER='%s'",paste(USER$name))
     }
     datpat=sqlQuery(connect,quer)
 
@@ -1033,7 +1033,7 @@ shinyServer(function(input, output,session) {
     if ( input$PatIdentifier %in% datpat[,1] ) {
 
       output$ViewTable=renderDataTable({
-        A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:8)]
+        A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:10)]
         DT::datatable(A, options = list(scrollX = TRUE,lengthMenu = c(1) ,pageLength = 1))
       })
 
@@ -1058,7 +1058,7 @@ shinyServer(function(input, output,session) {
     })
     output$patdataout=renderUI ({
 
-      datpat=sqlQuery(connect,paste("SELECT * from dbpfedev.patient"))
+      datpat=sqlQuery(connect,paste("SELECT * from patient"))
 
 
       if ( input$PatIdentifier %in% datpat[,1] ) {
@@ -1099,7 +1099,7 @@ shinyServer(function(input, output,session) {
 
         id="formInsertPatient",
         #SELECT  FROM `patient` WHERE `LOGINUSER`="maaoui" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;
-        #datpat=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER from dbpfedev.patient  WHERE `LOGINUSER`="%s" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;",paste(USER$name)))
+        #datpat=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER from patient  WHERE `LOGINUSER`="%s" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;",paste(USER$name)))
 
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
@@ -1146,7 +1146,7 @@ shinyServer(function(input, output,session) {
       if(an.error.occured){
         info("Error : Patient already exists")
       }else{
-        querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+        querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
 
         querytravinpfe <- paste0(
           "INSERT INTO travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`,`TODATE`)
@@ -1222,7 +1222,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
@@ -1256,7 +1256,7 @@ shinyServer(function(input, output,session) {
             selectInput("Type","Urban/Rural",choices =  c("N/A", "Urban","Rural")),
             selectInput("resedent","Residency ",choices =  c("N/A", "Yes","No")),
             selectInput("bybyte","Bite Notion",choices =  c("N/A", "Yes","No")),
-            dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE),
+            dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE),
             textInput("dateleavevisit","Duration (In weeks, one year = 52 weeks)*","-1")
 
         ),
@@ -1355,7 +1355,7 @@ shinyServer(function(input, output,session) {
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
 
-            selectInput("interrID","Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from dbpfedev.interrogator")))$ID_INTERROGATOR)))),
+            selectInput("interrID","Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator")))$ID_INTERROGATOR)))),
             textInput("hospital","Hospital",""),
             textInput("pysicien","Physician",""),
             textInput("sampler","Sampler",""),
@@ -1407,7 +1407,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$othercheckAdd, {
 
-    datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
 
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
@@ -1434,7 +1434,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$subchekupQ, {
 
-    datacheck=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
 
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
@@ -1481,7 +1481,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$othertreatmentAdd, {
 
     ############
-    datamytreatment2=sqlQuery(connect,paste("SELECT * from dbpfedev.treatmenthistory"))
+    datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
 
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
@@ -1507,7 +1507,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$othertreatmentHistoryAdd, {
 
     ############
-    datamytreatment2=sqlQuery(connect,paste("SELECT * from dbpfedev.treatmenthistory"))
+    datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
 
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
@@ -1534,7 +1534,7 @@ shinyServer(function(input, output,session) {
 
     ############
 
-    treatmenthistory=sqlQuery(connect,paste("SELECT * from dbpfedev.treatmenthistory"))
+    treatmenthistory=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
 
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
@@ -1582,7 +1582,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$otherregionAdd, {
 
-    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+    querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
 
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
@@ -1609,7 +1609,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$subregionQ, {
 
-    querySelectDataTR=sqlQuery(connect,paste("SELECT * from dbpfedev.travel_residency"))
+    querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
 
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
@@ -1658,7 +1658,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$btnAddSampleAndQuit, {
 
-    querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
+    querySelectDataSample=sqlQuery(connect,paste("SELECT  * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
 
     queryInsertSample <- paste0(
@@ -1689,7 +1689,7 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  sample")
       }else{info(paste0("Sample successfully stored ", idSample))}
     }
-    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
+    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
 
     output$patdataout=renderUI ({
       div(
@@ -1717,7 +1717,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$btnAddSampleAndOther, {
 
-    querySelectDataSample=sqlQuery(connect,paste("SELECT * from dbpfedev.sample "))
+    querySelectDataSample=sqlQuery(connect,paste("SELECT * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
@@ -1747,7 +1747,7 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  sample")
       }else{info(paste0("Sample successfully stored",idSample))}
     }
-    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
+    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
 
     #alert(paste0("Sample Added",length(querySelectDataSample[,1])+1))
     output$AdddSample=renderUI({
@@ -1787,7 +1787,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
@@ -1824,13 +1824,13 @@ shinyServer(function(input, output,session) {
       }else{info("Interrogator successfully stored")}
     }
 
-    updateSelectInput (session,"interrID",label="Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from dbpfedev.interrogator")))$ID_INTERROGATOR))))
+    updateSelectInput (session,"interrID",label="Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator")))$ID_INTERROGATOR))))
 
 
   })
 
   observeEvent(input$btnInsertDiognosis, {
-    querySelectDataDiognosis=sqlQuery(connect,paste("SELECT * from dbpfedev.diognosis"))
+    querySelectDataDiognosis=sqlQuery(connect,paste("SELECT * from diognosis"))
     queryInsertDiognosis <- paste0(
       "INSERT INTO  diognosis
       VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"','", toString(USER$name) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
@@ -1882,7 +1882,7 @@ shinyServer(function(input, output,session) {
 
     #
     shinyjs::reset("formAddLab")
-    updateSelectInput(session,"labname","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory")))$LABORATORY_NAME))))
+    updateSelectInput(session,"labname","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory")))$LABORATORY_NAME))))
 
   })
 
@@ -2044,7 +2044,7 @@ shinyServer(function(input, output,session) {
           id="FormUploadImage",
           box(width = 12, status = "info",solidHeader = TRUE,
               selectInput("sampleIDD","Sample",
-                          choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
+                          choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                           )),
               fileInput("MyImage","Image of lesion sampled",
                         accept = c('image/png','image/jpeg'))
@@ -2059,7 +2059,7 @@ shinyServer(function(input, output,session) {
 
 
   observeEvent(input$btnUploadImage, {
-    querySelectDataImg=sqlQuery(connect,paste("SELECT * from dbpfedev.Img"))
+    querySelectDataImg=sqlQuery(connect,paste("SELECT * from Img"))
     inFile  <- input$MyImage
     fileName  <- paste0(input$PatIdentifier,"_",input$sampleIDD,"_",length(querySelectDataImg)+1)
     queryInsertImg= paste0("INSERT INTO Img
@@ -2097,7 +2097,7 @@ shinyServer(function(input, output,session) {
           id="FormInsertAlliquotAndQuit",
           box(width = 12, status = "info",solidHeader = TRUE,
               selectInput("sampleIDD","Sample",
-                          choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
+                          choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                           ))
               ,
               numericInput("voll","Quantity in nanogramme","-1"),
@@ -2115,7 +2115,7 @@ shinyServer(function(input, output,session) {
   })
 
   #  observeEvent(input$btnInsertAlliquot, {
-  #    querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from dbpfedev.alliquot"))
+  #    querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from alliquot"))
   #    queryInsertAlliquot= paste0("INSERT INTO alliquot
   #                     VALUES ('", toString(paste0("Alliquot",length(querySelectDataAlliquot[,1])+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
   #
@@ -2125,12 +2125,12 @@ shinyServer(function(input, output,session) {
   # )
   # if(an.error.occured){
   #   info("Error : INSERT INTO alliquit ")
-  # }else{info("Alliquot successfully stored")}
+  # }else{info("Aliquot successfully stored")}
   #    shinyjs::reset("FormInsertAlliquotAndQuit")
   #  })
 
   observeEvent(input$btnInsertAlliquot, {
-    querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from dbpfedev.alliquot"))
+    querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from alliquot"))
     queryInsertAlliquot= paste0("INSERT INTO alliquot
                      VALUES ('", toString(paste0(input$sampleIDD,"-",length(querySelectDataAlliquot)+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
 
@@ -2147,7 +2147,7 @@ shinyServer(function(input, output,session) {
       )
       if(an.error.occured){
         info("Error : INSERT INTO alliquit ")
-      }else{info("Alliquot successfully stored")}
+      }else{info("Aliquot successfully stored")}
     }
 
     #shinyjs::reset("FormInsertAlliquotAndQuit")
@@ -2166,7 +2166,7 @@ shinyServer(function(input, output,session) {
       output$patdataout=renderUI ({
       })
 
-      # querySelectDataSample=sqlQuery(connect,paste("SELECT  * from dbpfedev.sample "))
+      # querySelectDataSample=sqlQuery(connect,paste("SELECT  * from sample "))
       # alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
 
       div(
@@ -2192,7 +2192,7 @@ shinyServer(function(input, output,session) {
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
-        actionButton("btnInsertAlliquotInt","Enter Alliquot data"),
+        actionButton("btnInsertAlliquotInt","Enter Aliquot data"),
         actionButton("btnAddSampleAndOther"," Submit and add other samples"),
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
@@ -2290,7 +2290,7 @@ shinyServer(function(input, output,session) {
   datas2= reactive({
 
 
-    All=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttest2))
+    All=sqlQuery(connect,paste("SELECT * from ",input$ttest2))
   })
 
   output$datas2= DT::renderDataTable ({
@@ -2324,7 +2324,7 @@ shinyServer(function(input, output,session) {
 
 
   output$monthview=renderDygraph({
-    totalChUp=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS=totalChUp[,"DATE_MED"]
     TS <- c(TS,seq(as.Date(TS[1]), as.Date(TS[length(TS)]), "month") )
     Month=as.yearmon(TS)
@@ -2337,7 +2337,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$monthview2=renderDygraph ({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS2=totalChUp2[,"DATE_MED"][which(totalChUp2$LOGINUSER==USER$name  )]
     TS2 <- c(TS2,seq(as.Date(TS2[1]), as.Date(TS2[length(TS2)]), "month") )
     Month2=as.yearmon(TS2)
@@ -2383,7 +2383,7 @@ shinyServer(function(input, output,session) {
   })
 
   preddata=reactive({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS=totalChUp2[,"DATE_MED"]
     Month=as.yearmon(TS)
     monthCal=as.data.frame(table(Month))
@@ -2398,7 +2398,7 @@ shinyServer(function(input, output,session) {
     preddataL
   })
   output$Timeseriesplot=renderDygraph({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TSD=totalChUp2[,"DATE_MED"]
     TSD2=ts(preddata(),start =as.numeric(format(as.Date(TSD[length(TSD)], format="%Y/%m/%d"),"%Y"))+1,frequency = 12)
 
@@ -2423,7 +2423,7 @@ shinyServer(function(input, output,session) {
 
 
   output$nameschartPIE= renderUI({
-    AAllPIE=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE))
+    AAllPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
     is.fact10 <- sapply(AAllPIE, is.factor)
     AAllPIE=data.frame( AAllPIE[, is.fact10])
     selectInput("ttestPIEnames", "",choices=c(colnames(AAllPIE)))
@@ -2431,7 +2431,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$pie=renderPlot({
-    dataPIE=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE))
+    dataPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
 
     Levels=dataPIE[,input$ttestPIEnames]
     ggplot(dataPIE, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y")
@@ -2475,7 +2475,7 @@ shinyServer(function(input, output,session) {
 
 
   output$nameschartPIE2= renderUI({
-    AAllPIE2=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE2))
+    AAllPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
     is.fact11 <- sapply(AAllPIE2, is.factor)
     AAllPIE2=data.frame( AAllPIE2[, is.fact11])
     selectInput("ttestPIEnames2", "",choices=c(colnames(AAllPIE2)))
@@ -2483,7 +2483,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$pie2=renderPlot({
-    dataPIE2=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE2))
+    dataPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
     dataPIE2N=dataPIE2[c(which(dataPIE2$LOGINUSER== USER$name)),]
 
     Levels=dataPIE2N[,input$ttestPIEnames2]
@@ -2523,7 +2523,7 @@ shinyServer(function(input, output,session) {
   #calandar#
   #############################################################################
   output$calendar=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from dbpfedev.medical_checkup"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup"))))
     dateMed$Var1=as.Date(dateMed$Var1)
 
 
@@ -2543,7 +2543,7 @@ shinyServer(function(input, output,session) {
   })
   ###############################################################################
   output$calendar2=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from dbpfedev.medical_checkup"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from medical_checkup"))))
     dateMed$DATE_MED=as.Date(dateMed$DATE_MED)
     dateMed=dateMed[which(dateMed$LOGINUSER==USER$name),]
 
@@ -2567,14 +2567,14 @@ shinyServer(function(input, output,session) {
   ##########################################################################################
 
   output$CountriesShopUI=renderUI({
-    countrie= unique( sqlQuery(connect,paste("SELECT COUNTRY_	 from dbpfedev.region")))
+    countrie= unique( sqlQuery(connect,paste("SELECT COUNTRY_	 from region")))
 
     selectInput("countriesshop", "",choices=countrie$COUNTRY_)
 
   })
 
   output$especeUI=renderUI({
-    espece= unique( sqlQuery(connect,paste("SELECT SPECIES	 from dbpfedev.sample")))
+    espece= unique( sqlQuery(connect,paste("SELECT SPECIES	 from sample")))
 
     selectInput("especesshop", "",choices=espece$SPECIES)
 
@@ -2585,9 +2585,9 @@ shinyServer(function(input, output,session) {
 
 
 
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from dbpfedev.sample"))
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from dbpfedev.region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from dbpfedev.travel_residency"))
+    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
+    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
 
     regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
 
@@ -2645,10 +2645,10 @@ shinyServer(function(input, output,session) {
 
     mapK <- get_map(location = input$countriesshop, zoom = 6)
 
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from dbpfedev.sample"))
+    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from sample"))
     sam=sam[which(sam[,"LOGINUSER"]==USER$name),]
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from dbpfedev.region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from dbpfedev.travel_residency"))
+    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
 
     regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
 
@@ -2721,8 +2721,8 @@ shinyServer(function(input, output,session) {
   ##############################################################################################
 
   cordata=reactive({
-    cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER from dbpfedev.patient"))
-    cor3=sqlQuery(connect,paste("SELECT * from dbpfedev.sample"))
+    cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER from patient"))
+    cor3=sqlQuery(connect,paste("SELECT * from sample"))
 
 
 
@@ -3003,8 +3003,8 @@ shinyServer(function(input, output,session) {
   ###########################################################################################
   output$WC=renderPlot({
 
-    one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup WHERE DATE_MED!='1900-01-01' "))
-    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from dbpfedev.sample WHERE Date_First_Apeard!='1900-01-01' "))
+    one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01' "))
+    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
     three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
 
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
@@ -3020,8 +3020,8 @@ shinyServer(function(input, output,session) {
 
   })
   output$MC=renderPlot({
-    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup WHERE DATE_MED!='1900-01-01'"))
-    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from dbpfedev.patient WHERE BIRTH_DATE!='1900-01-01'"))
+    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01'"))
+    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from patient WHERE BIRTH_DATE!='1900-01-01'"))
     three2= sqldf("select DATE_MED,BIRTH_DATE from  one2, two2
 
                   where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
@@ -3066,7 +3066,7 @@ shinyServer(function(input, output,session) {
   ################################################################################################################
   #
   # output$boxmP=renderPlot({
-  #   MP=sqlQuery(connect,paste("SELECT DATE_MED from dbpfedev.medical_checkup"))
+  #   MP=sqlQuery(connect,paste("SELECT DATE_MED from medical_checkup"))
   #   CheckUp_Month=format(MP, "%Y-%m")
   #
   #   databoxdateT=as.data.frame( table(CheckUp_Month))
@@ -3179,7 +3179,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$sel=renderUI({
-    selectInput("userLoginF","Select user",choices=c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from dbpfedev.userdata")))$LOGINUSER)))
+    selectInput("userLoginF","Select user",choices=c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from userdata")))$LOGINUSER)))
   })
 
 
@@ -3196,9 +3196,9 @@ shinyServer(function(input, output,session) {
       box(width = 11, status = "info",solidHeader = TRUE,
           id="useraddid",
           
-          textInput("userpassF","Change Password",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$MOTDPASS))),  
+          textInput("userpassF","Change Password",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from userdata where LOGINUSER='%s'",paste(input$userLoginF))))$MOTDPASS))),
           selectInput("NivSecF","Choose access level",choices =  c("normal", "super")),
-          textInput("userInsF","Change Institution",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from dbpfedev.userdata where LOGINUSER='%s'",paste(input$userLoginF))))$FROMINST))), 
+          textInput("userInsF","Change Institution",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from userdata where LOGINUSER='%s'",paste(input$userLoginF))))$FROMINST))),
           
           actionButton("subusernewUp","Update user data")
       ))
@@ -3230,7 +3230,7 @@ shinyServer(function(input, output,session) {
     div(
 
 
-      selectInput("Loguserdelete","Select user login",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))),
+      selectInput("Loguserdelete","Select user login",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))),
 
       actionButton("subuserDell","Delete user")
     )
@@ -3264,7 +3264,7 @@ shinyServer(function(input, output,session) {
   ##########################################################
 
   output$DatadelF666Fil=renderUI ({
-    AAllDel=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDelete))
+    AAllDel=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
 
     selectInput("filNameDelete","Select Filter",choices =  c(colnames(AAllDel)))
 
@@ -3272,7 +3272,7 @@ shinyServer(function(input, output,session) {
 
 
   output$DataDowLF666Fil=renderUI ({
-    AAllDowL=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDown))
+    AAllDowL=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     selectInput("filNameDown","Select Filter",choices =  c( colnames(AAllDowL) ))
 
   })
@@ -3281,7 +3281,7 @@ shinyServer(function(input, output,session) {
   #                            Values                             #
   #################################################################
   output$DatadelF666tableval=renderUI ({
-    AAllDel1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDelete))
+    AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[,input$filNameDelete]
 
     selectInput("valNameDelete","Select Value",choices =  c( unique(as.character(AAllDel2) )))
@@ -3289,7 +3289,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$DataDowLF666value=renderUI ({
-    AAllDown1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDown))
+    AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     AAllDown2=AAllDown1[,input$filNameDown]
     selectInput("valNameDown","Select Value",choices =  c(unique(as.character(AAllDown2))))
 
@@ -3299,20 +3299,20 @@ shinyServer(function(input, output,session) {
   #                            data results                       #
   #################################################################
   humDown=reactive({
-    AAllDown1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDown))
+    AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
 
     AAllDown2=AAllDown1[which(AAllDown1[,input$filNameDown]==as.character(input$valNameDown)),]
     data.frame(AAllDown2)
   })
 
   humDownallall=reactive({
-    AAllDown1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDown))
+    AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     AAllDown1
 
   })
 
   humDel=reactive({
-    AAllDel1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDelete))
+    AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[which(AAllDel1[,input$filNameDelete]==as.character(input$valNameDelete)),]
     data.frame(AAllDel2)
   })
@@ -3336,8 +3336,8 @@ shinyServer(function(input, output,session) {
     querydeleteuser <-sprintf("DELETE from userdata where LOGINUSER='%s'",paste(as.character(input$Loguserdelete)))
     sqlQuery(connect,querydeleteuser)
     info("User Deleted")
-    observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )})
-    observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from dbpfedev.userdata")))$LOGINUSER)))})
+    observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )})
+    observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from userdata")))$LOGINUSER)))})
   })
 
   observeEvent(input$DatadelDone, {
@@ -3345,7 +3345,7 @@ shinyServer(function(input, output,session) {
     sqlQuery(connect,querydeleteuser)
     info("Data successfully Deleted")
     observe({
-      AAllDel1=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$tableNameDelete))
+      AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
       AAllDel2=AAllDel1[,input$filNameDelete]
       updateSelectInput(session,"valNameDelete","",choices = c( unique(as.character(AAllDel2) ))  )
     })
@@ -3381,8 +3381,8 @@ shinyServer(function(input, output,session) {
     }else{info("User successfully added")}
 
     shinyjs::reset("formUser")
-    observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )})
-    observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER))  )
+    observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )})
+    observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )
     })
   })
 
@@ -3403,7 +3403,7 @@ shinyServer(function(input, output,session) {
       info("Error : Update USER")
     }else{info("User successfully Updated")}
 
-    observe({updateSelectInput(session,"userLoginF","",choices =  c(" ",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from dbpfedev.userdata")))$LOGINUSER)))
+    observe({updateSelectInput(session,"userLoginF","",choices =  c(" ",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER)))
 
     })
   })
@@ -3436,7 +3436,7 @@ shinyServer(function(input, output,session) {
   #                                             Select diagnosis data                                 #
   #####################################################################################################
   doneTest=reactive({
-    f=data.frame( sqlQuery(connect,sprintf("SELECT TEST,RESULT,LEISHSUSPECT from dbpfedev.diognosis where ID_SAMPLE='%s'",paste(input$upsample))))
+    f=data.frame( sqlQuery(connect,sprintf("SELECT TEST,RESULT,LEISHSUSPECT from diognosis where ID_SAMPLE='%s'",paste(input$upsample))))
     f
   })
 
@@ -3459,7 +3459,7 @@ shinyServer(function(input, output,session) {
     {
       modalDialog(
         selectInput("DUPpatient", "Select patient",
-                    choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from dbpfedev.patient")))$PATIENT_IDENTIFIER)))),
+                    choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from patient")))$PATIENT_IDENTIFIER)))),
 
         uiOutput("formUpdatePatient"),
 
@@ -3473,7 +3473,7 @@ shinyServer(function(input, output,session) {
     }else{
       modalDialog(
         selectInput("DUPpatient", "Select patient",
-                    choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from dbpfedev.patient where LOGINUSER='%s'",paste(USER$name))))$PATIENT_IDENTIFIER)))),
+                    choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from patient where LOGINUSER='%s'",paste(USER$name))))$PATIENT_IDENTIFIER)))),
 
         uiOutput("formUpdatePatient"),
 
@@ -3492,7 +3492,7 @@ shinyServer(function(input, output,session) {
   })
 
   UPdatavaluePat=reactive({
-    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.patient where PATIENT_IDENTIFIER='%s'",paste(input$DUPpatient) )))
+    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from patient where PATIENT_IDENTIFIER='%s'",paste(input$DUPpatient) )))
 
   })
   output$formUpdatePatient=renderUI({
@@ -3538,7 +3538,7 @@ shinyServer(function(input, output,session) {
   dataModalUPMEdCheck <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPcheck", "Select checkup date",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$DATE_MED))
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$DATE_MED))
                   )),
 
       uiOutput("formUpdateMedicalcheckup"),
@@ -3555,7 +3555,7 @@ shinyServer(function(input, output,session) {
   })
 
   UPdatavalueCheck=reactive({
-    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
+    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
   })
   output$formUpdateMedicalcheckup=renderUI({
     box(
@@ -3613,7 +3613,7 @@ shinyServer(function(input, output,session) {
   dataModalUPTreatment <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPtreat", "Select treatment starting date",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT START_DATE from dbpfedev.treatmenthistory where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$START_DATE))
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT START_DATE from treatmenthistory where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$START_DATE))
                   )),
 
       uiOutput("formUpdateTreatment"),
@@ -3629,7 +3629,7 @@ shinyServer(function(input, output,session) {
   })
 
   UPdatavalueTreat=reactive({
-    querySelectDataTreatment=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.treatmenthistory where PATIENT_IDENTIFIER='%s' and START_DATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPtreat)) )))
+    querySelectDataTreatment=data.frame(sqlQuery(connect,sprintf("SELECT * from treatmenthistory where PATIENT_IDENTIFIER='%s' and START_DATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPtreat)) )))
   })
 
   output$formUpdateTreatment=renderUI({
@@ -3674,7 +3674,7 @@ shinyServer(function(input, output,session) {
   dataModalUPRegion <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPmvt", "Select movement",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT FROMDate from dbpfedev.travel_residency where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$FROMDate))
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT FROMDate from travel_residency where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$FROMDate))
                   )),
 
       uiOutput("formUpdateTR"),
@@ -3692,7 +3692,7 @@ shinyServer(function(input, output,session) {
 
 
   UPdatavalueMvt=reactive({
-    querySelectDateTR=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.travel_residency where PATIENT_IDENTIFIER='%s' and FROMDATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
+    querySelectDateTR=data.frame(sqlQuery(connect,sprintf("SELECT * from travel_residency where PATIENT_IDENTIFIER='%s' and FROMDATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
   })
   output$formUpdateTR=renderUI({
     box(width = 12,
@@ -3738,7 +3738,7 @@ shinyServer(function(input, output,session) {
   dataModalUSample <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPsample", "Select sample",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from dbpfedev.sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                   )),
 
       uiOutput("formUpdateSample"),
@@ -3753,7 +3753,7 @@ shinyServer(function(input, output,session) {
     showModal(dataModalUSample())
   })
   UPdatavalueSample=reactive({
-    queryselectDataSample=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.sample where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPsample)) )))
+    queryselectDataSample=data.frame(sqlQuery(connect,sprintf("SELECT * from sample where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPsample)) )))
   })
   output$formUpdateSample=renderUI({
     box(width = 12,
@@ -3832,16 +3832,16 @@ shinyServer(function(input, output,session) {
   UPdatavalueDiagnosis=reactive({
 
     # if(toString(input$testupdiag)=="N/A" && toString(input$labupDiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
     # }else if(toString(input$labupDiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
     # }else if(toString(input$testupdiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
     # }else{
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
+    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
     # }
 
-    ddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
+    ddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
 
 
   })
@@ -3892,7 +3892,7 @@ shinyServer(function(input, output,session) {
   dataModalUInterrogator <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPInterrogator", "Select Interrogator",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from dbpfedev.interrogator where LOGINUSER='%s'",paste(USER$name))))$ID_INTERROGATOR)))),
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator where LOGINUSER='%s'",paste(USER$name))))$ID_INTERROGATOR)))),
 
       uiOutput("btnUpdateInterrogator") ,
 
@@ -3906,7 +3906,7 @@ shinyServer(function(input, output,session) {
     showModal(dataModalUInterrogator())
   })
   UPdatavalueinterrogator=reactive({
-    queryDataSelectInterrogator=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.interrogator where ID_INTERROGATOR='%s'",paste(input$DUPInterrogator) )))
+    queryDataSelectInterrogator=data.frame(sqlQuery(connect,sprintf("SELECT * from interrogator where ID_INTERROGATOR='%s'",paste(input$DUPInterrogator) )))
   })
   output$btnUpdateInterrogator=renderUI({
     box(width = 12,
@@ -3939,7 +3939,7 @@ shinyServer(function(input, output,session) {
   dataModalULabs<- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPLaboratory", "Select Laboratory",
-                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from dbpfedev.laboratory where LOGINUSER='%s'",paste(USER$name))))$LABORATORY_NAME)))),
+                  choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory where LOGINUSER='%s'",paste(USER$name))))$LABORATORY_NAME)))),
 
       uiOutput("testlabbbFFFFFF") ,
       footer = tagList(
@@ -3952,7 +3952,7 @@ shinyServer(function(input, output,session) {
     showModal( dataModalULabs())
   })
   UPdatavaluelabo=reactive({
-    dddddddlab=data.frame(sqlQuery(connect,sprintf("SELECT * from dbpfedev.laboratory where LABORATORY_NAME='%s'",paste(input$DUPLaboratory) )))
+    dddddddlab=data.frame(sqlQuery(connect,sprintf("SELECT * from laboratory where LABORATORY_NAME='%s'",paste(input$DUPLaboratory) )))
     dddddddlab
   })
   output$testlabbbFFFFFF=renderUI({
@@ -4154,7 +4154,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$PCP2D,{
 
-    totalChUp2=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TSD=totalChUp2[,"DATE_MED"]
     TSD2=ts(preddata(),start =as.numeric(format(as.Date(TSD[length(TSD)], format="%Y/%m/%d"),"%Y"))+1,frequency = 12)
 
@@ -4166,7 +4166,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$PCP1D,{
     pdf(paste(input$label_PCP1D,".pdf"),width = 15,height = 10)
-    MP=sqlQuery(connect,paste("SELECT DATE_MED from dbpfedev.medical_checkup"))
+    MP=sqlQuery(connect,paste("SELECT DATE_MED from medical_checkup"))
     CheckUp_Month=format(MP, "%Y-%m")
 
     databoxdateT=as.data.frame( table(CheckUp_Month))
@@ -4192,8 +4192,8 @@ shinyServer(function(input, output,session) {
   observeEvent(input$PAD,{
     pdf(paste(input$label_PAD1,".pdf"),width = 15,height = 10)
 
-    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup"))
-    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from dbpfedev.patient"))
+    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
+    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from patient"))
     three2= sqldf("select DATE_MED,BIRTH_DATE from  one2, two2
 
                   where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
@@ -4215,8 +4215,8 @@ shinyServer(function(input, output,session) {
   observeEvent(input$PAD2,{
     pdf(paste(input$label_PAD2,".pdf"),width = 3,height = 5)
 
-    one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from dbpfedev.medical_checkup"))
-    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from dbpfedev.sample"))
+    one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
+    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from sample"))
     three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
 
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
@@ -4236,7 +4236,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$CalendarD,{
 
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from dbpfedev.medical_checkup"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup"))))
     dateMed$Var1=as.Date(dateMed$Var1)
 
 
@@ -4259,7 +4259,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$CalendarD2,{
 
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from dbpfedev.medical_checkup"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from medical_checkup"))))
     dateMed$DATE_MED=as.Date(dateMed$DATE_MED)
     dateMed=dateMed[which(dateMed$LOGINUSER==USER$name),]
 
@@ -4283,7 +4283,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$MPNuD,{
 
-    totalChUp=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS=totalChUp[,"DATE_MED"]
     TS <- c(TS,seq(as.Date(TS[1]), as.Date(TS[length(TS)]), "month") )
     Month=as.yearmon(TS)
@@ -4301,7 +4301,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$MPNuD2,{
 
-    totalChUp2=sqlQuery(connect,paste("SELECT * from dbpfedev.medical_checkup"))
+    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS2=totalChUp2[,"DATE_MED"][which(totalChUp2$LOGINUSER==USER$name  )]
     TS2 <- c(TS2,seq(as.Date(TS2[1]), as.Date(TS2[length(TS2)]), "month") )
     Month2=as.yearmon(TS2)
@@ -4319,7 +4319,7 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$PieNvD,{
     pdf(paste(input$label_PieNvD,".pdf"),width = 15,height = 10)
-    dataPIE=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE))
+    dataPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
 
     Levels=dataPIE[,input$ttestPIEnames]
     print( ggplot(dataPIE, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y") )
@@ -4331,7 +4331,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$PieNvD2,{
     pdf(paste(input$label_PieNvD2,".pdf"),width = 15,height = 10)
 
-    dataPIE2=sqlQuery(connect,paste("SELECT * from dbpfedev.",input$ttestPIE2))
+    dataPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
     dataPIE2N=dataPIE2[c(which(dataPIE2$LOGINUSER== USER$name)),]
 
     Levels=dataPIE2N[,input$ttestPIEnames2]
@@ -4344,9 +4344,9 @@ shinyServer(function(input, output,session) {
   observeEvent(input$MapD,{
     pdf(paste(input$label_MapD,".pdf"),width = 15,height = 10)
 
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from dbpfedev.sample"))
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from dbpfedev.region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from dbpfedev.travel_residency"))
+    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
+    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
 
     regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
 
@@ -4381,10 +4381,10 @@ shinyServer(function(input, output,session) {
 
     mapK <- get_map(location = input$countriesshop, zoom = 6)
 
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from dbpfedev.sample"))
+    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from sample"))
     sam=sam[which(sam[,"LOGINUSER"]==USER$name),]
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from dbpfedev.region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from dbpfedev.travel_residency"))
+    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
 
     regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
 
