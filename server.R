@@ -41,9 +41,9 @@ library(V8)
 #library(Sys)
 
 Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
-connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
-#connect=odbcConnect("ServeurDSN", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
-#connect=odbcConnect("MyAppDBserver", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
+connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
+#connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
+#connect=odbcConnect("MyAppDB_CIC", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 
 js.png <- '
 shinyjs.exportPNG = function(params) {
