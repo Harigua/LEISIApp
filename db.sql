@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 02, 2019 at 01:13 PM
+-- Generation Time: Jul 04, 2019 at 01:37 PM
 -- Server version: 5.7.26-0ubuntu0.16.04.1
 -- PHP Version: 7.0.33-0ubuntu0.16.04.5
 
@@ -52,6 +52,36 @@ CREATE TABLE `diognosis` (
   `LEISHSUSPECT` char(50) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discrepancy`
+--
+
+CREATE TABLE `discrepancy` (
+  `idDiscrepancy` char(100) NOT NULL,
+  `PATIENT_IDENTIFIER` char(50) NOT NULL,
+  `DATE_MED` date NOT NULL,
+  `Description` text NOT NULL,
+  `user` char(50) NOT NULL,
+  `date_disc` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Img`
+--
+
+CREATE TABLE `Img` (
+  `id` char(255) NOT NULL,
+  `idPatient` char(50) NOT NULL,
+  `idSample` char(50) NOT NULL,
+  `user` char(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `interrogator`
 --
@@ -63,6 +93,34 @@ CREATE TABLE `interrogator` (
   `LAST_NAME_INTERROGATOR` char(20) DEFAULT NULL,
   `QUALITY` char(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `interrogator`
+--
+
+INSERT INTO `interrogator` (`ID_INTERROGATOR`, `LOGINUSER`, `FIRST_NAME_INTERROGATOR`, `LAST_NAME_INTERROGATOR`, `QUALITY`) VALUES
+('RHO001', 'zeineb', 'Oussaima', 'El Dbouni', 'Doctor'),
+('LBP001', 'zeineb', 'Pierre', 'Abi Hanna', 'Doctor'),
+('HFH001', 'zeineb', 'Fathallah', 'Ahlem', 'Technicien'),
+('HFH002', 'zeineb', 'Lazzem', 'Moez', 'Resident doctor'),
+('HFH003', 'zeineb', 'Ben Salah', 'Azer', 'Doctor'),
+('HFH004', 'zeineb', 'Hazgui', 'Olfa', 'Resident doctor'),
+('HFH005', 'zeineb', 'Khammari', 'Imene', 'Doctor'),
+('HFH006', 'zeineb', 'Abdelkhalek', 'Sana', 'Technicien'),
+('HLR001', 'zeineb', 'Jemel', 'Sana', 'Doctor'),
+('HLR002', 'zeineb', 'Boudaouara', 'Yosr', 'Resident doctor'),
+('CST001', 'zeineb', 'Daoui', 'Othmane', 'Researcher'),
+('HFH007', 'hejer', 'Ismaeil', 'Samar', 'Resident doctor'),
+('HLR003', 'hejer', 'Belhadj', 'Salaheddine', 'Doctor'),
+('HLR004', 'hejer', 'Dhiaeddine', 'Edriss', 'Resident doctor'),
+('HLR005', 'hejer', 'Sakly', 'Imen', 'Resident doctor'),
+('HLR006', 'hejer', 'Kallel', 'Aicha', 'Doctor'),
+('N/A', 'emna', 'N/A', 'N/A', 'N/A'),
+('IPM002', 'super', 'El Hamouchi', 'Adil', 'Researcher'),
+('HFH008', 'maaoui', 'Fakhfakh', 'Souhir', 'Resident doctor'),
+('HLR007', 'maaoui', 'ElFouleni', 'Foulen', 'Researcher');
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `laboratory`
@@ -136,6 +194,8 @@ CREATE TABLE `medical_checkup` (
   `GENDESC` char(200) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `molecularl_test`
 --
@@ -176,6 +236,8 @@ CREATE TABLE `patient` (
   `PHONE_NUMBER` char(15) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `region`
 --
@@ -212,6 +274,8 @@ CREATE TABLE `sample` (
   `DATE_EXTRACTION` date DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `travel_residency`
 --
@@ -227,6 +291,8 @@ CREATE TABLE `travel_residency` (
   `RESIDENCY` char(10) DEFAULT NULL,
   `TYPE` char(5) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `treatment`
@@ -256,6 +322,8 @@ CREATE TABLE `treatmenthistory` (
   `HEALING_DATE` char(50) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `userdata`
 --
@@ -273,7 +341,11 @@ CREATE TABLE `userdata` (
 --
 
 INSERT INTO `userdata` (`LOGINUSER`, `USE_LOGINUSER`, `MOTDPASS`, `LEVELSECURE`, `FROMINST`) VALUES
-('super', 'super', 'superuser', 'super', 'IPT');
+('super', 'super', 'super1234', 'super', 'IPT'),
+('emna', 'super', 'emna', 'normal', 'IPT'),
+('zeineb', 'super', 'zeineb', 'normal', 'IPT'),
+('maaoui', 'super', 'maaoui', 'normal', 'ISI'),
+('hejer', 'super', 'hejer', 'normal', 'IPT');
 
 --
 -- Indexes for dumped tables
