@@ -15,7 +15,7 @@ Lesionia is an open-source software/Web applications for the collection, managem
 - Go to [127.0.0.1/phpmyadmin](127.0.0.1/phpmyadmin) in your browser and create a new DataBase
 - Import [db.sql](https://github.com/Harigua/LEISIApp/blob/master/db.sql) in your MySql Database.
 - Install ODBC drivers and create DSN configuration from [here](https://web.synametrics.com/mysql.htm) like this
-![screenshot](https://github.com/Harigua/LEISIApp/blob/master/Screenshot%20from%202019-07-10%2010-03-08.png)
+![screenshot](https://github.com/Harigua/LEISIApp/blob/master/Screenshot%20from%202019-07-10%2010-03-08(1).jpg)
 - Installing R and RStudio [here](https://www.datacamp.com/community/tutorials/installing-R-windows-mac-ubuntu)
 - Two possible ways to get the project on your computer :
   1. With Git (Recommended but requires Git to be installed and a git account):
