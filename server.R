@@ -591,16 +591,18 @@ shinyServer(function(input, output,session) {
   output$uiLogin <- renderUI({
     if (USER$Logged == FALSE) {
       wellPanel(
-        column("", textInput("userName", "User Name:"),width = 3),
-        column("", passwordInput("passwd", "Password:"),width = 3),
+        column("", textInput("userName", "User Name:"),width = 4),
+        column("", passwordInput("passwd", "Password:"),width = 4),
         br(),
         actionButton("Login", "Login"),
         br(),
         br(),
         if (USER$Logged == FALSE) {
           p(USER$pass,style="color:red;")
-        }
-
+        },
+        h3("Contact us :"),
+        p("For more information on Lesionia and the data system management, please contact Dr. Emna HARIGUA at ",a("emna.harigua@pasteur.utm.tn")),
+        p("please note : We will get back to you shortly, usually within 2-3 days.",style="color:gray;")
       )
 
 
@@ -908,10 +910,11 @@ shinyServer(function(input, output,session) {
     }
   })
 
+
   output$mail=renderUI({
     if(USER$Logged==FALSE ){
       div(
-        column("", actionButton("mail", "Contact us ",width = 237
+        column("", actionButton("mail", "About us ",width = 237
                                 #,icon("paper-plane"), style="yellow: #fff; background-color: white ; border-color: #2e6da4"
         ),width = 3),br(),br()
       )
@@ -929,7 +932,7 @@ shinyServer(function(input, output,session) {
                id="mail",
                div(
                  box( width = 12,status = "info",solidHeader = TRUE,
-                      h1("Contact us", align="center"),
+                      h1("About us", align="center"),
                       h3("What is lesionia :"),
                       p("   Lesionia is an open-source software/Web applications for the collection, management and
                              analysis of clinical and epidemiological data related to patients suspected for cutaneous
@@ -2277,7 +2280,7 @@ shinyServer(function(input, output,session) {
                       catalog = NULL, schema = NULL, tableName = NULL,
                       tableType = NULL, literal = FALSE)
     opt=taables[,3]
-    cho=opt[c(2,3,8,10,12,13,15)]
+    cho=opt[c(2,3,5,6,8,10,12,13,15)]
     selectInput("ttest2", "",choices=cho)
 
   })
@@ -2772,7 +2775,7 @@ shinyServer(function(input, output,session) {
 
   prepdata=reactive({
 
-    Totlalacm1=cordata()#[,-c(1,2,4,6,10,12,13,14,15,16)]
+    Totlalacm1=cordata()#[,-c(1,2,4,6,12:16,18,19)]
     Age_Class <- cut(round(as.numeric(cordata()$PAITIENT_AGE)), c(0,10,20,30,40,50,60,70,80,120),
                      labels = c("Moins de 10 ans","11-20 ans","21-30 ans","31-40 ans","41-50 ans","51-60 ans", "61-70ans","71-80 ans ","plus de 80 ans" ))
     Lesion_Age_Class <- cut(as.numeric(cordata()$Lesion_Age), c(0, 2, 4, 6, 8, 10, 12, 15),
@@ -3188,6 +3191,11 @@ for(p in 1:dim(three2)[1])
                      ),
                      box(width = 8, status = "info",
                          DT::dataTableOutput("DataDowLF666doooooon")  )))
+          ),
+          tabPanel(h5(strong("View Discrepancys")),
+                   id="ViewDiscrepancys",
+                   fluidRow ( box(width = 8, status = "info",
+                         DT::dataTableOutput("DataDiscrepancys")  ))
           )
 
         )
@@ -3360,6 +3368,14 @@ for(p in 1:dim(three2)[1])
     AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[which(AAllDel1[,input$filNameDelete]==as.character(input$valNameDelete)),]
     data.frame(AAllDel2)
+  })
+
+
+
+  output$DataDiscrepancys=DT::renderDataTable ({
+
+    DT::datatable(sqlQuery(connect,paste("SELECT * from discrepancy")), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
+
   })
 
   output$DataDowLF666doooooon=DT::renderDataTable ({
