@@ -1411,7 +1411,7 @@ shinyServer(function(input, output,session) {
 
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$Hhost) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','NULL') ")
+      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','NULL') ")
 
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
@@ -1590,7 +1590,7 @@ shinyServer(function(input, output,session) {
 
     if( as.character(input$regvisit) ==""){
       info("Error : Missing value Country and state")
-    }else if( !(as.character(input$datedatevisit) <= Sys.Date() && as.character(input$datedatevisit) !="")){
+    }else if( !(as.character(input$datedatevisit) <= Sys.Date()) && as.character(input$datedatevisit) ==""){
       info("Error : Incorrect date Visit Date")
     }else{
       an.error.occured <- FALSE
@@ -2724,15 +2724,13 @@ shinyServer(function(input, output,session) {
     cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER from patient"))
     cor3=sqlQuery(connect,paste("SELECT * from sample"))
 
-
-
     cordataall=sqldf("select * from  cor3, cor1
-
                      where   cor3.PATIENT_IDENTIFIER=cor1.PATIENT_IDENTIFIER ")
 
+    cor=sqlQuery(connect,paste("SELECT AGE from patient"))
 
-    PAITIENT_AGE=as.numeric(round((as.Date(cordataall$DATE_EXTRACTION ) - as.Date(cordataall$BIRTH_DATE))/365))
-    Date_First_Apeard=as.numeric(abs(round((as.Date(cordataall$DATE_EXTRACTION ) - as.Date(cordataall$Date_First_Apeard)))))
+    PAITIENT_AGE=as.numeric(cor[,1])
+    Date_First_Apeard=sqlQuery(connect,paste("SELECT Date_First_Apeard from sample"))[,1]
     datatot=data.frame(cordataall,PAITIENT_AGE,Date_First_Apeard)
     datatot$LOCALISATION=as.factor(datatot$LOCALISATION)
     datatot
@@ -2742,7 +2740,7 @@ shinyServer(function(input, output,session) {
   output$corVarUI=renderUI({
 
 
-    selectizeInput("corvarstoplot", label=h4("Choose and combine Variables,SPECIES is necessary"), selected = c("SPECIES","GENDER"),choices=c(colnames(cordata()[,-c(1,2,4,6,10,12,13,14,15,16)])),multiple=TRUE)
+    selectizeInput("corvarstoplot", label=h4("Choose and combine Variables,SPECIES is necessary"), selected = c("SPECIES","GENDER"),choices=c(colnames(cordata()[,-c(1,2,4,6,12:16,18,19)])),multiple=TRUE)
 
   })
 
@@ -2774,10 +2772,10 @@ shinyServer(function(input, output,session) {
 
   prepdata=reactive({
 
-    Totlalacm1=cordata()[,-c(1,2,4,6,10,12,13,14,15,16)]
+    Totlalacm1=cordata()#[,-c(1,2,4,6,10,12,13,14,15,16)]
     Age_Class <- cut(round(as.numeric(cordata()$PAITIENT_AGE)), c(0,10,20,30,40,50,60,70,80,120),
                      labels = c("Moins de 10 ans","11-20 ans","21-30 ans","31-40 ans","41-50 ans","51-60 ans", "61-70ans","71-80 ans ","plus de 80 ans" ))
-    Lesion_Age_Class <- cut(as.numeric(cordata()$Date_First_Apeard.1), c(0, 15, 30, 45, 60, 75,90,105),
+    Lesion_Age_Class <- cut(as.numeric(cordata()$Lesion_Age), c(0, 2, 4, 6, 8, 10, 12, 15),
                             labels = c("moins de deux semaines", "2 - 4 semaines ", "4 - 6 semaines","6 - 8 semaines",
                                        "8- 10 semaines","10 - 12 semaines", "plus de 3 mois"))
 
@@ -3001,37 +2999,81 @@ shinyServer(function(input, output,session) {
   ###########################################################################################
   #                                            MOST parts                                   #
   ###########################################################################################
+  output$NC=renderPlot({
+
+    Nat_data=sqlQuery(connect,paste("SELECT NATIONALITY from patient"))$NATIONALITY
+
+    Nat_table=as.data.frame(prop.table(table(Nat_data)))
+    pie(Nat_table[,2] ,labels =paste(round(100*Nat_table[,2]/sum(Nat_table[,2]), 1),"%") , radius = 1 ,col = rainbow(length(Nat_table[,1])))
+    legend("topright",legend=Nat_table[,1], cex = 0.8,fill = rainbow(length( Nat_table[,1])))
+
+  })
   output$WC=renderPlot({
 
     one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01' "))
-    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
-    three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
-
+    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,Lesion_Age,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
+    three= sqldf("select one.PATIENT_IDENTIFIER,DATE_MED,Date_First_Apeard,Lesion_Age from  one, two
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-    days=    three$DATE_MED-three$Date_First_Apeard
-    Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 15, 30, 45, 60, 75,90,105),
+
+        days= round(as.numeric(as.Date(three$DATE_MED) - as.Date(three$Date_First_Apeard))/7)
+for(la in 1:dim(three)[1])
+{
+  if(as.numeric(three[la,]$Lesion_Age) < 0){
+    updateQuery=paste0("update sample set Lesion_Age='",days[la],"' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect, updateQuery)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      paste("Error in Update Lesion_Age")
+    }else{paste("Lesion_Age successfully Updated")}
+  }
+}
+
+
+    days=sqlQuery(connect,paste("SELECT Lesion_Age from sample"))$Lesion_Age
+    Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ",
                                           "8 to 10 ","10 to 12 ", "more than 3 weeks"))
     h=as.data.frame( table(Lesion_Age_in_weeks))
     d=as.data.frame(h)
 
-    p10 <- ggplot(d, aes(x= Lesion_Age_in_weeks ,y=Freq)) + geom_boxplot()
-    p10
+
+    Species_data=sqlQuery(connect,paste("SELECT SPECIES from sample"))$SPECIES
+    Species_table=as.data.frame(prop.table(table(Species_data)))
+    pie(Species_table[,2],labels =paste(round(100*Species_table[,2]/sum(Species_table[,2]), 1),"%"), radius = 1,col = rainbow(length(Species_table[,1])))
+    legend("topright",legend=Species_table[,1], cex = 0.8,fill = rainbow(length( Species_table[,1])))
+
+
 
   })
   output$MC=renderPlot({
     one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01'"))
-    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from patient WHERE BIRTH_DATE!='1900-01-01'"))
-    three2= sqldf("select DATE_MED,BIRTH_DATE from  one2, two2
-
+    two2=sqlQuery(connect,paste("SELECT AGE,BIRTH_DATE,PATIENT_IDENTIFIER from patient WHERE BIRTH_DATE!='1900-01-01'"))
+    three2= sqldf("select one2.PATIENT_IDENTIFIER,AGE,DATE_MED,BIRTH_DATE from  one2, two2
                   where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
-    age= three2$DATE_MED - three2$BIRTH_DATE
-    Patient_Age <- cut(round(as.numeric(age)/360), c(0,10,20,30,40,50,60,70,80,120),
+    age= round(as.numeric(as.Date(three2$DATE_MED) - as.Date(three2$BIRTH_DATE))/365)
+for(p in 1:dim(three2)[1])
+{
+  if(as.numeric(three2[p,]$AGE) < 0){
+    updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+    an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect, updateQuery)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      paste("Error in Update patient",p)
+    }else{paste("Patient",p,"age successfully Updated",age[p])}
+  }
+}
+    age = sqlQuery(connect,paste("select AGE from patient"))$AGE
+    Patient_Age <- cut(as.numeric(age), c(0,10,20,30,40,50,60,70,80,120),
                        labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
-    hage=as.data.frame( table(Patient_Age))
+    hage=prop.table( table(Patient_Age))
     dage=as.data.frame(hage)
 
-    p100 <- ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter()
+    #p100 <- ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter()
+    p100 <- hist(age, breaks=40 , col=rgb(0.2,0.8,0.5,0.5) , border=F , main="")
     p100
 
   })
@@ -3039,10 +3081,13 @@ shinyServer(function(input, output,session) {
   output$Random=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
-        box(width = 6, status = "info",solidHeader = FALSE,title = "Patient Age Distribution",
+        box(width=12, status = "info",solidHeader = FALSE,title = "Patient Age Distribution",
             plotOutput("MC")
         ),
-        box(width = 6,  status = "info",solidHeader = FALSE,title="Lesion Age per weeks",
+        box(width=6, status = "info",solidHeader = FALSE,title="Patient nationality distribution",
+            plotOutput("NC")
+        ),
+        box(width=6, status = "info",solidHeader = FALSE,title="Species distribution",
             plotOutput("WC")
         ),
 
@@ -4197,8 +4242,8 @@ shinyServer(function(input, output,session) {
     three2= sqldf("select DATE_MED,BIRTH_DATE from  one2, two2
 
                   where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
-    age= three2$DATE_MED - three2$BIRTH_DATE
-    Patient_Age <- cut(round(as.numeric(age)/360), c(0,10,20,30,40,50,60,70,80,120),
+    age= sqlQuery(connect,paste("SELECT AGE from patient"))$AGE
+    Patient_Age <- cut(round(as.numeric(age)), c(0,10,20,30,40,50,60,70,80,120),
                        labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
     hage=as.data.frame( table(Patient_Age))
     dage=as.data.frame(hage)
@@ -4220,10 +4265,10 @@ shinyServer(function(input, output,session) {
     three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
 
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-    days=    three$DATE_MED-three$Date_First_Apeard
-    Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 15, 30, 45, 60, 75,90,105),
+    days=  sqlQuery(connect,paste("SELECT Lesion_Age from patient"))$Lesion_Age
+    Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14 ),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ",
-                                          "8 to 10 ","10 to 12 ", "more than 3 weeks"))
+                                          "8 to 10 ","10 to 12 ", "more than 3 months"))
     h=as.data.frame( table(Lesion_Age_in_weeks))
     d=as.data.frame(h)
 
