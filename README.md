@@ -11,7 +11,26 @@ Lesionia is an open-source software/Web applications for the collection, managem
 
 #### Installation using Rstudio (graphical mode) suitable for both Linux and Windows [Coming soon]
 
-
+- Set up the DataBase with either wampServer(Window, Apache, MySql, Php) see [here](http://www.wampserver.com/en/) or with EasyPHP see [here](https://www.easyphp.org/)
+- Go to [127.0.0.1/phpmyadmin](127.0.0.1/phpmyadmin) in your browser and create a new DataBase
+- Import [db.sql](https://github.com/Harigua/LEISIApp/blob/master/db.sql) in your MySql Database.
+- Install ODBC drivers and create DSN configuration from [here](https://web.synametrics.com/mysql.htm) like this
+![screenshot](https://github.com/Harigua/LEISIApp/blob/master/Screenshot%20from%202019-07-10%2010-03-08.png)
+- Installing R and RStudio [here](https://www.datacamp.com/community/tutorials/installing-R-windows-mac-ubuntu)
+- Two possible ways to get the project on your computer :
+  1. With Git (Recommended but requires Git to be installed and a git account):
+     - First make sure that you download Git see [here](https://git-scm.com/download/win) and your account is set as an enviourment variable if not the next steps will not work [see](http://www.geo.uzh.ch/microsite/reproducible_research/post/rr-rstudio-git/) .
+     - In RStudio go to File>New Project>VersionControl>Git
+     - Choose location and paste the repository URL [https://github.com/Harigua/LEISIApp.git](https://github.com/Harigua/LEISIApp.git)
+     - Create Project 
+     - A prompt will ask you to connect to your git account 
+  2. With zip file download :
+     - Download the application as a zip file from [https://github.com/Harigua/LEISIApp.git](https://github.com/Harigua/LEISIApp.git)
+     - Extract the files 
+     - Double click on the LEISIApp(.Rproj) R project
+- An alert warning with a one click Install packages will appear (for both ui.R and server.R) if you have any trouble try installing them manually see section 8 of “Installation using command-lines under Ubuntu 16.04.”
+- Run the app with the runApp button or with shiny::runApp() in the R Console
+- If a “there is no package called ‘packageName’ ” error occurred try installing them with “install.packages("packageName")” or see section 8 of “Installation using command-lines under Ubuntu 16.04.”
 
 
 #### Installation using command-lines under Ubuntu 16.04. This section also includes the R packages and their dependencies
