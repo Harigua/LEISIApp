@@ -62,7 +62,7 @@ Lesionia is an open-source software/Web applications for the collection, managem
    > Please note that if a package is outdated could not install with install.packages("package_name") 
    you should use install_version("package_name", "version_number") or simply go to [section 6 of this answer](https://stackoverflow.com/questions/25721884/how-should-i-deal-with-package-xxx-is-not-available-for-r-version-x-y-z-wa/31293955)
    Or [this answer](https://stackoverflow.com/questions/37222603/i-want-to-use-ebimage-package-but-it-says-it-is-not-available-for-my-version-of)
-9. ODBC DNS Config file
+9. ODBC DSN Config file
    - Download libmyodbc8a.so from [here](https://dev.mysql.com/downloads/connector/odbc/)
    and place it in **/usr/lib/x86_64-linux-gnu/odbc/**
    - In **/etc/odbc.ini** write
