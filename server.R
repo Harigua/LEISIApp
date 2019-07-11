@@ -41,8 +41,8 @@ library(V8)
 #library(Sys)
 
 Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
-connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
-#connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
+#connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
+connect=odbcConnect("MyAppDB", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 #connect=odbcConnect("MyAppDB_CIC", uid='root', pwd='16souemna', DBMSencoding = "UTF-8")
 
 js.png <- '
@@ -1666,7 +1666,7 @@ shinyServer(function(input, output,session) {
 
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
 
    
     if(toString(input$extractDay)==""){
@@ -1724,7 +1724,7 @@ shinyServer(function(input, output,session) {
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("Not Identified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
+      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
 
     
     if(input$extractDay==""){
@@ -3013,6 +3013,58 @@ shinyServer(function(input, output,session) {
   })
   output$WC=renderPlot({
 
+    Species_data=sqlQuery(connect,paste("SELECT SPECIES from sample"))$SPECIES
+    Species_table=as.data.frame(prop.table(table(Species_data)))
+    pie(Species_table[,2],labels =paste(round(100*Species_table[,2]/sum(Species_table[,2]), 1),"%"), radius = 1,col = rainbow(length(Species_table[,1])))
+    legend("topright",legend=Species_table[,1], cex = 0.8,fill = rainbow(length( Species_table[,1])))
+
+
+
+  })
+  output$MC=renderPlot({
+
+    age = sqlQuery(connect,paste("select AGE from patient"))$AGE
+    Patient_Age <- cut(as.numeric(age), c(0,10,20,30,40,50,60,70,80,120),
+                       labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
+    hage=prop.table( table(Patient_Age))
+    dage=as.data.frame(hage)
+
+    #p100 <- ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter()
+    p100 <- hist(age, breaks=40 , col=rgb(0.2,0.8,0.5,0.5) , border=F , main="")
+    p100
+
+  })
+
+  output$Random=renderUI({
+
+    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
+    two2=sqlQuery(connect,paste("SELECT AGE,BIRTH_DATE,PATIENT_IDENTIFIER from patient"))
+    three2= sqldf("select one2.PATIENT_IDENTIFIER,AGE,DATE_MED,BIRTH_DATE from  one2, two2
+                  where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
+    age= round(as.numeric(as.Date(three2$DATE_MED) - as.Date(three2$BIRTH_DATE))/365)
+for(p in 1:dim(three2)[1])
+{
+  if(is.null(three2[p,]$AGE) | is.na(three2[p,]$AGE) | three2[p,]$AGE==""){
+    if(three2[p,]$BIRTH_DATE=="1900-01-01" | three2[p,]$DATE_MED=="1900-01-01"){
+      updateQuery=paste0("update patient set AGE='-1' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+    }else{
+      updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+    }
+  }else if(as.numeric(three2[p,]$AGE) < 0){
+    if(three2[p,]$BIRTH_DATE=="1900-01-01" | three2[p,]$DATE_MED=="1900-01-01"){
+      updateQuery=paste0("update patient set AGE='-1' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+    }else{
+      updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+    }
+an.error.occured <- FALSE
+    tryCatch( {sqlExecute(connect, updateQuery)}
+              , error = function(e) {an.error.occured <<- TRUE}
+    )
+    if(an.error.occured){
+      paste("Error in Update patient",p)
+    }else{paste("Patient",p,"age successfully Updated",age[p])}
+  }
+}
     one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01' "))
     two=sqlQuery(connect,paste("SELECT Date_First_Apeard,Lesion_Age,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
     three= sqldf("select one.PATIENT_IDENTIFIER,DATE_MED,Date_First_Apeard,Lesion_Age from  one, two
@@ -3032,56 +3084,13 @@ for(la in 1:dim(three)[1])
     }else{paste("Lesion_Age successfully Updated")}
   }
 }
-
-
     days=sqlQuery(connect,paste("SELECT Lesion_Age from sample"))$Lesion_Age
     Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ",
                                           "8 to 10 ","10 to 12 ", "more than 3 weeks"))
-    h=as.data.frame( table(Lesion_Age_in_weeks))
-    d=as.data.frame(h)
+    #h=as.data.frame( table(Lesion_Age_in_weeks))
+    #d=as.data.frame(h)
 
-
-    Species_data=sqlQuery(connect,paste("SELECT SPECIES from sample"))$SPECIES
-    Species_table=as.data.frame(prop.table(table(Species_data)))
-    pie(Species_table[,2],labels =paste(round(100*Species_table[,2]/sum(Species_table[,2]), 1),"%"), radius = 1,col = rainbow(length(Species_table[,1])))
-    legend("topright",legend=Species_table[,1], cex = 0.8,fill = rainbow(length( Species_table[,1])))
-
-
-
-  })
-  output$MC=renderPlot({
-    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01'"))
-    two2=sqlQuery(connect,paste("SELECT AGE,BIRTH_DATE,PATIENT_IDENTIFIER from patient WHERE BIRTH_DATE!='1900-01-01'"))
-    three2= sqldf("select one2.PATIENT_IDENTIFIER,AGE,DATE_MED,BIRTH_DATE from  one2, two2
-                  where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
-    age= round(as.numeric(as.Date(three2$DATE_MED) - as.Date(three2$BIRTH_DATE))/365)
-for(p in 1:dim(three2)[1])
-{
-  if(as.numeric(three2[p,]$AGE) < 0){
-    updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
-    an.error.occured <- FALSE
-    tryCatch( {sqlExecute(connect, updateQuery)}
-              , error = function(e) {an.error.occured <<- TRUE}
-    )
-    if(an.error.occured){
-      paste("Error in Update patient",p)
-    }else{paste("Patient",p,"age successfully Updated",age[p])}
-  }
-}
-    age = sqlQuery(connect,paste("select AGE from patient"))$AGE
-    Patient_Age <- cut(as.numeric(age), c(0,10,20,30,40,50,60,70,80,120),
-                       labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
-    hage=prop.table( table(Patient_Age))
-    dage=as.data.frame(hage)
-
-    #p100 <- ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter()
-    p100 <- hist(age, breaks=40 , col=rgb(0.2,0.8,0.5,0.5) , border=F , main="")
-    p100
-
-  })
-
-  output$Random=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
         box(width=12, status = "info",solidHeader = FALSE,title = "Patient Age Distribution",
