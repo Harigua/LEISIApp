@@ -5,7 +5,7 @@ library(RODBCext)
 library(distr)
 connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
 
-
+#patient age, nationality and gender
 query=paste("select * from patient")
 data=data.frame(sqlQuery(connect,query))
 data=data[,c(1:3,7)]
@@ -24,10 +24,10 @@ for(p in 1:dim(data)[1])
     )
     if(an.error.occured){
       sprintf("Error in Update patient %d",p)
-    }else{sprintf("Patient %d age successfully Updated",p)}	
+    }else{sprintf("patient %d successfully Updated",p)}	
 }
 
-
+#lesion age
 query=paste("select * from sample")
 data2=data.frame(sqlQuery(connect,query))
 #generate lesion ages with a costum distrubution
@@ -41,15 +41,13 @@ for(p in 1:dim(data2)[1])
               , error = function(e) {an.error.occured <<- TRUE}
     )
     if(an.error.occured){
-      sprintf("Error in Update patient %d",p)
-    }else{sprintf("Patient %d age successfully Updated",p)}	
+      sprintf("Error in Update lesion %d",p)
+    }else{sprintf("lesion %d age successfully Updated",p)}	
 }
 
-
-
+#species per nationality
 query=paste("select * from sample as s , patient as p where s.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and p.NATIONALITY='TN'")
 data3=data.frame(sqlQuery(connect,query))
-#generate species with a costum distrubution for TN
 LS <- sample(c("L.infantum","L.major","L.tropica","Other"), 3000, replace=TRUE, prob=c(55,30,10,5) )
 for(p in 1:dim(data3)[1])
 {
@@ -59,13 +57,12 @@ for(p in 1:dim(data3)[1])
               , error = function(e) {an.error.occured <<- TRUE}
     )
     if(an.error.occured){
-      sprintf("Error in Update patient %d",p)
-    }else{sprintf("Patient %d age successfully Updated",p)}	
+      sprintf("Error in Update sp %d",p)
+    }else{sprintf("sp %d successfully Updated",p)}	
 }
 
 query=paste("select * from sample as s , patient as p where s.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and p.NATIONALITY='MA'")
 data3=data.frame(sqlQuery(connect,query))
-#generate species with a costum distrubution for MA
 LS <- sample(c("L.major","L.infantum","Other"), 3000, replace=TRUE, prob=c(75,20,5) )
 for(p in 1:dim(data3)[1])
 {
@@ -75,13 +72,12 @@ for(p in 1:dim(data3)[1])
               , error = function(e) {an.error.occured <<- TRUE}
     )
     if(an.error.occured){
-      sprintf("Error in Update patient %d",p)
-    }else{sprintf("Patient %d age successfully Updated",p)}	
+      sprintf("Error in Update sp %d",p)
+    }else{sprintf("sp %d successfully Updated",p)}	
 }
 
 query=paste("select * from sample as s , patient as p where s.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and p.NATIONALITY='LB'")
 data3=data.frame(sqlQuery(connect,query))
-#generate species with a costum distrubution for LB
 LS <- sample(c("L.tropica","L.infantum","Other"), 3000, replace=TRUE, prob=c(75,20,5) )
 for(p in 1:dim(data3)[1])
 {
@@ -91,6 +87,8 @@ for(p in 1:dim(data3)[1])
               , error = function(e) {an.error.occured <<- TRUE}
     )
     if(an.error.occured){
-      sprintf("Error in Update patient %d",p)
-    }else{sprintf("Patient %d age successfully Updated",p)}	
+      sprintf("Error in Update sp %d",p)
+    }else{sprintf("sp %d successfully Updated",p)}	
 }
+
+
