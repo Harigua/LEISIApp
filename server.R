@@ -2781,8 +2781,7 @@ shinyServer(function(input, output,session) {
     Lesion_Age_Class <- cut(as.numeric(cordata()$Lesion_Age), c(0, 2, 4, 6, 8, 10, 12, 15),
                             labels = c("moins de deux semaines", "2 - 4 semaines ", "4 - 6 semaines","6 - 8 semaines",
                                        "8- 10 semaines","10 - 12 semaines", "plus de 3 mois"))
-    info(paste0(Age_Class))
-    info(paste0(cordata()$PAITIENT_AGE))
+
     is.fact1 <- sapply(Totlalacm1, is.factor)
     dataacm1=data.frame( Totlalacm1[, is.fact1],Age_Class,Lesion_Age_Class)
 
