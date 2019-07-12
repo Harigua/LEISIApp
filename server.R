@@ -935,19 +935,19 @@ shinyServer(function(input, output,session) {
                       h1("About us", align="center"),
                       h3("What is lesionia :"),
                       p("   Lesionia is an open-source software/Web applications for the collection, management and
-                             analysis of clinical and epidemiological data related to patients suspected for cutaneous
-                             leishmaniasis. It was developed in the frame of the PEER518 project. It is conceived to enable
-                             researchers within the PEER518 consortium that are based in different countries and acting at
-                             different stages of the data life cycle to enter and access the data with respect to the FAIR
-                             criteria.
+                             analysis of clinical and epidemiological data related to patients with confirmed cutaneous
+                             leishmaniasis and their negative controls. It was developed in the frame of the PEER518 project.
+                             It is conceived to enable researchers within the PEER518 consortium that are based in different
+                             countries and acting at different stages of the data life cycle to enter and access the data with
+                             respect to the FAIR criteria.
                          "),
                       br(),
                       h3(" What is the PER518 project :"),
                       p("  PER518: Diagnosis of Cutaneous Leishmaniasis: Development
                             and Evaluation of Multiplex POC DNA Assays. "),
-                      p("  Objectives: Our aim is to develop species specific and multiplex DNA assays for the
-                             identification of the Leishmania species: L. infantum/L. donovani, L. major and L. tropica, which
-                             are the main causal agents of leishmaniases encountered in the Old World (Africa, MENA,
+                      p("  Objectives: Our aim is to develop species specific and multiplex DNA assays for the concomitant detection
+                             and identification of the Leishmania species: L. infantum/L. donovani, L. major and L. tropica, which
+                             are the main causal agents of cutaneous leishmaniasis encountered in the Old World (Africa, MENA,
                              Europe and Asia). Such diseases are also of global relevance in more than 98 countries
                              affected. "),
                       p("   Methodology: We use novel technologies for the isothermal amplification and detection of DNA
@@ -961,14 +961,16 @@ shinyServer(function(input, output,session) {
                              is also well known that the species differently react to the different treatments available. So far
                              reporting does not precise the causal species, so enlarged use of such tools would improve
                              disease epidemiology and burden estimates. Likewise, with more popular DNA tests it becomes
-                             possible to adequately and timely react in emerging foci Clinical trials will be needed to improve
+                             possible to adequately and timely react in emerging foci. Clinical trials will be needed to improve
                              robustness of the recommendations. "),
                       br(),
                       h3("Who are we :"),
                      
                         p("  Laboratory of Molecular Epidemiology and Experimental Pathology at Institut Pasteur de Tunis
-                             is the central node of the PEER518 consortium that includes partners from Tunisia, Morocco, 
-                             Lebanon, Mali and the USA. "),
+                             is the central node of the PEER518 consortium that includes partners from Tunisia (Hopital de
+                             Farhat Hachad, Sousse and Hopital La Rabta, Tunis), Morocco (Institut Pasteur du MAroc),
+                             Lebanon (Rafik el Hariri Hospital and Faculty of Public Health), Mali (Faculty of Medicine and
+                             Odontostomatology, University of Bamako) and the USA (Infectious Disease Research Institute). "),
                       br(),
                       h3("How to collaborate :"),
                       p(" If you are interested in collaborating with us, please send an email to Dr. Ikram Guizani( ",a("ikram.Guizani@pasteur.tn"),
