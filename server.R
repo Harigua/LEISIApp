@@ -1414,7 +1414,7 @@ shinyServer(function(input, output,session) {
 
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','NULL') ")
+      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','N/A') ")
 
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
@@ -1441,7 +1441,7 @@ shinyServer(function(input, output,session) {
 
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',NULL) ")
+      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',N/A) ")
 
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
@@ -2724,17 +2724,15 @@ shinyServer(function(input, output,session) {
   ##############################################################################################
 
   cordata=reactive({
-    cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER from patient"))
+    cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER, AGE from patient"))
     cor3=sqlQuery(connect,paste("SELECT * from sample"))
 
     cordataall=sqldf("select * from  cor3, cor1
                      where   cor3.PATIENT_IDENTIFIER=cor1.PATIENT_IDENTIFIER ")
 
-    cor=sqlQuery(connect,paste("SELECT AGE from patient"))
-
-    PAITIENT_AGE=as.numeric(cor[,1])
-    Date_First_Apeard=sqlQuery(connect,paste("SELECT Date_First_Apeard from sample"))[,1]
-    datatot=data.frame(cordataall,PAITIENT_AGE,Date_First_Apeard)
+    PAITIENT_AGE=as.numeric(cor1$AGE)
+    Lesion_Age=as.numeric(cor3$Lesion_Age)
+    datatot=data.frame(cordataall,PAITIENT_AGE,Lesion_Age)
     datatot$LOCALISATION=as.factor(datatot$LOCALISATION)
     datatot
 
@@ -2776,12 +2774,13 @@ shinyServer(function(input, output,session) {
   prepdata=reactive({
 
     Totlalacm1=cordata()#[,-c(1,2,4,6,12:16,18,19)]
-    Age_Class <- cut(round(as.numeric(cordata()$PAITIENT_AGE)), c(0,10,20,30,40,50,60,70,80,120),
+    Age_Class <- cut(as.numeric(cordata()$PAITIENT_AGE), c(0,10,20,30,40,50,60,70,80,120),
                      labels = c("Moins de 10 ans","11-20 ans","21-30 ans","31-40 ans","41-50 ans","51-60 ans", "61-70ans","71-80 ans ","plus de 80 ans" ))
     Lesion_Age_Class <- cut(as.numeric(cordata()$Lesion_Age), c(0, 2, 4, 6, 8, 10, 12, 15),
                             labels = c("moins de deux semaines", "2 - 4 semaines ", "4 - 6 semaines","6 - 8 semaines",
                                        "8- 10 semaines","10 - 12 semaines", "plus de 3 mois"))
-
+    info(paste0(Age_Class))
+    info(paste0(cordata()$PAITIENT_AGE))
     is.fact1 <- sapply(Totlalacm1, is.factor)
     dataacm1=data.frame( Totlalacm1[, is.fact1],Age_Class,Lesion_Age_Class)
 
@@ -3056,14 +3055,14 @@ for(p in 1:dim(three2)[1])
     }else{
       updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
     }
-an.error.occured <- FALSE
+  }
+    an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, updateQuery)}
               , error = function(e) {an.error.occured <<- TRUE}
     )
     if(an.error.occured){
       paste("Error in Update patient",p)
     }else{paste("Patient",p,"age successfully Updated",age[p])}
-  }
 }
     one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup WHERE DATE_MED!='1900-01-01' "))
     two=sqlQuery(connect,paste("SELECT Date_First_Apeard,Lesion_Age,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
@@ -3073,8 +3072,19 @@ an.error.occured <- FALSE
         days= round(as.numeric(as.Date(three$DATE_MED) - as.Date(three$Date_First_Apeard))/7)
 for(la in 1:dim(three)[1])
 {
-  if(as.numeric(three[la,]$Lesion_Age) < 0){
-    updateQuery=paste0("update sample set Lesion_Age='",days[la],"' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+  if(is.null(three2[p,]$AGE) | is.na(three2[p,]$AGE) | three2[p,]$AGE==""){
+    if(three[la,]$Date_First_Apeard=="1900-01-01" | three[la,]$DATE_MED=="1900-01-01"){
+      updateQuery=paste0("update sample set Lesion_Age='-1' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+    }else{
+      updateQuery=paste0("update sample set Lesion_Age='",days[la],"' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+    }
+  }else if(as.numeric(three[la,]$Lesion_Age) < 0){
+    if(three[la,]$Date_First_Apeard=="1900-01-01" | three[la,]$DATE_MED=="1900-01-01"){
+      updateQuery=paste0("update sample set Lesion_Age='-1' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+    }else{
+      updateQuery=paste0("update sample set Lesion_Age='",days[la],"' where PATIENT_IDENTIFIER='",three[la,]$PATIENT_IDENTIFIER,"';")
+    }
+  }
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, updateQuery)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3082,7 +3092,6 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       paste("Error in Update Lesion_Age")
     }else{paste("Lesion_Age successfully Updated")}
-  }
 }
     days=sqlQuery(connect,paste("SELECT Lesion_Age from sample"))$Lesion_Age
     Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14),
