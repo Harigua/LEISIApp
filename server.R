@@ -1,13 +1,11 @@
-
 library(readr)
-
 world <- read_delim("www/country_list.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
 cities <- read_delim("www/worldcities.csv",  ",", escape_double = FALSE, trim_ws = TRUE)[,c('iso2','city','city')]
 for(i in 1:nrow(cities)){
   cities[i,3] <-  paste(cities[i,1],cities[i,2], sep = ", ")
 }
 choice <- read_delim("www/choice.csv",  ";", escape_double = FALSE, trim_ws = TRUE)
-#library(mailR)
+
 library(Hmisc)
 library(shiny)
 library(shinyjs)
@@ -38,7 +36,6 @@ library(multcompView)
 library(dygraphs)
 suppressPackageStartupMessages(library(googleVis))
 library(V8)
-#library(Sys)
 
 Sys.setenv(NLS_LANG="FRENCH_FRANCE.UTF8")
 connect=odbcConnect("InDev", uid='root', pwd='16souemna' , DBMSencoding = "UTF-8")
@@ -59,152 +56,61 @@ Dygraph.Export.asPNG(params.dygraph, image);
 }
 '
 
-
 shinyServer(function(input, output,session) {
-
-
   useShinyjs()
   extendShinyjs(text = js.png)
   includeScript('www/dygraph-extra.js')
   img(id = 'plot-static')
-
-  dataalliq=reactive({
-    sqlQuery(connect,paste("SELECT * from alliquot"))
-  })
-
   datatestech=reactive({
     sqlQuery(connect,paste("SELECT * from molecularl_test"))
   })
-
-  datalab=reactive({
-    sqlQuery(connect,paste("SELECT * from laboratory"))
-  })
-
-  pat=reactive({
-    sqlQuery(connect,paste("SELECT * from patient"))
-  })
-
-  ChUp=reactive({
-    sqlQuery(connect,paste("SELECT * from medical_checkup"))
-  })
-
-  datareg=reactive({
-    sqlQuery(connect,paste("SELECT * from region"))
-  })
-
   dataech=reactive({
     sqlQuery(connect,paste("SELECT * from sample"))
   })
-
-  useee=reactive({
-    sqlQuery(connect,paste("SELECT * from userdata"))
-  })
-
-  dataetab=reactive({
-    sqlQuery(connect,paste("SELECT * from laboratory"))
-  })
-
   datainvv=reactive({
     sqlQuery(connect,paste("SELECT * from interrogator"))
   })
-
-
-
   addClass(selector = "body", class = "sidebar-collapse")
-
   output$tables=renderUI({
     taables=sqlTables(connect, errors = FALSE, as.is = TRUE,
                       catalog = NULL, schema = NULL, tableName = NULL,
                       tableType = NULL, literal = FALSE)
     selectInput("ttest", "",choices=taables[,3])
-
   })
-
-
-
   output$datainv=renderUI({
-
-
     selectInput("investcinn","Choose from list the investigator", choices= c("",as.character(datainvv()[,1])) , multiple=FALSE )
-
   })
-
-
   datas= reactive({
-    AAll=sqlQuery(connect,paste("SELECT * from ",input$ttest))
-    AAll
+    sqlQuery(connect,paste("SELECT * from ",input$ttest))
   })
-
   output$datas= DT::renderDataTable ({
-
     DT::datatable(datas(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
-
   })
-
-
-
-
-
   output$sum= renderPrint ({
-
     summary(datas())
-
   })
-
   output$sum2= renderPrint ({
-
     summary(datas2())
-
   })
-
   observeEvent(input$subtosample, {
-
     output$addallo=renderUI({
       div(
         actionButton("addalliquot","Add alliquot"),
         actionLink("back","Go back"))
     })
-
     output$echnn=renderUI({
     })
   })
 
-
-
-
-
-
-  observeEvent(input$selecthome2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selecthome2.1, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selecthome2.2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selecthome2.3, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selecthome2.5, {
+  #######################################################
+  observeEvent(input$selecthome, {
     addClass(selector = "body", class = "sidebar-collapse")
     newvalue <- "acc2"
     updateTabItems(session, "tabs", newvalue)
   })
 
   #######################################################
-
   observeEvent(input$selectDatMang, {
-
     ############################################################################
     #                              Access to Super                             #
     ############################################################################
@@ -213,88 +119,10 @@ shinyServer(function(input, output,session) {
     validate(
       need(security!="normal", "You have to be a super user to access")
     )
-
-
     addClass(selector = "body", class = "sidebar-collapse")
     newvalue <- "cleanD"
     updateTabItems(session, "tabs", newvalue)
   })
-  observeEvent(input$selectMang1, {
-    ############################################################################
-    #                              Access to Super                             #
-    ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from userdata"))
-    security=security[which(security[,1]==USER$name),3]
-    validate(
-      need(security!="normal", "You have to be a super user to access")
-    )
-
-
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "cleanD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectMang2, {
-    ############################################################################
-    #                              Access to Super                             #
-    ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from userdata"))
-    security=security[which(security[,1]==USER$name),3]
-    validate(
-      need(security!="normal", "You have to be a super user to access")
-    )
-
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "cleanD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selectMang3, {
-    ############################################################################
-    #                              Access to Super                             #
-    ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from userdata"))
-    security=security[which(security[,1]==USER$name),3]
-    validate(
-      need(security!="normal", "You have to be a super user to access")
-    )
-
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "cleanD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selectMang4, {
-    ############################################################################
-    #                              Access to Super                             #
-    ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from userdata"))
-    security=security[which(security[,1]==USER$name),3]
-    validate(
-      need(security!="normal", "You have to be a super user to access")
-    )
-
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "cleanD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selectMang5, {
-    ############################################################################
-    #                              Access to Super                             #
-    ############################################################################
-    security=sqlQuery(connect,paste("SELECT * from userdata"))
-    security=security[which(security[,1]==USER$name),3]
-    validate(
-      need(security!="normal", "You have to be a super user to access")
-    )
-
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "cleanD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-
 
   ####################################################################
   observeEvent(input$selectDatAdd, {
@@ -302,94 +130,16 @@ shinyServer(function(input, output,session) {
     newvalue <- "OTD"
     updateTabItems(session, "tabs", newvalue)
   })
-  observeEvent(input$selectDatAdd2.1, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "OTD"
-    updateTabItems(session, "tabs", newvalue)
-  })
 
-  observeEvent(input$selectDatAdd2.2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "OTD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAdd2.3, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "OTD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAdd2.4, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "OTD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selectDatAdd2.5, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "OTD"
-    updateTabItems(session, "tabs", newvalue)
-  })
   ##############################################################
   observeEvent(input$selectDatView, {
     addClass(selector = "body", class = "sidebar-collapse")
     newvalue <- "VD"
     updateTabItems(session, "tabs", newvalue)
   })
-  observeEvent(input$selectDatView2_1, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "VD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatView2_2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "VD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatView2_3, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "VD"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatView2_4, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "VD"
-    updateTabItems(session, "tabs", newvalue)
-  })
 
-  observeEvent(input$selectDatView2_5, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "VD"
-    updateTabItems(session, "tabs", newvalue)
-  })
   ################################################################
-
   observeEvent(input$selectDatAna, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "AnD"
-    updateTabItems (session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAna2_1, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "AnD"
-    updateTabItems (session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAna2_2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "AnD"
-    updateTabItems (session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAna2_3, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "AnD"
-    updateTabItems (session, "tabs", newvalue)
-  })
-  observeEvent(input$selectDatAna2_4, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "AnD"
-    updateTabItems (session, "tabs", newvalue)
-  })
-
-  observeEvent(input$selectDatAna2_5, {
     addClass(selector = "body", class = "sidebar-collapse")
     newvalue <- "AnD"
     updateTabItems (session, "tabs", newvalue)
@@ -401,193 +151,109 @@ shinyServer(function(input, output,session) {
     newvalue <- "UP"
     updateTabItems(session, "tabs", newvalue)
   })
-  observeEvent(input$selectpub2_1, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "UP"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectpub2_2, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "UP"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectpub2_3, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "UP"
-    updateTabItems(session, "tabs", newvalue)
-  })
-  observeEvent(input$selectpub2_4, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "UP"
-    updateTabItems(session, "tabs", newvalue)
 
-  })
-
-  observeEvent(input$selectpub2_5, {
-    addClass(selector = "body", class = "sidebar-collapse")
-    newvalue <- "UP"
-    updateTabItems(session, "tabs", newvalue)
-
-  })
   #########################################################################
-
-
   userdata=reactive({
-    dataU=sqlQuery(connect,"SELECT * from userdata")
-    dataU
+    sqlQuery(connect,"SELECT * from userdata")
   })
-
-
   observeEvent(input$Sub, {
     observeEvent(input$title, {
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
     })
-
     valid=FALSE
-
     for(i in 1:length(userdata()[,1])) if ( input$user== userdata()[i,1] && input$pass==userdata()[i,2] ) valid=TRUE
-
-
     if (valid=="TRUE") updateTabItems(session, "tabs", "acc2")
-
   })
-
   observeEvent(input$toInvestigator, {
-
     newvalue <- "Add Interrogator"
     updateTabItems(session, "inputdata", newvalue)
   })
   observeEvent(input$toPatientp2, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$toPatient, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$addintertopat1, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$addintertopat2, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$addintertohost, {
-
     newvalue <- "Add Host"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$toLesion, {
-
     newvalue <- "Lesion data"
     updateTabItems(session, "inputdata", newvalue)
   })
-
-
-
   observeEvent(input$interIntoinvest, {
-
     newvalue <- "Add Interrogator"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$interIntoetab1, {
-
     newvalue <- "Add Institution"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$interIntoetab2, {
-
     newvalue <- "Add Institution"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$tosample, {
-
     newvalue <- "Sample data"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$testtolesion, {
-
     newvalue <- "Lesion data"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$testtoetab1, {
-
     newvalue <- "Add Institution"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$testtoetab2, {
-
     newvalue <- "Add Institution"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$treattopat1, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$treattopat2, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$movetopat1, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$movetopat2, {
-
     newvalue <- "Add Patient"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$movetoreg1, {
-
     newvalue <- "Add Region"
     updateTabItems(session, "inputdata", newvalue)
   })
-
   observeEvent(input$movetoreg2, {
-
     newvalue <- "Add Region"
     updateTabItems(session, "inputdata", newvalue)
   })
-
-
   output$value <- renderText({
     req(input$go)
     isolate(input$password)
   })
-
   ########################################
   USER <- reactiveValues(Logged = FALSE , session = session$user)
-
   PASSWORD=reactive({
     data.frame( sqlQuery(connect,"SELECT * from userdata"))
   })
-
-
   output$uiLogin <- renderUI({
     if (USER$Logged == FALSE) {
       wellPanel(
@@ -604,14 +270,8 @@ shinyServer(function(input, output,session) {
         p("For more information on Lesionia and the data system management, please contact Dr. Emna HARIGUA at ",a("emna.harigua@pasteur.utm.tn")),
         p("please note : We will get back to you shortly, usually within 2-3 days.",style="color:gray;")
       )
-
-
     }
   })
-
-
-
-
 
   # Login info during session ----
   output$userPanel <- renderUI({
@@ -623,39 +283,29 @@ shinyServer(function(input, output,session) {
                )
         ),
         column(1, actionLink("logout", "Logout"))
-        #,
-        # column(1, actionLink("selecthome2","Home page"
-        #                      ,icon = icon("list-alt")
-        #                     )
-        #       )
-
       )
     }
   })
-
   output$homenav=renderUI({
     if(USER$Logged==TRUE ){
       div(
         fluidRow(
           box(width = 2, status = "info",solidHeader = TRUE,
-              column(3,  h3(actionLink("selectDatMang",strong("Data Management"),icon = icon("fa fa-american-sign-language-interpreting"))))),
+              column(3,  h3(actionLink("selectDatMang",strong("Data Management"),icon = icon("fa fa-american-sign-language-interpreting"))))
+          ),
           box(width = 2, status = "info",solidHeader = TRUE,
-              column(3,  h3(actionLink("selectDatAdd",strong("Data Entry"),icon = icon("list-alt"))))),
+              column(3,  h3(actionLink("selectDatAdd",strong("Data Entry"),icon = icon("list-alt"))))
+          ),
           box(width = 2, status = "info",solidHeader = TRUE,
               column(3,  h3(actionLink("selectDatView",strong("Data Viewer") ,icon = icon("table"))))
           ),
           box(width = 2, status = "info",solidHeader = TRUE,
-              column(3,  h3(actionLink("selectDatAna",strong("Data Analysor"),icon = icon("bar-chart-o")))))
-          # ,
-          # box(width = 2, status = "info",solidHeader = TRUE,
-          #     column(3,  h3(actionLink("selectpub",strong("Publication Consultor") ,icon = icon("refresh")))))
+              column(3,  h3(actionLink("selectDatAna",strong("Data Analysor"),icon = icon("bar-chart-o"))))
+          )
         )
       )
     }
   })
-
-
-
 
   # control login
   observeEvent(input$Login , {
@@ -681,23 +331,17 @@ shinyServer(function(input, output,session) {
 
   ###############################################
   #### Add data ##############################
-
   output$Patient=renderUI({
     if(USER$Logged==TRUE ){
-
       h3("Hello in this section.")
-
       tabBox(
         id="inputdata",
         title = tagList( ""),
         width = 10,
         height = 4,
-
-
         tabPanel(h3(strong("Add Patient Data")),
                  id="formPR",
                  uiOutput("firsttimeID"),
-
                  uiOutput("patdataout"),
                  uiOutput("patennt"),
                  uiOutput("AdddSample"),
@@ -706,10 +350,6 @@ shinyServer(function(input, output,session) {
                  uiOutput("AdddRegion"),
                  uiOutput("alliquot")
         ),
-
-
-
-
         tabPanel(h3(strong("Diagnosis")),
                  id="formInsertDiagnos",
                  div(
@@ -717,7 +357,6 @@ shinyServer(function(input, output,session) {
                    fluidRow(
                      box(width = 12, status = "info",solidHeader = TRUE,
                          p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
                          selectInput("chemtest","Molecular test*",choices = c("",as.character(datatestech()[,1]))),
                          selectInput("labname","Laboratory*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory")))$LABORATORY_NAME)))),
                          selectInput("sample","Sample*",choices = c("",as.character(dataech()[,1]))),
@@ -728,9 +367,10 @@ shinyServer(function(input, output,session) {
                      ),
                      actionButton("btnInsertDiognosis", "Submit Data",  class = "btn-primary"),
                      actionButton("editDiag", "Edit",  class = "btn-primary")
-                   ))),
+                   )
+                 )
+        ),
         tabPanel(h3(strong("Identified Species")),
-
                  fluidRow(
                    div(
                      id="formUpdateIdentifiedSpecies",
@@ -741,10 +381,10 @@ shinyServer(function(input, output,session) {
                      column("",selectInput("spece","Identified Species",choices =c("",c(as.character(data.frame(sqlQuery(connect,sprintf("SELECT SPECIES from leishmania_species")))$SPECIES)))),width = 3),
 
                      actionButton("btnUpdateIdentifiedSpecies","Update Leishmania species")
-                   ))),
-
+                   )
+                 )
+        ),
         tabPanel(h3(strong("Add Interrogator")),
-
                  fluidRow(
                    div(
                      shinyjs::useShinyjs(),
@@ -760,8 +400,9 @@ shinyServer(function(input, output,session) {
                      ),
                      actionButton("btnAddInterrogator", "Submit Data",  class = "btn-primary"),
                      actionButton("editinterr", "Edit",  class = "btn-primary")
-                   )) ),
-
+                   )
+                 )
+        ),
         tabPanel(h3(strong("Add laboratory")),
                  fluidRow(
                    div(
@@ -776,11 +417,10 @@ shinyServer(function(input, output,session) {
                      ),
                      actionButton("btnInsertLab", "Submit",  class = "btn-primary"),
                      actionButton("editlab", "Edit",  class = "btn-primary")
-                   )) ),
-
-
+                   )
+                 )
+        ),
         tabPanel(h3(strong("Add Discrepancy")),
-
                  fluidRow(
                    div(
                      shinyjs::useShinyjs(),
@@ -796,8 +436,9 @@ shinyServer(function(input, output,session) {
 
                      ),
                      actionButton("btnInsertDiscrepancy", "Submit",  class = "btn-primary")
-                   )) )
-
+                   )
+                 )
+        )
       )
     }else{  USER$Logged <- FALSE
     USER$pass <- ""
@@ -805,17 +446,13 @@ shinyServer(function(input, output,session) {
     updateTabItems(session, "tabs", newvalue)
     addClass(selector = "body", class = "sidebar-collapse")}
   })
-
   output$idMedDiscrepancy=renderUI({
-
     selectInput("Med_check","date of medical checkup*",choices = c("",as.character(data.frame(sqlQuery(connect,sprintf( "SELECT `DATE_MED` from `medical_checkup` WHERE `PATIENT_IDENTIFIER`='%s'",paste(as.character(input$idPatientDisc)) )))$DATE_MED)))
-
   })
   observeEvent(input$btnInsertDiscrepancy , {
     queryInserDiscrepancy  <- paste0(
       "INSERT INTO discrepancy(idDiscrepancy,PATIENT_IDENTIFIER,DATE_MED,Description,user)
       VALUES ('",paste0(input$idPatientDisc),"/",input$Med_check,"','",input$idPatientDisc,"','",input$Med_check,"','",input$text_Disc,"','",USER$name,"') ")
-
     if (input$idPatientDisc==""){
       info("Error : Missing data patient DB code")
     }else if(input$Med_check==""){
@@ -833,10 +470,7 @@ shinyServer(function(input, output,session) {
         info("Discrepancy  successfully added")
       }
     }
-
-    #
     shinyjs::reset("formAddDiscrepancy")
-
   })
   output$viewtable=renderUI({
     if(USER$Logged==TRUE ){
@@ -855,22 +489,18 @@ shinyServer(function(input, output,session) {
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
       addClass(selector = "body", class = "sidebar-collapse")}
-
-
   })
-
   output$map1=renderGvis ({
     if(USER$Logged==TRUE ){
-
       gvisGeoChart(world, locationvar="Country" ,"Estimated Population at Risk of CL",
                    options=list( projection="kavrayskiy-vii",
                                  colorAxis="{colors:['#CECEF6', '#06325A']}",
                                  backgroundColor="White",
-                                 width=1075, height=400))}
-
-
+                                 width=1075, height=400
+                   )
+      )
+    }
   })
-
   output$map2=renderGvis ({
     if(USER$Logged==TRUE ){
       box(
@@ -879,38 +509,27 @@ shinyServer(function(input, output,session) {
                        projection="kavrayskiy-vii",
                        colorAxis="{colors:['white', 'blue']}",
                        backgroundColor="steelblue",
-                       width=1000, height=200,region="145" )))}
-
-
+                       width=1000, height=200,region="145"
+                     )
+        )
+      )
+    }
   })
-
-
-
   output$adnlove=renderUI ({
     if(USER$Logged==FALSE ){
-
-      imm=  tags$img(src="adnlove.png",width=150, height=490)
-      imm
+      tags$img(src="adnlove.png",width=150, height=490)
     }
   })
-
   output$wiw=renderUI ({
     if(USER$Logged==FALSE ){
-
-      imm1=  tags$img(src="wiw.png",width=800, height=450)
-      imm1
+      tags$img(src="wiw.png",width=800, height=450)
     }
   })
-
   output$ipt=renderUI ({
     if(USER$Logged==FALSE ){
-
-      imIPT=  tags$img(src="logo-IPT.png",width=90, height=450)
-      imIPT
+      tags$img(src="logo-IPT.png",width=90, height=450)
     }
   })
-
-
   output$mail=renderUI({
     if(USER$Logged==FALSE ){
       div(
@@ -920,12 +539,8 @@ shinyServer(function(input, output,session) {
       )
     }
   })
-
-
-
   observeEvent( input$mail, {
     output$mailcontent=renderUI({
-
       if(USER$Logged==FALSE  ){
         div(
           box( width = 16,status = "info",solidHeader = FALSE,
@@ -985,46 +600,18 @@ shinyServer(function(input, output,session) {
                       br()
                  ),
                  # column("", ,width = 12 ),
-
-                 # column("", actionButton("sendthemail","Send the mail"),width = 2),
                  column("", actionButton("cancelmail","Cancel") ,width = 2 )
-               )))
-
+               )
+          )
+        )
       }
     })
   })
-
-  # observeEvent( input$sendthemail, {
-  #   from <- c("<hajjiyessin@gmail.com>")
-  #   to <- c("<hajjiyessin@gmail.com>")
-  #   subject <- toString(input$topic)
-  #   body <- paste0("This mail was sent from ",toString(input$usermail), " working at ",toString(input$userwork),"                                                                                                                                                                                                              Topic :  ",toString(input$topic) ,"                                                                                                                                                                                                                                                                  Mail body :  ","                                                                                                                                                                                                                                                                                                   ",toString(input$Content1))
-  #
-  #   send.mail(from, to, subject, body,
-  #             smtp = list(host.name = "smtp.gmail.com", port = 587, user.name = "hajjiyessin@gmail.com", passwd = "appLesion", ssl = TRUE),
-  #             authenticate = TRUE,
-  #             send = TRUE  )
-  #   info("Mail sent successfully")
-  #   shinyjs::reset("mail")
-  #
-  # })
-
   observeEvent( input$cancelmail, {
     output$mailcontent=renderUI({
       if(USER$Logged==FALSE  ){}
     })
   })
-
-  # observe({
-  #   if (is.null(input$idInterrogator) || input$idInterrogator ==0 || input$idInterrogator < 0 ) {
-  #     #info(text = "ERROR : Please enter a valid interrogator id")
-  #     shinyjs::disable("submitID")
-  #   } else {
-  #     shinyjs::enable("submitID")
-  #   }
-  # })
-
-
   output$patdataout=renderUI ({
     if(paste(USER$name)=='super')
     {
@@ -1033,15 +620,11 @@ shinyServer(function(input, output,session) {
       quer=sprintf("SELECT * from patient where LOGINUSER='%s'",paste(USER$name))
     }
     datpat=sqlQuery(connect,quer)
-
-
     if ( input$PatIdentifier %in% datpat[,1] ) {
-
       output$ViewTable=renderDataTable({
         A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:10)]
         DT::datatable(A, options = list(scrollX = TRUE,lengthMenu = c(1) ,pageLength = 1))
       })
-
       div(
         DT::dataTableOutput("ViewTable"),
         actionButton("btnInsertT_RInt","Travel/Residency"),
@@ -1050,30 +633,25 @@ shinyServer(function(input, output,session) {
         actionButton("btnInsertTreatmentInt","Add Treatment "),
         actionButton("btnInsertSampleInt","Add Sample "),
         actionButton("gotofirst","Quit")
-      )} else{
+      )
+    } else{
         div(
           actionButton("addpatient","Add Patient"),
-          actionButton("editpatient", "Edit Patient")) }
-
+          actionButton("editpatient", "Edit Patient")
+        )
+    }
   })
-
   observeEvent( input$gotofirst, {
     output$firsttimeID=renderUI({
       textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
     })
     output$patdataout=renderUI ({
-
       datpat=sqlQuery(connect,paste("SELECT * from patient"))
-
-
       if ( input$PatIdentifier %in% datpat[,1] ) {
-
         output$ViewTable=renderDataTable({
           A=datpat[which(datpat$PATIENT_IDENTIFIER==input$PatIdentifier),c(1,6:8)]
-
           DT::datatable(A, options = list(scrollX = TRUE,lengthMenu = c(1) ,pageLength = 1))
         })
-
         div(
           DT::dataTableOutput("ViewTable"),
           actionButton("btnInsertT_RInt","Travel/Residency"),
@@ -1082,65 +660,47 @@ shinyServer(function(input, output,session) {
           actionButton("btnInsertTreatmentInt","Add Treatment "),
           actionButton("btnInsertSampleInt","Add Sample "),
           actionButton("gotofirst","Quit")
-        )} else{
+        )
+      } else{
           div(
             actionButton("addpatient","Add Patient"),
-            actionButton("editpatient", "Edit Patient")) }
-
+            actionButton("editpatient", "Edit Patient")
+          )
+      }
     })
   })
-
-
-
   observeEvent( input$addpatient, {
-
     output$patennt=renderUI({
-
-
       output$firsttimeID=renderUI({
-
       })
       div(
-
         id="formInsertPatient",
-        #SELECT  FROM `patient` WHERE `LOGINUSER`="maaoui" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;
-        #datpat=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER from patient  WHERE `LOGINUSER`="%s" ORDER BY `PATIENT_IDENTIFIER` DESC LIMIT 1;",paste(USER$name)))
-
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
             textInput("idPatient","Patient DB Code *",placeholder = 'PPPLL****'),
             textInput("medfilenumber","Patient ID",""),
-
             selectInput("ConsPat","Consentment", c("N/A","No","Yes","YES from IBA")), 
             dateInput("datenaissp","Birth date",value = "1900-01-01"), 
             numericInput("AgePatient","Or Age","-1"), 
             selectInput("nationalp","Nationality", c("N/A","other","TN","LB", "SY", "MA", "DZ")),
             textInput("othernationalp","If other please specify") ,                          
-            selectInput("sexep","Gender", c("N/A","Other","Female","Male")), 
-            
-            
+            selectInput("sexep","Gender", c("N/A","Other","Female","Male")),
             box(width = 12, status = "info",solidHeader = TRUE,
                 selectInput("countryState_PA","Country and state of Residency (The last 6 months)*",choices = c('',cities[,3])),
                 textInput("city_PA","City"), 
                 selectInput("TypePA","Urban/Rural",choices =  c("N/A", "Urban","Rural")), 
                 selectInput("bitePA","Bite Notion",choices =  c("N/A", "Yes","No"))
-                
             )
-
         ),
         actionButton("btnInsertPatient","Submit"),
         actionButton("cansAdd","Cancel")
       )
     })
   })
-
   observeEvent( input$btnInsertPatient, {
-
     queryIpfe <- paste0(
       "INSERT INTO patient
       VALUES ('",toString(input$idPatient)  ,"','",toString(USER$name)  ,"', '",toString( input$medfilenumber) ,"','','','",toString( input$datenaissp) ,"','",toString( input$AgePatient) ,"','",if(toString( input$nationalp)=="other"){toString( toupper(input$othernationalp))}else{toString( input$nationalp)} ,"','",toString( input$sexep) ,"','",toString( input$ConsPat) ,"','') ")
-
     if (input$idPatient=="" || input$idPatient=="PPPLL****"){
       info("Error : Missing data Patient DB Id")
     }else{
@@ -1152,38 +712,28 @@ shinyServer(function(input, output,session) {
         info("Error : Patient already exists")
       }else{
         querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
-
         querytravinpfe <- paste0(
           "INSERT INTO travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`, `BYTENOT`, `RESIDENCY`,`TYPE`,`TODATE`)
       VALUES ('", toString(paste0(input$idPatient,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$countryState_PA,", ",input$city_PA ,"', '",paste0(USER$name),"','",toString(input$idPatient),"', '",as.character( input$datenaissp )  ,"', '",toString( input$bitePA ) ,"', '",paste0( "Yes" ) ,"','",toString(input$TypePA),"','-1') ")
-
         tryCatch( {sqlExecute(connect, querytravinpfe)}
                   , error = function(e) {an.error.occured <<- TRUE}
         )
         if(an.error.occured){
           info("Error : INSERT INTO  travel_residency from patient")
         }
-
         info("Patient successfully stored")
       }
     }
-
     shinyjs::reset("formInsertPatient")
-
     output$firsttimeID=renderUI({
       textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
     })
     output$patennt=renderUI({
-
     })
   })
-
   output$firsttimeID=renderUI({
     textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
   })
-
-
-
   observeEvent( input$cansAdd, {
     output$firsttimeID=renderUI({
       textInput("PatIdentifier","Please Enter the Patient DB Code",placeholder = 'PPPLL****')
@@ -1191,26 +741,18 @@ shinyServer(function(input, output,session) {
     output$patennt=renderUI({
     })
   })
-
-
   observeEvent(input$btnInsertSampleInt, {
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
-
       div(
-
         id="formSample",
-
         box( width = 12, status = "info",solidHeader = TRUE,
              p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
              selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE),
              selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE),
              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
@@ -1232,30 +774,20 @@ shinyServer(function(input, output,session) {
         actionButton("btnUpdateSampleInt","Edit"),
         actionButton("cansAddinfo","Cancel")
       )
-
     })
   })
-
-
   observeEvent(input$btnInsertT_RInt, {
-
-
     output$AdddRegion=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
       div(
-
         id="formInsertT_R",
-
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
             selectInput("regvisit","Country and state*",choices = c('',cities[,3])),
             textInput("regvisitc","City"),
             selectInput("Type","Urban/Rural",choices =  c("N/A", "Urban","Rural")),
@@ -1263,7 +795,6 @@ shinyServer(function(input, output,session) {
             selectInput("bybyte","Bite Notion",choices =  c("N/A", "Yes","No")),
             dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE),
             textInput("dateleavevisit","Duration (In weeks, one year = 52 weeks)*","-1")
-
         ),
         actionButton("subregionQ","Submit and Quit"),
         actionButton("otherregionAdd"," Submit and add other regions"),
@@ -1272,22 +803,16 @@ shinyServer(function(input, output,session) {
       )
     })
   })
-
-
   observeEvent(input$btnInsertTreatmentInt, {
     output$AdddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
       div(
         id="formInsertTreatment",
-
-
         box(width = 12, status = "info",solidHeader = TRUE,
             selectInput("treattype","Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE), 
             textInput("otherTreattype","If other please specify") ,  
@@ -1298,31 +823,24 @@ shinyServer(function(input, output,session) {
             textInput("Posology","Posology",""), 
             textInput("admin","Administration Root",""),
             numericInput("injectionnumber","Number of injections* (for Glucantime)","-1")
-            
         ),
         actionButton("subtreatmentQ","Submit and Quit"),
         actionButton("othertreatmentAdd"," Submit and Add Treatment"),
         actionButton("edittreatment","Edit"),
         actionButton("cansAddinfo","Cancel")
       )
-
     })
   })
-
   observeEvent(input$btnInsertTreatmenthistoryInt, {
     output$AdddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
       div(
         id="formInsertTreatmenthistory",
-
-
         box(width = 12, status = "info",solidHeader = TRUE,
             selectInput("treattype","historical Treatment type",choices = c("N/A","Other","Antibiotics","Glucantime","No treatment"),multiple = TRUE), 
             textInput("otherTreattype","If other please specify") , 
@@ -1333,7 +851,6 @@ shinyServer(function(input, output,session) {
             textInput("Posology","Posology",""), 
             textInput("admin","Administration Root",""), 
             numericInput("injectionnumber","Number of injections* (for Glucantime)","-1")
-            
         ),
         actionButton("subtreatmentQ","Submit and Quit"),
         actionButton("othertreatmentHistoryAdd"," Submit and Add Treatment"),
@@ -1342,24 +859,18 @@ shinyServer(function(input, output,session) {
       )
     })
   })
-
   observeEvent(input$btnInsertCheckupInt , {
     output$Adddcheckup=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
       div(
-
         id="formCh",
-
         box(width = 12, status = "info",solidHeader = TRUE,
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
             selectInput("interrID","Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator")))$ID_INTERROGATOR)))),
             textInput("hospital","Hospital",""),
             textInput("pysicien","Physician",""),
@@ -1375,18 +886,13 @@ shinyServer(function(input, output,session) {
             selectInput("Lesion_Sites","Lesion localisation",choices = c("N/A","Other","Face", "Upper limbs","Lower limbs","Trunc"),multiple = TRUE)
         ),
         actionButton("subchekupQ","Submit and Quit"),
-
         actionButton("othercheckAdd"," Submit and add other checkup"),
         actionButton("editmedcheck","Edit Checkup"),
         actionButton("cansAddinfo","Cancel")
       )
     })
   })
-
   observeEvent(input$cansAddinfo, {
-
-
-
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1398,7 +904,6 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-
     output$Adddcheckup=renderUI({
     })
     output$AdddSample=renderUI({
@@ -1407,17 +912,12 @@ shinyServer(function(input, output,session) {
     })
     output$AdddTreatment=renderUI({
     })
-
   })
-
   observeEvent(input$othercheckAdd, {
-
     datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','N/A') ")
-
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
     }else if(input$Lesion_Number<(-1)){
@@ -1431,20 +931,13 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  Medical checkUp")
       }else{info("Medical checkUp successfully added")}
     }
-
     shinyjs::reset("formCh")
-
   })
-
-
   observeEvent(input$subchekupQ, {
-
     datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
       VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',N/A) ")
-
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
     }else if(input$Lesion_Number<(-1)){
@@ -1458,8 +951,6 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  Medical checkUp")
       }else{info("Medical checkUp successfully added")}
     }
-
-
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1471,7 +962,6 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-
     output$Adddcheckup=renderUI({
     })
     output$AdddSample=renderUI({
@@ -1480,18 +970,12 @@ shinyServer(function(input, output,session) {
     })
     output$AdddTreatment=renderUI({
     })
-
   })
-
   observeEvent(input$othertreatmentAdd, {
-
-    ############
     datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
-
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
       VALUES ( '", toString(paste0("Treatment",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
-
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
@@ -1505,19 +989,13 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  treatmenthistory")
       }else{info("Treatment successfully stored")}
     }
-
     shinyjs::reset("formInsertTreatment")
   })
-
   observeEvent(input$othertreatmentHistoryAdd, {
-
-    ############
     datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
-
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
       VALUES ( '", toString(paste0("Treatment",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
-
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
@@ -1531,20 +1009,13 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  treatmenthistory")
       }else{info("Treatment successfully stored")}
     }
-
     shinyjs::reset("formInsertTreatmenthistory")
   })
-
   observeEvent(input$subtreatmentQ, {
-
-    ############
-
     treatmenthistory=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
-
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
       VALUES ( '", toString(paste0("Treatment",length(treatmenthistory[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
-
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
@@ -1558,10 +1029,7 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  treatmenthistory")
       }else{info("Treatment successfully stored")}
     }
-
     shinyjs::reset("formInsertTreatment")
-    ################
-
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1573,7 +1041,6 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-
     output$Adddcheckup=renderUI({
     })
     output$AdddSample=renderUI({
@@ -1583,16 +1050,11 @@ shinyServer(function(input, output,session) {
     output$AdddTreatment=renderUI({
     })
   })
-
-
   observeEvent(input$otherregionAdd, {
-
     querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
-
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
       VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit,", ",input$regvisitc,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
-
     if( as.character(input$regvisit) ==""){
       info("Error : Missing value Country and state")
     }else if( !(as.character(input$datedatevisit) <= Sys.Date()) && as.character(input$datedatevisit) ==""){
@@ -1609,17 +1071,12 @@ shinyServer(function(input, output,session) {
         shinyjs::reset("formInsertT_R")
       }
     }
-
   })
-
   observeEvent(input$subregionQ, {
-
     querySelectDataTR=sqlQuery(connect,paste("SELECT * from travel_residency"))
-
     querytravinpfe <- paste0(
       "INSERT INTO  travel_residency(`IDMVT`, `CITY`, `LOGINUSER` ,`PATIENT_IDENTIFIER`, `FROMDATE`,`TODATE`, `BYTENOT`, `RESIDENCY`,`TYPE`)
       VALUES ('", toString(paste0(input$PatIdentifier,"-",length(querySelectDataTR[,1])+1)) ,"', '",input$regvisit,", ",input$regvisitc,"', '",paste0(USER$name),"','",toString(input$PatIdentifier),"', '",as.character( input$datedatevisit )  ,"', '",as.character( input$dateleavevisit )  ,"', '",toString( input$bybyte ) ,"', '",toString( input$resedent ) ,"', '",toString( input$Type ) ,"') ")
-
     if( as.character(input$regvisit) ==""){
       info("Error : Missing value Country and state")
     }else if( !(as.character(input$datedatevisit) <= Sys.Date()) && as.character(input$datedatevisit) ==""){
@@ -1633,8 +1090,6 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  travel_residency")
       }else{info(" successfully added")}
     }
-
-    #shinyjs::reset("formInsertT_R")
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1646,7 +1101,6 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-
     output$Adddcheckup=renderUI({
     })
     output$AdddSample=renderUI({
@@ -1655,22 +1109,13 @@ shinyServer(function(input, output,session) {
     })
     output$AdddTreatment=renderUI({
     })
-
-
   })
-
-
-
   observeEvent(input$btnAddSampleAndQuit, {
-
     querySelectDataSample=sqlQuery(connect,paste("SELECT  * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
-
     queryInsertSample <- paste0(
       "INSERT INTO  sample
       VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
-
-   
     if(toString(input$extractDay)==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1695,7 +1140,6 @@ shinyServer(function(input, output,session) {
       }else{info(paste0("Sample successfully stored ", idSample))}
     }
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
-
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1716,19 +1160,13 @@ shinyServer(function(input, output,session) {
     })
     output$AdddRegion=renderUI({
     })
-    #alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
-
   })
-
   observeEvent(input$btnAddSampleAndOther, {
-
     querySelectDataSample=sqlQuery(connect,paste("SELECT * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
       VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
-
-    
     if(input$extractDay==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1753,28 +1191,16 @@ shinyServer(function(input, output,session) {
       }else{info(paste0("Sample successfully stored",idSample))}
     }
     observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
-
-    #alert(paste0("Sample Added",length(querySelectDataSample[,1])+1))
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-      #alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
-
-
-
-
-
-
       div(
-
         box( width = 12, status = "info",solidHeader = TRUE,
               p("feilds with asterisk(*) are mandatory", style = "color:red"),
-              
               selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE), 
               selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE), 
               selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")), 
@@ -1788,7 +1214,6 @@ shinyServer(function(input, output,session) {
               selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
               selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular"),multiple=TRUE) , 
               textInput("otherdescriptionlesion","If other please specify")
-
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
         actionButton("btnUpImgInt","Upload Image"),
@@ -1798,19 +1223,14 @@ shinyServer(function(input, output,session) {
         actionButton("cansAddinfo","Cancel")
       )
     })
-
   })
-
   observeEvent(input$btnAddInterrogator, {
-
     shinyjs::reset("formAddInterrogator")
-
   })
   observeEvent(input$btnAddInterrogator, {
     queryAddInterrogator <- paste0(
       "INSERT INTO  interrogator
       VALUES ('", input$idInterrogator ,"', '",toString( USER$name ) ,"', '",toString( input$nameInterrogator ) ,"', '",toString(input$lastNameInterrogator) ,"','",toString( input$qualityInterrogator) ,"') ")
-
     if(toString(input$idInterrogator)==""){
       info("Error : Missing data id interrogator")
     }else if(toString(input$nameInterrogator) == ""){
@@ -1828,18 +1248,13 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO Interrogator")
       }else{info("Interrogator successfully stored")}
     }
-
     updateSelectInput (session,"interrID",label="Interrogator ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator")))$ID_INTERROGATOR))))
-
-
   })
-
   observeEvent(input$btnInsertDiognosis, {
     querySelectDataDiognosis=sqlQuery(connect,paste("SELECT * from diognosis"))
     queryInsertDiognosis <- paste0(
       "INSERT INTO  diognosis
       VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"','", toString(USER$name) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
-
     if(toString(input$chemtest) == ""){
       info("Error : Missing data test")
     }else if(toString(input$labname)==""){
@@ -1863,7 +1278,6 @@ shinyServer(function(input, output,session) {
     }
     shinyjs::reset("formInsertDiagnos")
   })
-
   observeEvent(input$btnInsertLab , {
     queryInsertLab <- paste0(
       "INSERT INTO laboratory
@@ -1884,160 +1298,38 @@ shinyServer(function(input, output,session) {
         info("laboratory successfully added")
       }
     }
-
-    #
     shinyjs::reset("formAddLab")
     updateSelectInput(session,"labname","Laboratory",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT LABORATORY_NAME from laboratory")))$LABORATORY_NAME))))
-
   })
-
   output$imgslide=renderUI({
     if (USER$Logged == FALSE) {
-
-
       includeHTML("www/style.css")
       includeHTML("www/imageslider.html")
-
     }
   })
-
   output$appkey=renderUI({
     if (USER$Logged == TRUE) {
       box(width =10 , status = "info",solidHeader = TRUE,
           div(
             fluidRow(
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selecthome2","Home page",icon = icon("list-alt"))))),
+                  column(3,  h5(actionLink("selecthome","Home page",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selectMang1","Data Management",icon = icon("list-alt"))))),
+                  column(3,  h5(actionLink("selectMang","Data Management",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selectDatAdd2.1","Data Entry",icon = icon("list-alt"))))),
+                  column(3,  h5(actionLink("selectDatAdd","Data Entry",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selectDatView2_1","Data Viewer" ,icon = icon("table"))))),
+                  column(3,  h5(actionLink("selectDatView","Data Viewer" ,icon = icon("table"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selectDatAna2_1","Data Analysor",icon = icon("bar-chart-o")))))
+                  column(3,  h5(actionLink("selectDatAna","Data Analysor",icon = icon("bar-chart-o")))))
               #,
               # box(width = 2, status = "info",solidHeader = TRUE,
-              #     column(3,  h5(actionLink("selectpub2_1","Publication Consultor" ,icon = icon("refresh")))))
+              #     column(3,  h5(actionLink("selectpub","Publication Consultor" ,icon = icon("refresh")))))
             )
           )
-
       )
     }
   })
-
-
-  output$appkey2=renderUI({
-    if (USER$Logged == TRUE) {
-      box(width = 3 , status = "info",solidHeader = TRUE, Position="right"  ,
-          div(
-            fluidRow(
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selecthome2.1","Home page",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectMang2","Data Management",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAdd2.2","Data Entry",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatView2_2","Data Viewer" ,icon = icon("table"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAna2_2","Data Analysor",icon = icon("bar-chart-o")))))
-              # ,
-              # box(width = 12, status = "info",solidHeader = TRUE,
-              #     column(8,  h5(actionLink("selectpub2_2","Publication Consultor" ,icon = icon("refresh")))))
-            )
-          )
-
-      )
-    }
-  })
-
-  output$appkey3=renderUI({
-    if (USER$Logged == TRUE) {
-      box(width = 3 , status = "info",solidHeader = TRUE,
-          div(
-            fluidRow(
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selecthome2.2","Home page",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectMang3","Data Management",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAdd2.3","Data Entry",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatView2_3","Data Viewer" ,icon = icon("table"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAna2_3","Data Analysor",icon = icon("bar-chart-o")))))
-              # ,
-              # box(width = 12, status = "info",solidHeader = TRUE,
-              #     column(8,  h5(actionLink("selectpub2_3","Publication Consultor" ,icon = icon("refresh")))))
-            )
-          )
-
-      )
-    }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
-  })
-  output$appkey4=renderUI({
-    if (USER$Logged == TRUE) {
-      box(width = 3 , status = "info",solidHeader = TRUE,
-          div(
-            fluidRow(
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selecthome2.3","Home page",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectMang4","Data Management",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAdd2.4","Data Entry",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatView2_4","Data Viewer" ,icon = icon("table"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAna2_4","Data Analysor",icon = icon("bar-chart-o")))))
-              # ,
-              # box(width = 12, status = "info",solidHeader = TRUE,
-              #     column(8,  h5(actionLink("selectpub2_4","Publication Consultor" ,icon = icon("refresh")))))
-            )
-          )
-
-      )
-    }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
-  })
-
-  output$appkey5=renderUI({
-    if (USER$Logged == TRUE) {
-      box(width =15 , status = "info",solidHeader = TRUE,
-          div(
-            fluidRow(
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selecthome2.5","Home page",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectMang5","Data Management",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAdd2.5","Data Entry",icon = icon("list-alt"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatView2_5","Data Viewer" ,icon = icon("table"))))),
-              box(width = 12, status = "info",solidHeader = TRUE,
-                  column(8,  h5(actionLink("selectDatAna2_5","Data Analysor",icon = icon("bar-chart-o")))))
-              # ,
-              # box(width = 12, status = "info",solidHeader = TRUE,
-              #     column(8,  h5(actionLink("selectpub2_5","Publication Consultor" ,icon = icon("refresh")))))
-            )
-          )
-
-      )
-    }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
-  })
-
   observeEvent(input$btnUpImgInt, {
 
     output$AdddSample=renderUI({
@@ -2053,7 +1345,6 @@ shinyServer(function(input, output,session) {
                           )),
               fileInput("MyImage","Image of lesion sampled",
                         accept = c('image/png','image/jpeg'))
-
           ),
           actionButton("btnUploadImage","Submit"),
           actionButton("cansAddalliquot","Cancel")
@@ -2061,16 +1352,12 @@ shinyServer(function(input, output,session) {
       }
     })
   })
-
-
   observeEvent(input$btnUploadImage, {
     querySelectDataImg=sqlQuery(connect,paste("SELECT * from Img"))
     inFile  <- input$MyImage
     fileName  <- paste0(input$PatIdentifier,"_",input$sampleIDD,"_",length(querySelectDataImg)+1)
     queryInsertImg= paste0("INSERT INTO Img
                      VALUES ('",fileName,"','",input$PatIdentifier,"','",input$sampleIDD  ,"', '",USER$name ,"') ")
-
-
     if(is.null(inFile)){
       info("Error : NO IMAGE TO UPLOAD")
     }else if(input$sampleIDD==""){
@@ -2085,18 +1372,13 @@ shinyServer(function(input, output,session) {
       }else{
         file.copy(inFile$datapath,file.path("./StoredImages",fileName))
         info("Image successfully stored")
-
       }
     }
-
   })
-
   observeEvent(input$btnInsertAlliquotInt, {
-
     output$AdddSample=renderUI({
     })
     output$alliquot=renderUI({
-
       if (USER$Logged == TRUE) {
         div(
           id="FormInsertAlliquotAndQuit",
@@ -2118,27 +1400,10 @@ shinyServer(function(input, output,session) {
       }
     })
   })
-
-  #  observeEvent(input$btnInsertAlliquot, {
-  #    querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from alliquot"))
-  #    queryInsertAlliquot= paste0("INSERT INTO alliquot
-  #                     VALUES ('", toString(paste0("Alliquot",length(querySelectDataAlliquot[,1])+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
-  #
-  # an.error.occured <- FALSE
-  # tryCatch( {sqlExecute(connect,queryInsertAlliquot)}
-  #           , error = function(e) {an.error.occured <<- TRUE}
-  # )
-  # if(an.error.occured){
-  #   info("Error : INSERT INTO alliquit ")
-  # }else{info("Aliquot successfully stored")}
-  #    shinyjs::reset("FormInsertAlliquotAndQuit")
-  #  })
-
   observeEvent(input$btnInsertAlliquot, {
     querySelectDataAlliquot=sqlQuery(connect,paste("SELECT * from alliquot"))
     queryInsertAlliquot= paste0("INSERT INTO alliquot
                      VALUES ('", toString(paste0(input$sampleIDD,"-",length(querySelectDataAlliquot)+1)) ,"','",toString(input$sampleIDD)  ,"', '",toString( USER$name ) ,"','",input$voll,"','",toString(paste0( input$val, "/", input$RakPFE,"/", input$valL,"/", input$conserve,"/", input$Position))  ,"') ")
-
     if(input$sampleIDD==""){
       info("Error : Missing value Sample id")
     }else if(is.na(input$voll)){
@@ -2154,33 +1419,21 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO alliquit ")
       }else{info("Aliquot successfully stored")}
     }
-
-    #shinyjs::reset("FormInsertAlliquotAndQuit")
   })
-
   observeEvent(input$cansAddalliquot, {
     output$alliquot=renderUI({
-
     })
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
       })
-
       output$patdataout=renderUI ({
       })
-
-      # querySelectDataSample=sqlQuery(connect,paste("SELECT  * from sample "))
-      # alert(paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)))
-
       div(
-
         id="formInsertSample",
-
         box( width = 12, status = "info",solidHeader = TRUE,
              p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
              selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE),
              selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE),
              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
@@ -2204,11 +1457,8 @@ shinyServer(function(input, output,session) {
       )
     })
   })
-
   output$visualisation=renderUI({
     if (USER$Logged == TRUE) {
-
-
       who=sqlQuery(connect ,paste("SELECT * from userdata "))
       if (who[which(who[,1]== USER$name ),4]== "super" ){
         tabBox(
@@ -2216,28 +1466,25 @@ shinyServer(function(input, output,session) {
           title = tagList( ""),
           width = 10,
           height = 4,
-
           tabPanel(h4(strong("Tables View")),
-                   uiOutput("viewtable")),
-
+                   uiOutput("viewtable")
+          ),
           tabPanel(h4(strong("Patients Calendar")),
-
                    div(htmlOutput("calendar"),
-                       uiOutput("calendarDB"))),
+                       uiOutput("calendarDB")
+                   )
+          ),
           tabPanel(h4(strong("Monthly patients")),
-
-                   dygraphOutput("monthview"),
-                   uiOutput("MPNuDB")),
+                   dygraphOutput("monthview")
+          ),
           tabPanel(h4(strong("Partition")),
-                   uiOutput("PieChart"),
-                   uiOutput("PieNvDB")),
+                   uiOutput("PieChart")
+          ),
           tabPanel(h4(strong("Patients map")),
-                   uiOutput("SpeciesMapView"),
-                   uiOutput("MapDB"))
-
+                   uiOutput("SpeciesMapView")
+          )
         )
       }else{
-
         tabBox(
           id="viewdata",
           title = tagList( ""),
@@ -2245,38 +1492,15 @@ shinyServer(function(input, output,session) {
           height = 4,
           tabPanel(h4(strong("Tables View")),
                    uiOutput("viewtable2"))#,
-
-          #tabPanel(h4(strong("Patients Calendar")),
-          #         div( htmlOutput("calendar2"),
-          #              uiOutput("calendarDB2"))),
-          #tabPanel(h4(strong("Monthly patients")),
-          #         dygraphOutput("monthview2"),
-          #         uiOutput("MPNuDB2")),
-
-          #tabPanel(h4(strong("Partition")),
-          #         uiOutput("PieChart2"),
-          #         uiOutput("PieNvDB2")),
-          #tabPanel(h4(strong("Patients map")),
-          #         uiOutput("SpeciesMapViewN"),
-          #         uiOutput("MapDB2"))
-
-
         )
-
       }
-
-
-
     }else{ USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-
-
-
   output$tables2=renderUI({
     taables=sqlTables(connect, errors = FALSE, as.is = TRUE,
                       catalog = NULL, schema = NULL, tableName = NULL,
@@ -2284,26 +1508,13 @@ shinyServer(function(input, output,session) {
     opt=taables[,3]
     cho=opt[c(2,3,5,6,8,10,12,13,15)]
     selectInput("ttest2", "",choices=cho)
-
   })
-
-
-
-
-
-
   datas2= reactive({
-
-
-    All=sqlQuery(connect,paste("SELECT * from ",input$ttest2))
+    sqlQuery(connect,paste("SELECT * from ",input$ttest2))
   })
-
   output$datas2= DT::renderDataTable ({
-
     DT::datatable(datas2(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
-
   })
-
   output$viewtable2=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
@@ -2316,18 +1527,14 @@ shinyServer(function(input, output,session) {
         box(width = 7, status = "info",solidHeader = FALSE,
             DT::dataTableOutput("datas2")
         )
-      )}else{  USER$Logged <- FALSE
+      )
+    }else{  USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")}
-
-
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-
-
-
   output$monthview=renderDygraph({
     totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS=totalChUp[,"DATE_MED"]
@@ -2340,7 +1547,6 @@ shinyServer(function(input, output,session) {
     MVG=dygraph(TSSD)%>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
     MVG
   })
-
   output$monthview2=renderDygraph ({
     totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS2=totalChUp2[,"DATE_MED"][which(totalChUp2$LOGINUSER==USER$name  )]
@@ -2353,40 +1559,33 @@ shinyServer(function(input, output,session) {
     MVG2=dygraph(TSSD2) %>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
     MVG2
   })
-
-
   output$DataAnalysis=renderUI({
     if (USER$Logged == TRUE) {
-
-
-
       tabBox(
         id="viewdata",
         title = tagList( ""),
         width = 10,
         height = 4,
         tabPanel(h4(strong("General Statistics")),
-                 uiOutput("Random")),
-        #tabPanel(h4(strong("Patient cases Prediction")),
-        #         plotOutput("boxmP"),
-        #         uiOutput("PCP1DB"),
-        #         uiOutput("tSSS"),
-        #         uiOutput("PCP2DB")),
+                 uiOutput("Random")
+        ),
         tabPanel(h4(strong("Correlation")),
-                 uiOutput("CrossTablecor"),
-                 uiOutput("CorrDB")),
+                 uiOutput("CrossTablecor")
+        ),
         tabPanel(h4(strong("Regression")),
-                 uiOutput("Reg")),
+                 uiOutput("Reg")
+        ),
         tabPanel(h4(strong("ACM")),
-                 fluidRow(div(   uiOutput("CAMM") ) ))
+                 fluidRow( div( uiOutput("CAMM") ) )
+        )
       )
     }else{ USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
   preddata=reactive({
     totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TS=totalChUp2[,"DATE_MED"]
@@ -2406,38 +1605,26 @@ shinyServer(function(input, output,session) {
     totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     TSD=totalChUp2[,"DATE_MED"]
     TSD2=ts(preddata(),start =as.numeric(format(as.Date(TSD[length(TSD)], format="%Y/%m/%d"),"%Y"))+1,frequency = 12)
-
-    dygraph(TSD2)%>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector() })
-
-
-
-
+    dygraph(TSD2)%>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
+  })
 
   ####################################################################################
   ##################                      PIE plot start                ##############
   ####################################################################################
-
   output$tableschartPIE=renderUI({
     taablesPIE=sqlTables(connect, errors = FALSE, as.is = TRUE,
                          catalog = NULL, schema = NULL, tableName = NULL,
                          tableType = NULL, literal = FALSE)
-
     selectInput("ttestPIE", "",choices=taablesPIE[,3])
-
   })
-
-
   output$nameschartPIE= renderUI({
     AAllPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
     is.fact10 <- sapply(AAllPIE, is.factor)
     AAllPIE=data.frame( AAllPIE[, is.fact10])
     selectInput("ttestPIEnames", "",choices=c(colnames(AAllPIE)))
-
   })
-
   output$pie=renderPlot({
     dataPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
-
     Levels=dataPIE[,input$ttestPIEnames]
     ggplot(dataPIE, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y")
   })
@@ -2459,15 +1646,14 @@ shinyServer(function(input, output,session) {
         box(width = 6, status = "info",solidHeader = FALSE,
             plotOutput("pie")
         )
-      )}else{  USER$Logged <- FALSE
+      )
+    }else{  USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")}
-
-
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
 
   #############################################
   output$tableschartPIE2=renderUI({
@@ -2475,26 +1661,19 @@ shinyServer(function(input, output,session) {
                           catalog = NULL, schema = NULL, tableName = NULL,
                           tableType = NULL, literal = FALSE)
     selectInput("ttestPIE2", "",choices=taablesPIE2[c(1,3,4,10,8,6),3])
-
   })
-
-
   output$nameschartPIE2= renderUI({
     AAllPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
     is.fact11 <- sapply(AAllPIE2, is.factor)
     AAllPIE2=data.frame( AAllPIE2[, is.fact11])
     selectInput("ttestPIEnames2", "",choices=c(colnames(AAllPIE2)))
-
   })
-
   output$pie2=renderPlot({
     dataPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
     dataPIE2N=dataPIE2[c(which(dataPIE2$LOGINUSER== USER$name)),]
-
     Levels=dataPIE2N[,input$ttestPIEnames2]
     ggplot(dataPIE2N, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y")
   })
-
   output$PieChart2=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
@@ -2512,17 +1691,14 @@ shinyServer(function(input, output,session) {
         box(width = 6, status = "info",solidHeader = FALSE,
             plotOutput("pie2")
         )
-      )}else{  USER$Logged <- FALSE
+      )
+    }else{  USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")}
-
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-  ###########################################################################
-
-
 
   #############################################################################
   #calandar#
@@ -2530,8 +1706,6 @@ shinyServer(function(input, output,session) {
   output$calendar=renderGvis ({
     dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup"))))
     dateMed$Var1=as.Date(dateMed$Var1)
-
-
     Cal <- gvisCalendar(dateMed,
                         datevar="Var1",
                         numvar="Freq",
@@ -2544,14 +1718,12 @@ shinyServer(function(input, output,session) {
                           cellColor: { stroke: 'red', strokeOpacity: 0.2 },
                           focusedCellColor: {stroke:'red'}}")
     )
-
   })
   ###############################################################################
   output$calendar2=renderGvis ({
     dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from medical_checkup"))))
     dateMed$DATE_MED=as.Date(dateMed$DATE_MED)
     dateMed=dateMed[which(dateMed$LOGINUSER==USER$name),]
-
     Cal <- gvisCalendar(dateMed,
                         datevar="DATE_MED",
                         numvar="Freq",
@@ -2564,60 +1736,41 @@ shinyServer(function(input, output,session) {
                           cellColor: { stroke: 'red', strokeOpacity: 0.2 },
                           focusedCellColor: {stroke:'red'}}")
     )
-
   })
 
   ##########################################################################################
-  #MAP#
+  #Species MAP#
   ##########################################################################################
-
   output$CountriesShopUI=renderUI({
-    countrie= unique( sqlQuery(connect,paste("SELECT COUNTRY_	 from region")))
-
-    selectInput("countriesshop", "",choices=countrie$COUNTRY_)
-
+    countrie= unique( sqlQuery(connect,paste("SELECT DISTINCT CITY from travel_residency")))
+    selectInput("countriesshop", "",choices=countrie$CITY)
   })
-
   output$especeUI=renderUI({
-    espece= unique( sqlQuery(connect,paste("SELECT SPECIES	 from sample")))
-
+    espece= unique( sqlQuery(connect,paste("SELECT SPECIES from sample")))
     selectInput("especesshop", "",choices=espece$SPECIES)
-
   })
-
-
   output$SpeciesMAP=renderPlot ({
-
-
-
     sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
     reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
     town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-
     regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
-
-
     Tab=sqldf("select CITY,SPECIES from  sam, town
-
               where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
     TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
     TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
     TabSl=as.data.frame(TabSl)
     testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
     TabOl=as.data.frame(testttttttt)
-
     df2 <- data.frame(location = as.character(TabOl$CITY),
                       values = TabOl$SPECIES.length,
                       stringsAsFactors = FALSE)
-
-
     locs_geo <- geocode(df2$location)
     df2 <- cbind(df2, locs_geo)
-
     mapK <- get_map(location = input$countriesshop, zoom = 6)
     ggmap(mapK) +
       geom_point(data = df2, aes(x = lon, y = lat, size = values,colour = values))
   })
+
   output$SpeciesMapView=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
@@ -2635,57 +1788,43 @@ shinyServer(function(input, output,session) {
         box(width = 6, status = "info",solidHeader = FALSE,
             plotOutput("SpeciesMAP")
         )
-      )}else{  USER$Logged <- FALSE
+      )
+    }else{  USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")}
-
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
 
   ###########################################################################################
-
-
   output$SpeciesMAPN=renderPlot ({
-
     mapK <- get_map(location = input$countriesshop, zoom = 6)
-
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from sample"))
+    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER from sample"))
     sam=sam[which(sam[,"LOGINUSER"]==USER$name),]
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    reg=sqlQuery(connect,paste("SELECT DISTINCT CITY from travel_residency"))
     town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-
-    regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
-
-
+    regC=reg[which(reg[,"CITY"]== input$countriesshop) ,]
     Tab=sqldf("select CITY,SPECIES from  sam, town
-
               where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
     TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
     TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
     TabSl=as.data.frame(TabSl)
     testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
     TabOl=as.data.frame(testttttttt)
-
     df2 <- data.frame(location = as.character(TabOl$CITY),
                       values = TabOl$SPECIES.length,
                       stringsAsFactors = FALSE)
-
-
     locs_geo <- geocode(df2$location)
     df2 <- cbind(df2, locs_geo)
-
-
     ggmap(mapK) +
       geom_point(data = df2, aes(x = lon, y = lat, size = values,colour = values))
-
   })
   output$SpeciesMapViewN=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
         box(width = 3, status = "info",solidHeader = TRUE,
             title = "Choose Country",
-
             tags$hr(),
             uiOutput("CountriesShopUI")
         ),
@@ -2697,66 +1836,35 @@ shinyServer(function(input, output,session) {
         box(width = 6, status = "info",solidHeader = FALSE,
             plotOutput("SpeciesMAPN")
         )
-      )}else{  USER$Logged <- FALSE
+      )
+    }else{  USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
       updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")}
-
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-  ###########################################################################
-  #Time series data#
-  ###########################################################################
-
-  # output$tSSS=renderUI({
-  #   if(USER$Logged==TRUE ){
-  #     fluidRow(
-  #       div(column(1,tableOutput("Predicted"),width = 3),
-  #           column(1,dygraphOutput("Timeseriesplot"),width = 7))
-  #     )}else{  USER$Logged <- FALSE
-  #     USER$pass <- ""
-  #     newvalue <- "acc2"
-  #     updateTabItems(session, "tabs", newvalue)
-  #     addClass(selector = "body", class = "sidebar-collapse")}
-  # })
-
   ##############################################################################################
   # Correlation plot#
   ##############################################################################################
-
   cordata=reactive({
     cor1=sqlQuery(connect,paste("SELECT PATIENT_IDENTIFIER,BIRTH_DATE,NATIONALITY,GENDER, AGE from patient"))
     cor3=sqlQuery(connect,paste("SELECT * from sample"))
-
     cordataall=sqldf("select * from  cor3, cor1
                      where   cor3.PATIENT_IDENTIFIER=cor1.PATIENT_IDENTIFIER ")
-
     PAITIENT_AGE=as.numeric(cor1$AGE)
     Lesion_Age=as.numeric(cor3$Lesion_Age)
     datatot=data.frame(cordataall,PAITIENT_AGE,Lesion_Age)
     datatot$LOCALISATION=as.factor(datatot$LOCALISATION)
     datatot
-
   })
-
   output$corVarUI=renderUI({
-
-
     selectizeInput("corvarstoplot", label=h4("Choose and combine Variables,SPECIES is necessary"), selected = c("SPECIES","GENDER"),choices=c(colnames(cordata()[,-c(1,2,4,6,12:16,18,19)])),multiple=TRUE)
-
   })
-
-
   output$corrr=renderPlot ({
     Variables=c(input$corvarstoplot)
-    d=ggpairs(cordata()[,Variables], mapping = aes(color = SPECIES) , title = "Crossed variables")
-
-    d
+    ggpairs(cordata()[,Variables], mapping = aes(color = SPECIES) , title = "Crossed variables")
   })
-
-
-
   output$CrossTablecor=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
@@ -2772,46 +1880,33 @@ shinyServer(function(input, output,session) {
   #############################################################################
   #                                 ACM                                       #
   #############################################################################
-
   prepdata=reactive({
-
     Totlalacm1=cordata()#[,-c(1,2,4,6,12:16,18,19)]
     Age_Class <- cut(as.numeric(cordata()$PAITIENT_AGE), c(0,10,20,30,40,50,60,70,80,120),
                      labels = c("Moins de 10 ans","11-20 ans","21-30 ans","31-40 ans","41-50 ans","51-60 ans", "61-70ans","71-80 ans ","plus de 80 ans" ))
     Lesion_Age_Class <- cut(as.numeric(cordata()$Lesion_Age), c(0, 2, 4, 6, 8, 10, 12, 15),
                             labels = c("moins de deux semaines", "2 - 4 semaines ", "4 - 6 semaines","6 - 8 semaines",
                                        "8- 10 semaines","10 - 12 semaines", "plus de 3 mois"))
-
     is.fact1 <- sapply(Totlalacm1, is.factor)
     dataacm1=data.frame( Totlalacm1[, is.fact1],Age_Class,Lesion_Age_Class)
-
     droplevels(dataacm1)
   })
-
   output$acmvars=renderUI({
     vecs=colnames(prepdata())
     selectizeInput ("acmV",label = "Choose variables",choices = c("",vecs[vecs!="SPECIES"]) ,multiple=TRUE)
   })
-
-
   output$ACM0=renderPlot({
-
     acm20 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
     scatterutil.eigen(acm20$eig,nf=3,box=T)
-
   })
   output$ACM1=renderPlot({
-
     acm21 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
     s.label(acm21$co,clabel = 0.7)
-
   })
   output$ACM2=renderPlot({
-
     acm22 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
     s.class(acm22$li, prepdata()$SPECIES, col = brewer.pal(4, "Set1"))
   })
-
   output$CAMM=renderUI({
     if(USER$Logged==TRUE ){
       div( box(width = 12, height = 560, status = "info",solidHeader = FALSE,
@@ -2823,39 +1918,36 @@ shinyServer(function(input, output,session) {
                  tabPanel(h5(strong("Eigen values")),
                           box(width = 12,
                               uiOutput("acmvars"),
-                              plotOutput("ACM0" ),
-                              uiOutput("ACM_EigDB"))),
+                              plotOutput("ACM0" )
+                          )
+                 ),
                  tabPanel(h5(strong(" Distribution of Modalities")),
-                          plotOutput("ACM1"),
-                          uiOutput("ACM_DMDB")),
+                          plotOutput("ACM1")
+                 ),
                  tabPanel(h5(strong("Individuels map")),
-                          plotOutput("ACM2"),
-                          uiOutput("ACM_IMapDB")),
+                          plotOutput("ACM2")
+                 ),
                  tabPanel(h5(strong("Clustring")),
-                          plotOutput("clusr"),
-                          uiOutput("ACM_ClusDB"))))
+                          plotOutput("clusr")
+                 ),
+               ))
       ))
-
     }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-
 
   ###################################################################################
   #                               Relation variables                                #
   ###################################################################################
-
   prepdataNumeric=reactive({
     Totlal=cordata()
     is.num1 <- sapply(Totlal, is.numeric)
-    daaaaat=data.frame( Totlal[, is.num1])
-    daaaaat
+    data.frame( Totlal[, is.num1])
   })
-
   output$quanti1=renderUI({
     selectInput("quanti11",label = "Choose first variable",choices = c("",colnames(prepdataNumeric())))
   })
@@ -2865,9 +1957,6 @@ shinyServer(function(input, output,session) {
   output$quanti3=renderUI({
     selectInput("quanti13",label = "Choose first variable",choices = c("",colnames(prepdataNumeric())))
   })
-
-
-
   output$quali1=renderUI({
     selectInput("quali11",label = "Choose Second variable",choices = c("",colnames(prepdata())))
   })
@@ -2877,23 +1966,14 @@ shinyServer(function(input, output,session) {
   output$quali3=renderUI({
     selectInput("quali13",label = "Choose Second variable",choices = c("",colnames(prepdata())))
   })
-
   output$resCor1= renderPrint({
     attach(prepdataNumeric())
     first=prepdataNumeric()[,input$quanti11]
     second=prepdataNumeric()[,input$quanti12]
     corrr1=data.frame(first,second)
     attach(corrr1)
-
-
     summary(l1 <- lm(corrr1[,1] ~ corrr1[,2]),    correlation=TRUE)
-
   })
-
-
-
-
-
   output$resCor2= renderTable ({
     attach(prepdataNumeric())
     attach(prepdata())
@@ -2904,7 +1984,6 @@ shinyServer(function(input, output,session) {
     anov=data.frame(first2,second2)
     isolate(anova(lm(first2~second2,data = anov)))
   })
-
   output$resCor3= renderPrint({
     attach(prepdataNumeric())
     first3=prepdata()[,input$quali12]
@@ -2914,12 +1993,9 @@ shinyServer(function(input, output,session) {
     confus=table(corrr3[,1],corrr3[,2])
     chisq.test(confus, correct=TRUE)
   })
-
-
   output$Reg=renderUI({
     if(USER$Logged==TRUE ){
       fluidRow(
-
         tabBox(
           id="rlatall",
           title = tagList( ""),
@@ -2928,39 +2004,45 @@ shinyServer(function(input, output,session) {
           tabPanel(h5(strong("Linear Model")),
                    box(width = 3, status = "info",solidHeader = FALSE,
                        uiOutput("quanti1"),
-                       uiOutput("quanti2")),
+                       uiOutput("quanti2")
+                       ),
                    box(width = 8,status = "info",solidHeader = FALSE,
-                       div( verbatimTextOutput("resCor1")))
-
+                       div( verbatimTextOutput("resCor1"))
+                    )
           ),
           tabPanel(h5(strong("ANOVA")),
                    box(width = 3, status = "info",solidHeader = FALSE,
                        uiOutput("quanti3"),
                        uiOutput("quali1")),
                    box(width =9  , status = "info",solidHeader = TRUE,
-                       tableOutput("resCor2")),
+                       tableOutput("resCor2")
+                   ),
                    box(title = "Tukey HSD test", width =12 , status = "info",solidHeader = FALSE,
                        box(width = 3 , status = "info",solidHeader = FALSE,
-                           verbatimTextOutput("platuk2")),
+                           verbatimTextOutput("platuk2")
+                       ),
                        box(width =7 , status = "info",solidHeader = FALSE,
-                           div( plotOutput ("platuk") ) ))),
+                           div( plotOutput ("platuk") )
+                       )
+                   )
+          ),
           tabPanel(h5(strong("Chi square")),
                    box(width = 6, status = "info",solidHeader = FALSE,
                        uiOutput("quali2"),
-                       uiOutput("quali3")),
-                   htmlOutput("resCor3")  )
-
+                       uiOutput("quali3")
+                       ),
+                   htmlOutput("resCor3")
+          )
         )
-
       )
     }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
   output$platuk <- renderPlot({
-
     attach(prepdataNumeric())
     attach(prepdata())
     first20=prepdataNumeric()[,input$quanti13]
@@ -2969,10 +2051,7 @@ shinyServer(function(input, output,session) {
     attach(corrr20)
     aooov= aov(first20~second21,data = corrr20)
     tuk=TukeyHSD(aooov , conf.level=0.95)
-
     plot(tuk, las=1 , col="blue")
-
-
   })
   output$platuk2 <- renderPrint ({
     attach(prepdataNumeric())
@@ -2984,15 +2063,12 @@ shinyServer(function(input, output,session) {
     aooov= aov(first20~second21,data = corrr20)
     tuk=TukeyHSD(aooov , conf.level=0.95)
     tuk$second21
-
   })
 
   #########################################################################################
   #                                     Clustering                                        #
   #########################################################################################
-
   output$clusr=renderPlot({
-
     acmclust <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
     d=dist(acmclust$li,method = "euclidean")
     h=hclust(d,"ward.D2")
@@ -3003,40 +2079,22 @@ shinyServer(function(input, output,session) {
   #                                            MOST parts                                   #
   ###########################################################################################
   output$NC=renderPlot({
-
     Nat_data=sqlQuery(connect,paste("SELECT NATIONALITY from patient"))$NATIONALITY
-
     Nat_table=as.data.frame(prop.table(table(Nat_data)))
     pie(Nat_table[,2] ,labels =paste(round(100*Nat_table[,2]/sum(Nat_table[,2]), 1),"%") , radius = 1 ,col = rainbow(length(Nat_table[,1])))
     legend("topright",legend=Nat_table[,1], cex = 0.8,fill = rainbow(length( Nat_table[,1])))
-
   })
   output$WC=renderPlot({
-
     Species_data=sqlQuery(connect,paste("SELECT SPECIES from sample"))$SPECIES
     Species_table=as.data.frame(prop.table(table(Species_data)))
     pie(Species_table[,2],labels =paste(round(100*Species_table[,2]/sum(Species_table[,2]), 1),"%"), radius = 1,col = rainbow(length(Species_table[,1])))
     legend("topright",legend=Species_table[,1], cex = 0.8,fill = rainbow(length( Species_table[,1])))
-
-
-
   })
   output$MC=renderPlot({
-
     age = sqlQuery(connect,paste("select AGE from patient"))$AGE
-    Patient_Age <- cut(as.numeric(age), c(0,10,20,30,40,50,60,70,80,120),
-                       labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
-    hage=prop.table( table(Patient_Age))
-    dage=as.data.frame(hage)
-
-    #p100 <- ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter()
-    p100 <- hist(age, breaks=40 , col=rgb(0.2,0.8,0.5,0.5) , border=F , main="")
-    p100
-
+    hist(age, breaks=40 , col=rgb(0.2,0.8,0.5,0.5) , border=F , main="")
   })
-
   output$Random=renderUI({
-
     one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
     two2=sqlQuery(connect,paste("SELECT AGE,BIRTH_DATE,PATIENT_IDENTIFIER from patient"))
     three2= sqldf("select one2.PATIENT_IDENTIFIER,AGE,DATE_MED,BIRTH_DATE from  one2, two2
@@ -3069,7 +2127,6 @@ for(p in 1:dim(three2)[1])
     two=sqlQuery(connect,paste("SELECT Date_First_Apeard,Lesion_Age,PATIENT_IDENTIFIER from sample WHERE Date_First_Apeard!='1900-01-01' "))
     three= sqldf("select one.PATIENT_IDENTIFIER,DATE_MED,Date_First_Apeard,Lesion_Age from  one, two
                  where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-
         days= round(as.numeric(as.Date(three$DATE_MED) - as.Date(three$Date_First_Apeard))/7)
 for(la in 1:dim(three)[1])
 {
@@ -3098,9 +2155,6 @@ for(la in 1:dim(three)[1])
     Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14),
                                labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ",
                                           "8 to 10 ","10 to 12 ", "more than 3 weeks"))
-    #h=as.data.frame( table(Lesion_Age_in_weeks))
-    #d=as.data.frame(h)
-
     if(USER$Logged==TRUE ){
       fluidRow(
         box(width=12, status = "info",solidHeader = FALSE,title = "Patient Age Distribution",
@@ -3111,80 +2165,45 @@ for(la in 1:dim(three)[1])
         ),
         box(width=6, status = "info",solidHeader = FALSE,title="Species distribution",
             plotOutput("WC")
-        ),
-
-        uiOutput("PADB")
-
-
-
+        )
       )
-
     }else{  USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-
-
-  ################################################################################################################
-  #                                               boxplot patient                                                #
-  ################################################################################################################
-  #
-  # output$boxmP=renderPlot({
-  #   MP=sqlQuery(connect,paste("SELECT DATE_MED from medical_checkup"))
-  #   CheckUp_Month=format(MP, "%Y-%m")
-  #
-  #   databoxdateT=as.data.frame( table(CheckUp_Month))
-  #
-  #   CheckUp_Month_=format(as.yearmon(as.character.Date(databoxdateT$CheckUp_Month),"%Y-%m"), "%m")
-  #   CheckUp_Month_<- ordered(sort(as.numeric(CheckUp_Month_)),
-  #                            levels = sort(unique(as.numeric(CheckUp_Month_))),
-  #                            labels = c("Jan", "Feb", "Mar","Apr",
-  #                                       "May","Jun", "Jul","Aug","Sep","Oct","Nov","Dec"))
-  #
-  #
-  #
-  #   databoxdate=cbind(databoxdateT,CheckUp_Month_)
-  #
-  #
-  #   ggplot(databoxdate, aes(x=CheckUp_Month_  ,y=Freq,color=CheckUp_Month_)) + geom_boxplot()+geom_jitter()
-  # })
 
   ################################################################################################################
   #                                              data management                                                 #
   ################################################################################################################
-
   output$Managementall=renderUI({
     if(USER$Logged==TRUE ){
-
       if(paste(USER$name)=='super')
-      {
-        h3("Hello in this section.")
-
+      {h3("Hello in this section.")
         tabBox(
           id="managedatatool",
-          title = tagList( ""),
+          title = tagList(""),
           width = 30,
           height = 4,
-
-
           tabPanel(h5(strong("Users")),
                    id="formUser",
                    fluidRow (
                      div(
                        id="formUser",
                        box(title = "Add new user",width = 3,
-                           uiOutput( "adduserFIN")),
+                           uiOutput( "adduserFIN")
+                       ),
                        box(title = "Delete user",width = 3,
-                           uiOutput( "DeluserFIN")),
+                           uiOutput( "DeluserFIN")
+                       ),
                        box(title = "Update existing user",width = 3,
-                           uiOutput( "UpuserFIN"))
-
-                     ))
+                           uiOutput( "UpuserFIN")
+                       )
+                     )
+                   )
           ),
-
           tabPanel(h5(strong("Delete row data")),
                    id="formCleaningtool",
                    fluidRow (
@@ -3195,7 +2214,10 @@ for(la in 1:dim(three)[1])
                              actionButton("DatadelDone","Delete")
                      ),
                      box(width = 8, status = "info",
-                         DT::dataTableOutput("DatadelF666doooooon") )))
+                         DT::dataTableOutput("DatadelF666doooooon")
+                     )
+                     )
+                   )
           ),
           tabPanel(h5(strong("Download data")),
                    id="formDownLoadtool",
@@ -3209,121 +2231,75 @@ for(la in 1:dim(three)[1])
                              actionButton("DataLowLDoneAll","Download all table")
                      ),
                      box(width = 8, status = "info",
-                         DT::dataTableOutput("DataDowLF666doooooon")  )))
+                         DT::dataTableOutput("DataDowLF666doooooon")
+                     )
+                     )
+                   )
           ),
           tabPanel(h5(strong("View Discrepancys")),
                    id="ViewDiscrepancys",
                    fluidRow ( box(width = 8, status = "info",
-                         DT::dataTableOutput("DataDiscrepancys")  ))
+                         DT::dataTableOutput("DataDiscrepancys")  )
+                   )
           )
-
         )
       }else{info("ERROR :: Access Denied")}
     }else{ USER$Logged <- FALSE
-    USER$pass <- ""
-    newvalue <- "acc2"
-    updateTabItems(session, "tabs", newvalue)
-    addClass(selector = "body", class = "sidebar-collapse")}
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
   })
-
-
-
-
   output$adduserFIN=renderUI ({
-
-
     div(
-
-
-
       box(width = 10, status = "info",solidHeader = TRUE,
           textInput("userLogin","Create Login",""),
-
           textInput("userpass","Create Password",""),  
           selectInput("NivSec","Data access",choices =  c("normal", "super")),
-          textInput("userIns","Institution",""), 
-          
-          
-          
-
+          textInput("userIns","Institution",""),
           actionButton("subusernew","Submit user")
-      ))
+      )
+    )
   })
-
   output$sel=renderUI({
     selectInput("userLoginF","Select user",choices=c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from userdata")))$LOGINUSER)))
   })
-
-
-
   output$UpuserFINav=renderUI ({
-
-
-
-
     div(
-
-
-
       box(width = 11, status = "info",solidHeader = TRUE,
           id="useraddid",
-          
           textInput("userpassF","Change Password",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from userdata where LOGINUSER='%s'",paste(input$userLoginF))))$MOTDPASS))),
           selectInput("NivSecF","Choose access level",choices =  c("normal", "super")),
           textInput("userInsF","Change Institution",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT * from userdata where LOGINUSER='%s'",paste(input$userLoginF))))$FROMINST))),
-          
           actionButton("subusernewUp","Update user data")
-      ))
+      )
+    )
   })
-
-
   output$UpuserFIN=renderUI ({
-
-
-
-
     div(
-
-
-
       box(width = 10, status = "info",solidHeader = TRUE,
           uiOutput("sel"),
           uiOutput("UpuserFINav")
-
-
-      ))
+      )
+    )
   })
-
-
-
   output$DeluserFIN=renderUI ({
-
-
     div(
-
-
       selectInput("Loguserdelete","Select user login",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))),
-
       actionButton("subuserDell","Delete user")
     )
   })
 
-
-
   ##########################################################
   #                         tables                         #
   ##########################################################
-
   output$DatadelF666table=renderUI ({
     taablesDel=sqlTables(connect, errors = FALSE, as.is = TRUE,
                          catalog = NULL, schema = NULL, tableName = NULL,
                          tableType = NULL, literal = FALSE)
-
     selectInput("tableNameDelete","Select Table",choices = taablesDel[,3]  )
-
   })
-
-
   output$DataDowLF666table=renderUI ({
     taablesDowL=sqlTables(connect, errors = FALSE, as.is = TRUE,
                           catalog = NULL, schema = NULL, tableName = NULL,
@@ -3331,22 +2307,17 @@ for(la in 1:dim(three)[1])
     selectInput("tableNameDown","Select Table",choices =  taablesDowL[,3])
 
   })
+
   ##########################################################
   #                         Filters                        #
   ##########################################################
-
   output$DatadelF666Fil=renderUI ({
     AAllDel=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
-
     selectInput("filNameDelete","Select Filter",choices =  c(colnames(AAllDel)))
-
   })
-
-
   output$DataDowLF666Fil=renderUI ({
     AAllDowL=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     selectInput("filNameDown","Select Filter",choices =  c( colnames(AAllDowL) ))
-
   })
 
   #################################################################
@@ -3355,16 +2326,12 @@ for(la in 1:dim(three)[1])
   output$DatadelF666tableval=renderUI ({
     AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[,input$filNameDelete]
-
     selectInput("valNameDelete","Select Value",choices =  c( unique(as.character(AAllDel2) )))
-
   })
-
   output$DataDowLF666value=renderUI ({
     AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     AAllDown2=AAllDown1[,input$filNameDown]
     selectInput("valNameDown","Select Value",choices =  c(unique(as.character(AAllDown2))))
-
   })
 
   #################################################################
@@ -3372,43 +2339,26 @@ for(la in 1:dim(three)[1])
   #################################################################
   humDown=reactive({
     AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
-
     AAllDown2=AAllDown1[which(AAllDown1[,input$filNameDown]==as.character(input$valNameDown)),]
     data.frame(AAllDown2)
   })
-
   humDownallall=reactive({
-    AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
-    AAllDown1
-
+    sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
   })
-
   humDel=reactive({
     AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[which(AAllDel1[,input$filNameDelete]==as.character(input$valNameDelete)),]
     data.frame(AAllDel2)
   })
-
-
-
   output$DataDiscrepancys=DT::renderDataTable ({
-
     DT::datatable(sqlQuery(connect,paste("SELECT * from discrepancy")), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
-
   })
-
   output$DataDowLF666doooooon=DT::renderDataTable ({
-
     DT::datatable(humDown(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
-
   })
-
   output$DatadelF666doooooon=DT::renderDataTable({
-
     DT::datatable(humDel(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
   })
-
-
   #####################################################################################################
   #                                           button DELETE DATA                                      #
   #####################################################################################################
@@ -3419,7 +2369,6 @@ for(la in 1:dim(three)[1])
     observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )})
     observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT * from userdata")))$LOGINUSER)))})
   })
-
   observeEvent(input$DatadelDone, {
     querydeleteuser <-sprintf("DELETE from %s where %s='%s'; ",paste(as.character(input$tableNameDelete)),paste(as.character(input$filNameDelete) )   ,paste(as.character(input$valNameDelete)))
     sqlQuery(connect,querydeleteuser)
@@ -3443,7 +2392,6 @@ for(la in 1:dim(three)[1])
     info("Data successfully stored")
   })
 
-
   #####################################################################################################
   #                                                button add user                                    #
   #####################################################################################################
@@ -3451,7 +2399,6 @@ for(la in 1:dim(three)[1])
     queryuseraddpfe <- paste0(
       "INSERT INTO  userdata
       VALUES ('",as.character( input$userLogin ) ,"','",toString( USER$name ) ,"', '",as.character( input$userpass) ,"', '",as.character( input$NivSec ) ,"', '",as.character( input$userIns ) ,"') ")
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryuseraddpfe)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3459,7 +2406,6 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Insert USER")
     }else{info("User successfully added")}
-
     shinyjs::reset("formUser")
     observe({updateSelectInput(session,"Loguserdelete","",choices =  c(as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )})
     observe({updateSelectInput(session,"userLoginF","",choices =  c("",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER))  )
@@ -3474,7 +2420,6 @@ for(la in 1:dim(three)[1])
                                 WHERE LOGINUSER ='%s';"
                               ,paste(as.character(input$userpassF)),paste(as.character(input$NivSecF)),paste(as.character(input$userInsF)),paste(as.character(USER$name)),
                               paste(as.character(input$userLoginF)))
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryuserUPpfe)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3482,9 +2427,7 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update USER")
     }else{info("User successfully Updated")}
-
     observe({updateSelectInput(session,"userLoginF","",choices =  c(" ",as.character(data.frame( sqlQuery(connect,paste("SELECT LOGINUSER from userdata")))$LOGINUSER)))
-
     })
   })
 
@@ -3493,7 +2436,6 @@ for(la in 1:dim(three)[1])
   #####################################################################################################
   observeEvent(input$btnUpdateIdentifiedSpecies,{
     queryUpdateIdentifiedSpecies <- sprintf("UPDATE sample SET SPECIES='%s' WHERE ID_SAMPLE='%s'",paste(as.character(input$spece)),paste(as.character(input$upsample),collapse = ", " ))
-
     if(toString(input$upsample)==""){
       info("You must choose a sample from list")
     }else if(toString(input$spece)==""){
@@ -3508,43 +2450,28 @@ for(la in 1:dim(three)[1])
       }else{info("Species successfully Updated ")}
     }
     observe({updateSelectInput(session,"upsample","Choose Sample",choices = c("",as.character(dataech()[,1])))})
-
   })
-
 
   #####################################################################################################
   #                                             Select diagnosis data                                 #
   #####################################################################################################
   doneTest=reactive({
-    f=data.frame( sqlQuery(connect,sprintf("SELECT TEST,RESULT,LEISHSUSPECT from diognosis where ID_SAMPLE='%s'",paste(input$upsample))))
-    f
+    data.frame( sqlQuery(connect,sprintf("SELECT TEST,RESULT,LEISHSUSPECT from diognosis where ID_SAMPLE='%s'",paste(input$upsample))))
   })
-
   output$testsDone=renderTable ({
-
     doneTest()
-
   })
-
-
-
-
 
   #####################################################################################################
   #                                              Edit patient data                                    #
   #####################################################################################################
-
   dataModalUPPatient <- function(failed = FALSE) {
     if(paste(USER$name)=='super')
     {
       modalDialog(
         selectInput("DUPpatient", "Select patient",
                     choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from patient")))$PATIENT_IDENTIFIER)))),
-
         uiOutput("formUpdatePatient"),
-
-
-
         footer = tagList(
           modalButton("Cancel"),
           actionButton("btnUpdatePatient", "OK")
@@ -3554,11 +2481,7 @@ for(la in 1:dim(three)[1])
       modalDialog(
         selectInput("DUPpatient", "Select patient",
                     choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT PATIENT_IDENTIFIER from patient where LOGINUSER='%s'",paste(USER$name))))$PATIENT_IDENTIFIER)))),
-
         uiOutput("formUpdatePatient"),
-
-
-
         footer = tagList(
           modalButton("Cancel"),
           actionButton("btnUpdatePatient", "OK")
@@ -3567,13 +2490,10 @@ for(la in 1:dim(three)[1])
     }
   }
   observeEvent(input$editpatient, {
-
     showModal(dataModalUPPatient())
   })
-
   UPdatavaluePat=reactive({
-    querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from patient where PATIENT_IDENTIFIER='%s'",paste(input$DUPpatient) )))
-
+    data.frame(sqlQuery(connect,sprintf("SELECT * from patient where PATIENT_IDENTIFIER='%s'",paste(input$DUPpatient) )))
   })
   output$formUpdatePatient=renderUI({
     box(
@@ -3589,15 +2509,14 @@ for(la in 1:dim(three)[1])
       #textInput("phonenumUP","Phone number",value =UPdatavaluePat()$PHONE_NUMBER)
     )
   })
+
   ########################################################################
   # button update patient                                                #
   ########################################################################
-
   observeEvent(input$btnUpdatePatient,{
     queryUpdatePatient <- sprintf("
                                  UPDATE patient SET MEDICAL_FILE_NUMBER='%s',BIRTH_DATE='%s',AGE='%s',NATIONALITY='%s',GENDER='%s',CONSENT='%s' WHERE LOGINUSER='%s' and PATIENT_IDENTIFIER='%s';",
                                   paste(as.character(input$medfilenumberUP)),paste(as.character(input$datenaisspUP)),paste(as.character(input$AgePatientUP)),paste(as.character(input$nationalpUP)),paste(as.character(input$sexepUP)),paste(as.character(input$ConsPatUP)),paste(USER$name),paste(as.character(input$DUPpatient)))
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect, queryUpdatePatient)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3605,25 +2524,18 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update patient ")
     }else{info("Patient successfully Updated")}
-
     removeModal()
-
   })
-
 
   #####################################################################################################
   #                                              Edit checkup data                                    #
   #####################################################################################################
-
   dataModalUPMEdCheck <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPcheck", "Select checkup date",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$DATE_MED))
                   )),
-
       uiOutput("formUpdateMedicalcheckup"),
-
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("btnUpdateMedicalcheckup", "OK")
@@ -3633,14 +2545,12 @@ for(la in 1:dim(three)[1])
   observeEvent(input$editmedcheck, {
     showModal(dataModalUPMEdCheck())
   })
-
   UPdatavalueCheck=reactive({
     querySelectDataPatient=data.frame(sqlQuery(connect,sprintf("SELECT * from medical_checkup where PATIENT_IDENTIFIER='%s' and DATE_MED='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPcheck)) )))
   })
   output$formUpdateMedicalcheckup=renderUI({
     box(
       p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
       textInput("interrIDUP","Interrogator ID",value = UPdatavalueCheck()$ID_INTERROGATOR),
       textInput("hospitalUP","Hospital",value = UPdatavalueCheck()$HOSPITAL),
       textInput("pysicienUP","Physician",value = UPdatavalueCheck()$PHYSICIAN ),
@@ -3651,23 +2561,18 @@ for(la in 1:dim(three)[1])
       textInput("AhostUP","Possible animal contact" ,value = UPdatavalueCheck()$ANIMAL_AROUND),
       numericInput("Lesion_NumberUP","Number of Lesions*",value = UPdatavalueCheck()$LESNUM ),
       textInput("Lesion_SitesUP","Lesion Sites",value = UPdatavalueCheck()$LESPOSSS )
-
     )
   })
-
 
   ########################################################################
   # button update CheckUp                                                #
   ########################################################################
-
   observeEvent(input$btnUpdateMedicalcheckup,{
-
     queryCheckUPpfe <- paste0("UPDATE medical_checkup SET ID_INTERROGATOR='",input$interrIDUP,"' ,HOSPITAL='",input$hospitalUP,"',PHYSICIAN='",input$pysicienUP,"',
                                SAMPLER='",input$samplerUP,"',CLINICAL_STATE='",input$clinstateUP,"',POSSIBLE_HUMAN_HOSTS='",input$HhostRUP,"',
                                LINK_HUMAN_HOSTS='",input$HhostLUP,"',ANIMAL_AROUND='",input$AhostUP,"' ,LESPOSSS ='",input$Lesion_SitesUP,"',
                                LESNUM ='",input$Lesion_NumberUP,"',GENDESC='",input$General_DescriptionUP,"'
                                where PATIENT_IDENTIFIER='",input$PatIdentifier,"' and DATE_MED='",input$DUPcheck,"' and ID_MED='",UPdatavalueCheck()$ID_MED,"' ;" )
-
     if(is.na(input$Lesion_NumberUP)){
       info("Error : Wrong value lesion number")
     }else if(input$Lesion_NumberUP<(-1)){
@@ -3681,23 +2586,18 @@ for(la in 1:dim(three)[1])
         info("Error : Update medical checkup")
       }else{info("Medical Checkup successfully Updated")}
     }
-
     removeModal()
   })
-
 
   #####################################################################################################
   #                                     Edit historical treatment data                                #
   #####################################################################################################
-
   dataModalUPTreatment <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPtreat", "Select treatment starting date",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT START_DATE from treatmenthistory where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$START_DATE))
                   )),
-
       uiOutput("formUpdateTreatment"),
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("btnUpdateTreatment", "OK")
@@ -3707,11 +2607,9 @@ for(la in 1:dim(three)[1])
   observeEvent(input$edittreatment, {
     showModal(dataModalUPTreatment())
   })
-
   UPdatavalueTreat=reactive({
-    querySelectDataTreatment=data.frame(sqlQuery(connect,sprintf("SELECT * from treatmenthistory where PATIENT_IDENTIFIER='%s' and START_DATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPtreat)) )))
+    data.frame(sqlQuery(connect,sprintf("SELECT * from treatmenthistory where PATIENT_IDENTIFIER='%s' and START_DATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPtreat)) )))
   })
-
   output$formUpdateTreatment=renderUI({
     box(width = 12,
         textInput("treattypeUP","Treatment type",value = UPdatavalueTreat()$TREATMENT_TYPE),
@@ -3726,11 +2624,9 @@ for(la in 1:dim(three)[1])
     )
   })
 
-
   ########################################################################
   # button update treatment                                              #
   ########################################################################
-
   observeEvent(input$btnUpdateTreatment,{
     queryUpdateTreatment <- paste0("UPDATE treatmenthistory SET TREATMENT_TYPE='",input$treattypeUP,"' ,PRESCRIBEDFOR='",input$prescribedUP,"',DURATIONN='",input$datetreatendUP,"',
                                     POSOLOGY='",input$PosologyUP,"', ADMINROUTE='",input$adminUP,"',INJECTION_NUMBER='",input$injectionnumberUP,"',HEALING_DATE='",input$healingUP,"',START_DATE='",input$datetreatbegUP,"'
@@ -3742,24 +2638,18 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update treatment")
     }else{info("Treatment successfully Updated")}
-
     removeModal()
   })
-
 
   #####################################################################################################
   #                                              Edit movement data                                    #
   #####################################################################################################
-
   dataModalUPRegion <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPmvt", "Select movement",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT FROMDate from travel_residency where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$FROMDate))
                   )),
-
       uiOutput("formUpdateTR"),
-
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("btnUpdateT_R", "OK")
@@ -3769,35 +2659,27 @@ for(la in 1:dim(three)[1])
   observeEvent(input$editregion, {
     showModal(dataModalUPRegion())
   })
-
-
   UPdatavalueMvt=reactive({
-    querySelectDateTR=data.frame(sqlQuery(connect,sprintf("SELECT * from travel_residency where PATIENT_IDENTIFIER='%s' and FROMDATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
+    data.frame(sqlQuery(connect,sprintf("SELECT * from travel_residency where PATIENT_IDENTIFIER='%s' and FROMDATE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPmvt)) )))
   })
   output$formUpdateTR=renderUI({
     box(width = 12,
         textInput("regvisitUP","City", value=UPdatavalueMvt()$CITY),
         textInput("TypeUP","Urban/Rural",value=UPdatavalueMvt()$TYPE),
         textInput("resedentUP","Residency ",value=UPdatavalueMvt()$RESIDENCY),
-
         textInput("bybyteUP","Bite Notion",value=UPdatavalueMvt()$BYTENOT),
         dateInput("datedatevisitUP","Visit Date",value = UPdatavalueMvt()$FROMDATE),
         textInput("dateleavevisitUP","Duration (In wek)",value = UPdatavalueMvt()$TODATE)
-
     )
   })
-
 
   ########################################################################
   # button update mvt                                                    #
   ########################################################################
-
   observeEvent(input$btnUpdateT_R,{
-
     querymvtpfe <- paste0("UPDATE travel_residency SET 	CITY='",as.character(input$regvisitUP),"' ,RESIDENCY='",as.character(input$resedentUP),"',BYTENOT='",as.character(input$bybyteUP),"',
                            TODATE='",as.character(input$dateleavevisitUP),"',TYPE='",as.character(input$TypeUP),"', FROMDATE='",as.character(input$datedatevisitUP),"' where
                            PATIENT_IDENTIFIER='",as.character(input$PatIdentifier),"' and FROMDATE='",as.character(input$DUPmvt),"' and IDMVT='",UPdatavalueMvt()$IDMVT,"'  ;" )
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect,querymvtpfe)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3805,24 +2687,18 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update Mouvement ")
     }else{info("Mouvement successfully Updated")}
-
-
-
     removeModal()
   })
 
   #####################################################################################################
   #                                              Edit Sample data                                    #
   #####################################################################################################
-
   dataModalUSample <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPsample", "Select sample",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                   )),
-
       uiOutput("formUpdateSample"),
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("btnUpdateSample", "OK")
@@ -3833,12 +2709,11 @@ for(la in 1:dim(three)[1])
     showModal(dataModalUSample())
   })
   UPdatavalueSample=reactive({
-    queryselectDataSample=data.frame(sqlQuery(connect,sprintf("SELECT * from sample where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPsample)) )))
+    data.frame(sqlQuery(connect,sprintf("SELECT * from sample where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s'",paste(input$PatIdentifier),paste(as.character(input$DUPsample)) )))
   })
   output$formUpdateSample=renderUI({
     box(width = 12,
         p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
         textInput("samplsupportUP","Type of sample support",value = UPdatavalueSample()$TYPE_OF_SAMPLE_SUPPORT_),
         textInput("sammethUP","Sampling Method",value = UPdatavalueSample()$SAMPLING_METHOD),
         textInput("directexamUP","Direct examination result",value = UPdatavalueSample()$DIRECT_EXAMINATION),
@@ -3851,18 +2726,14 @@ for(la in 1:dim(three)[1])
         # textInput("locallesionUP","Lesion localisation*",value = UPdatavalueSample()$LOCALISATION) ,
         textInput("extractDayUP","Sampling date*",value = UPdatavalueSample()$DATE_EXTRACTION),
         textInput("descriptionlesionUP","Lesion description",value = UPdatavalueSample()$DESCRIPTION)
-
     )
   })
-
 
   ########################################################################
   # button update Sample                                                 #
   ########################################################################
-
   observeEvent(input$btnUpdateSample,{
     queryUpdateSample <- sprintf("UPDATE sample SET SAMPLING_METHOD='%s',TYPE_OF_SAMPLE_SUPPORT_='%s',
-
                                   DIRECT_EXAMINATION='%s',ABUDANCE_ON_THE_SMEAR='%s', Date_First_Apeard='%s',  Lesion_Age='%s',
                                   DIAMETREMax='%s',DIAMETREMin='%s',HIGHT='%s',DATE_EXTRACTION='%s',DESCRIPTION='%s'
                                   where PATIENT_IDENTIFIER='%s' and ID_SAMPLE='%s';",
@@ -3871,8 +2742,6 @@ for(la in 1:dim(three)[1])
                                  paste(as.character(input$diamlesionMaxUP)),paste(as.character(input$diamlesionMinUP)),paste(as.character(input$highlesionUP)),
                                  paste(as.character(input$extractDayUP)),paste(as.character(input$descriptionlesionUP)) ,
                                  paste(as.character(input$PatIdentifier)), paste(as.character(input$DUPsample)) )
-    
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect,queryUpdateSample)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3880,25 +2749,17 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update Sample  ")
     }else{info("Sample successfully Updated")}
-
     removeModal()
   })
-
-
 
   #####################################################################################################
   #                                              Edit Diagnosis data                                 #
   #####################################################################################################
-
   dataModalUDiagnosis <- function(failed = FALSE) {
     modalDialog(
-
       selectInput("sampleUPDiag","Sample ID",choices = c("",c(as.character(data.frame( sqlQuery(connect,paste("SELECT ID_SAMPLE from sample", if(toString(input$PatIdentifier)!=""){paste0("where PATIENT_IDENTIFIER='",input$PatIdentifier,"';" )} ) ))[,1])))),
-
-
       uiOutput("testdiagTestAndLabName"),
       uiOutput("testdiagFFFFFF"),
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("okDiagnosis", "OK")
@@ -3908,22 +2769,8 @@ for(la in 1:dim(three)[1])
   observeEvent(input$editDiag, {
     showModal(dataModalUDiagnosis())
   })
-
   UPdatavalueDiagnosis=reactive({
-
-    # if(toString(input$testupdiag)=="N/A" && toString(input$labupDiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s'",paste(as.character(input$sampleUPDiag)) )))
-    # }else if(toString(input$labupDiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)))))
-    # }else if(toString(input$testupdiag)=="N/A"){
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)), paste(as.character(input$labupDiag)))))
-    # }else{
-    #   dddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
-    # }
-
     ddddddDiag=data.frame(sqlQuery(connect,sprintf("SELECT * from diognosis where ID_SAMPLE='%s' and TEST='%s' and LABORATORY_NAME='%s'",paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)), paste(as.character(input$labupDiag)))))
-
-
   })
   output$testdiagTestAndLabName=renderUI({
     box(width = 12,
@@ -3938,13 +2785,12 @@ for(la in 1:dim(three)[1])
         numericInput("quantityUP","Quantity",value = UPdatavalueDiagnosis()$QUANTITE),
         textInput("restestUP","Test result",value = UPdatavalueDiagnosis()$RESULT),
         textInput("susSpecUP","Suspected Species",value = UPdatavalueDiagnosis()$LEISHSUSPECT)
-
     )
   })
+
   ########################################################################
   # button update Diagnosis                                              #
   ########################################################################
-
   observeEvent(input$okDiagnosis,{
     queryUpdateDiognosis <- sprintf(" UPDATE diognosis SET 	DIAGNOSIS_DATE='%s' ,QUANTITE='%s',
                                       RESULT='%s',	LEISHSUSPECT='%s' where
@@ -3952,7 +2798,6 @@ for(la in 1:dim(three)[1])
                                     paste(as.character(input$dattestUP)),paste(as.character(input$quantityUP)),
                                     paste(as.character(input$restestUP)),paste(as.character(input$susSpecUP)) ,
                                     paste(as.character(input$sampleUPDiag)),paste(as.character(input$testupdiag)),paste(as.character(input$labupDiag)),paste(as.character(UPdatavalueDiagnosis()$IDDIAGNOSIS)) )
-
     an.error.occured <- FALSE
     tryCatch( {sqlExecute(connect,queryUpdateDiognosis)}
               , error = function(e) {an.error.occured <<- TRUE}
@@ -3960,7 +2805,6 @@ for(la in 1:dim(three)[1])
     if(an.error.occured){
       info("Error : Update Diagnosis   ")
     }else{info("Diagnosis successfully Updated")}
-
     observe({updateSelectInput(session,"upsample","Choose Sample",choices = c("",as.character(dataech()[,1])))})
     removeModal()
   })
@@ -3968,14 +2812,11 @@ for(la in 1:dim(three)[1])
   #####################################################################################################
   #                                            Edit Interrogator data                                 #
   #####################################################################################################
-
   dataModalUInterrogator <- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPInterrogator", "Select Interrogator",
                   choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_INTERROGATOR from interrogator where LOGINUSER='%s'",paste(USER$name))))$ID_INTERROGATOR)))),
-
       uiOutput("btnUpdateInterrogator") ,
-
       footer = tagList(
         modalButton("Cancel"),
         actionButton("btnUpdateInterrogator", "OK")
@@ -3991,17 +2832,16 @@ for(la in 1:dim(three)[1])
   output$btnUpdateInterrogator=renderUI({
     box(width = 12,
         p("feilds with asterisk(*) are mandatory", style = "color:red"),
-
         textInput("idInterrogatorUP","Identity number*",value =UPdatavalueinterrogator()$ID_Interrogator),
         textInput("nameInterrogatorUP","Last name*",value =UPdatavalueinterrogator()$LAST_NAME_Interrogator),
         textInput("lastNameInterrogatorUP","First name*",value = UPdatavalueinterrogator()$FIRST_NAME_Interrogator),
         textInput("qualityInterrogatorUP","Quality*",value = UPdatavalueinterrogator()$QUALITY)
     )
   })
+
   ########################################################################
   # button update interrogator                                                    #
   ########################################################################
-
   observeEvent(input$btnUpdateInterrogator,{
     queryUpdateInterrogator <- sprintf("
                              UPDATE interrogator SET 	ID_INTERROGATOR='%s' ,LAST_NAME_INTERROGATOR='%s',FIRST_NAME_INTERROGATOR='%s',QUALITY='%s' where
@@ -4012,10 +2852,10 @@ for(la in 1:dim(three)[1])
     info("Interrogator successfully Updated")
     removeModal()
   })
+
   #####################################################################################################
   #                                              Edit laboratory data                                 #
   #####################################################################################################
-
   dataModalULabs<- function(failed = FALSE) {
     modalDialog(
       selectInput("DUPLaboratory", "Select Laboratory",
@@ -4032,8 +2872,7 @@ for(la in 1:dim(three)[1])
     showModal( dataModalULabs())
   })
   UPdatavaluelabo=reactive({
-    dddddddlab=data.frame(sqlQuery(connect,sprintf("SELECT * from laboratory where LABORATORY_NAME='%s'",paste(input$DUPLaboratory) )))
-    dddddddlab
+    data.frame(sqlQuery(connect,sprintf("SELECT * from laboratory where LABORATORY_NAME='%s'",paste(input$DUPLaboratory) )))
   })
   output$testlabbbFFFFFF=renderUI({
     box(width = 12,
@@ -4041,10 +2880,10 @@ for(la in 1:dim(three)[1])
         textInput("countryLabUP","Country",value = UPdatavaluelabo()$COUNTRY)
     )
   })
+
   ########################################################################
   # button update laboratory                                             #
   ########################################################################
-
   observeEvent(input$okDUPLaboratory,{
     queryUpdateLab <- sprintf("
                            UPDATE laboratory SET 	LABORATORY_NAME='%s' ,COUNTRY='%s' where
@@ -4054,454 +2893,13 @@ for(la in 1:dim(three)[1])
     sqlExecute(connect,query = queryUpdateLab )
     info("Laboratory successfully Updated")
     removeModal()
-
-
   })
-
-
-
-  #####################################################################################################################################
-  #                                                Download buttons                                                                    #
-  #####################################################################################################################################
-
-  #                                         ViZ                                     #
-
-  ######################################## super ####################################
-  output$calendarDB= renderUI({
-    div(
-      textInput("label_cal", "", value = "",placeholder = "Plot label"),
-      actionButton("CalendarD", "Download")
-    )
-  })
-
-
-  output$MPNuDB= renderUI({
-    div(
-      textInput("label_MPNu", "", value = "",placeholder = "Plot label"),
-      actionButton("MPNuD", "Download")
-    )
-  })
-
-  output$PieNvDB= renderUI({
-    div(
-      textInput("label_PieNvD", "", value = "",placeholder = "Plot label"),
-      actionButton("PieNvD", "Download")
-    )
-  })
-
-  output$MapDB= renderUI({
-    div(
-      actionButton("ZoomMapD", "Zoom"),
-      textInput("label_MapD", "", value = "",placeholder = "Plot label"),
-      actionButton("MapD", "Download")
-    )
-  })
-  ################################# normal #####################################
-  output$calendarDB2= renderUI({
-    div(
-      textInput("label_cal2", "", value = "",placeholder = "Plot label"),
-      actionButton("CalendarD2", "Download")
-    )
-  })
-
-
-  output$MPNuDB2= renderUI({
-    div(
-      textInput("label_MPNu2", "", value = "",placeholder = "Plot label"),
-      actionButton("MPNuD2", "Download")
-    )
-  })
-
-  output$PieNvDB2= renderUI({
-    div(
-      textInput("label_PieNvD2", "", value = "",placeholder = "Plot label"),
-      actionButton("PieNvD2", "Download")
-    )
-  })
-
-  output$MapDB2= renderUI({
-    div(
-      actionButton("ZoomMapD2", "Zoom"),
-      textInput("label_MapD2", "", value = "",placeholder = "Plot label"),
-      actionButton("MapD2", "Download")
-    )
-  })
-
-  #                                         Analysis                                         #
-  #
-  # output$PADB= renderUI({
-  #   div(
-  #
-  #     column("", textInput("label_PAD1", "", value = "",placeholder = "Plot 1 label"),width = 2),
-  #     column("", actionButton("PAD", "Download plot 1"),width = 3),
-  #     column("", textInput("label_PAD2", "", value = "",placeholder = "Plot 2 label"),width = 2),
-  #     column("", actionButton("PAD2", "Download plot 2"),width = 3)
-  #   )
-  # })
-  #
-  # output$PCP1DB= renderUI({
-  #   div(
-  #     textInput("label_PCP1D", "", value = "",placeholder = "Plot label"),
-  #     actionButton("PCP1D", "Download")
-  #   )
-  # })
-
-  # output$PCP2DB= renderUI({
-  #   div(
-  #     textInput("label_PCP2D", "", value = "",placeholder = "Plot label"),
-  #     actionButton("PCP2D", "Download")
-  #   )
-  # })
-  #
-  # output$CorrDB= renderUI({
-  #   div(
-  #     textInput("label_CorrD", "", value = "",placeholder = "Plot label"),
-  #     actionButton("CorrD", "Download")
-  #   )
-  # })
-  #
-  # output$ACM_EigDB= renderUI({
-  #   div(
-  #     textInput("label_ACM_EigD", "", value = "",placeholder = "Plot label"),
-  #     actionButton("ACM_EigD", "Download")
-  #   )
-  # })
-  # output$ACM_DMDB= renderUI({
-  #   div(
-  #     textInput("label_ACM_DMD", "", value = "",placeholder = "Plot label"),
-  #     actionButton("ACM_DMD", "Download")
-  #   )
-  # })
-  # output$ACM_IMapDB= renderUI({
-  #   div(
-  #     textInput("label_ACM_IMapD", "", value = "",placeholder = "Plot label"),
-  #     actionButton("ACM_IMapD", "Download")
-  #   )
-  # })
-  #
-  # output$ACM_ClusDB= renderUI({
-  #   div(
-  #     textInput("label_ACM_ClusD", "", value = "",placeholder = "Plot label"),
-  #     actionButton("ACM_ClusD", "Download")
-  #   )
-  # })
-
-  #############################################################################
-
-  observeEvent(input$ACM_EigD,{
-    pdf(paste(input$label_ACM_EigD,".pdf"),width = 15,height = 5)
-    acm20 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
-    scatterutil.eigen(acm20$eig,nf=3,box=T)
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$ACM_DMD,{
-    pdf(paste(input$label_ACM_DMD,".pdf"),width = 15,height = 10)
-    acm21 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
-    s.label(acm21$co,clabel = 0.7)
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$ACM_IMapD,{
-    pdf(paste(input$label_ACM_IMapD,".pdf"),width = 15,height = 10)
-    acm22 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
-    s.class(acm22$li, prepdata()$SPECIES, col = brewer.pal(4, "Set1"))
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$ACM_ClusD,{
-    pdf(paste(input$label_ACM_ClusD,".pdf"),width = 15,height = 10)
-    acmclust <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
-    d=dist(acmclust$li,method = "euclidean")
-    h=hclust(d,"ward.D2")
-    plot(h, labels= cordata()[,"ID_SAMPLE"] )
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$CorrD,{
-    pdf(paste(input$label_CorrD,".pdf"),width = 15,height = 10)
-    Variables=c(input$corvarstoplot)
-    d=ggpairs(cordata()[,Variables], mapping = aes(color = SPECIES) , title = "Crossed variables")
-    print(d)
-    info("Download success")
-    dev.off()
-  })
-
-
-  observeEvent(input$PCP2D,{
-
-    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TSD=totalChUp2[,"DATE_MED"]
-    TSD2=ts(preddata(),start =as.numeric(format(as.Date(TSD[length(TSD)], format="%Y/%m/%d"),"%Y"))+1,frequency = 12)
-
-    printDy= dygraph(TSD2) %>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
-    htmlwidgets::saveWidget(printDy, paste(input$label_PCP2D,".html"))
-    info("Download success")
-
-  })
-
-  observeEvent(input$PCP1D,{
-    pdf(paste(input$label_PCP1D,".pdf"),width = 15,height = 10)
-    MP=sqlQuery(connect,paste("SELECT DATE_MED from medical_checkup"))
-    CheckUp_Month=format(MP, "%Y-%m")
-
-    databoxdateT=as.data.frame( table(CheckUp_Month))
-
-    CheckUp_Month_=format(as.yearmon(as.character.Date(databoxdateT$CheckUp_Month),"%Y-%m"), "%m")
-    CheckUp_Month_<- ordered(sort(as.numeric(CheckUp_Month_)),
-                             levels = sort(unique(as.numeric(CheckUp_Month_))),
-                             labels = c("Jan", "Feb", "Mar","Apr",
-                                        "May","Jun", "Jul","Aug","Sep","Oct","Nov","Dec"))
-
-
-
-    databoxdate=cbind(databoxdateT,CheckUp_Month_)
-
-
-    print(ggplot(databoxdate, aes(x=CheckUp_Month_  ,y=Freq,color=CheckUp_Month_)) + geom_boxplot()+geom_jitter())
-
-
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$PAD,{
-    pdf(paste(input$label_PAD1,".pdf"),width = 15,height = 10)
-
-    one2=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
-    two2=sqlQuery(connect,paste("SELECT BIRTH_DATE,PATIENT_IDENTIFIER from patient"))
-    three2= sqldf("select DATE_MED,BIRTH_DATE from  one2, two2
-
-                  where   one2.PATIENT_IDENTIFIER=two2.PATIENT_IDENTIFIER ")
-    age= sqlQuery(connect,paste("SELECT AGE from patient"))$AGE
-    Patient_Age <- cut(round(as.numeric(age)), c(0,10,20,30,40,50,60,70,80,120),
-                       labels = c("< 10 years","11-20","21-30","31-40","41-50","51-60", "61-70","71-80",">80 years" ))
-    hage=as.data.frame( table(Patient_Age))
-    dage=as.data.frame(hage)
-
-    print(  ggplot(dage, aes(x= Patient_Age ,y=Freq)) + geom_boxplot()+geom_jitter() )
-
-
-
-    info("Download success")
-    dev.off()
-  })
-
-
-  observeEvent(input$PAD2,{
-    pdf(paste(input$label_PAD2,".pdf"),width = 3,height = 5)
-
-    one=sqlQuery(connect,paste("SELECT DATE_MED,PATIENT_IDENTIFIER from medical_checkup"))
-    two=sqlQuery(connect,paste("SELECT Date_First_Apeard,PATIENT_IDENTIFIER from sample"))
-    three= sqldf("select DATE_MED,Date_First_Apeard from  one, two
-
-                 where   one.PATIENT_IDENTIFIER=two.PATIENT_IDENTIFIER ")
-    days=  sqlQuery(connect,paste("SELECT Lesion_Age from patient"))$Lesion_Age
-    Lesion_Age_in_weeks <- cut(as.numeric(days), c(0, 2, 4, 6, 8, 10, 12, 14 ),
-                               labels = c("< 2 weeks", "2 to 4  ", "4 to 6","6 to 8 ",
-                                          "8 to 10 ","10 to 12 ", "more than 3 months"))
-    h=as.data.frame( table(Lesion_Age_in_weeks))
-    d=as.data.frame(h)
-
-    print(ggplot(d, aes(x= Lesion_Age_in_weeks ,y=Freq)) + geom_boxplot())
-
-
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$CalendarD,{
-
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup"))))
-    dateMed$Var1=as.Date(dateMed$Var1)
-
-
-    Cal <- gvisCalendar(dateMed,
-                        datevar="Var1",
-                        numvar="Freq",
-                        options=list(
-                          title="Daily Patients",
-                          height=320,
-                          calendar="{yearLabel: { fontName: 'Times-Roman',
-                          fontSize: 32, color: '#1A8763', bold: true},
-                          cellSize: 10,
-                          cellColor: { stroke: 'red', strokeOpacity: 0.2 },
-                          focusedCellColor: {stroke:'red'}}")
-    )
-    print(Cal, tag="chart", paste(input$label_cal,".html"))
-    info("Download success")
-
-  })
-
-  observeEvent(input$CalendarD2,{
-
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from medical_checkup"))))
-    dateMed$DATE_MED=as.Date(dateMed$DATE_MED)
-    dateMed=dateMed[which(dateMed$LOGINUSER==USER$name),]
-
-    Cal <- gvisCalendar(dateMed,
-                        datevar="DATE_MED",
-                        numvar="Freq",
-                        options=list(
-                          title="Daily Patients",
-                          height=320,
-                          calendar="{yearLabel: { fontName: 'Times-Roman',
-                          fontSize: 32, color: '#1A8763', bold: true},
-                          cellSize: 10,
-                          cellColor: { stroke: 'red', strokeOpacity: 0.2 },
-                          focusedCellColor: {stroke:'red'}}")
-    )
-    print(Cal, tag="chart", paste(input$label_cal2,".html"))
-    info("Download success")
-
-
-  })
-
-  observeEvent(input$MPNuD,{
-
-    totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TS=totalChUp[,"DATE_MED"]
-    TS <- c(TS,seq(as.Date(TS[1]), as.Date(TS[length(TS)]), "month") )
-    Month=as.yearmon(TS)
-    PM=table(Month)
-    number=as.data.frame( PM)
-    number[,2]=number[,2]-1
-    TSSD=zoo(number[,2],seq(as.Date(TS[1]),as.Date(TS[length(TS)]),by="month") )
-    MVG=dygraph(TSSD) %>% dyOptions(stackedGraph = TRUE) %>%   dyRangeSelector()
-
-    htmlwidgets::saveWidget(MVG,  paste(input$label_MPNu,".html"))
-
-    info("Download success")
-
-  })
-
-  observeEvent(input$MPNuD2,{
-
-    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TS2=totalChUp2[,"DATE_MED"][which(totalChUp2$LOGINUSER==USER$name  )]
-    TS2 <- c(TS2,seq(as.Date(TS2[1]), as.Date(TS2[length(TS2)]), "month") )
-    Month2=as.yearmon(TS2)
-    PM2=table(Month2)
-    number2=as.data.frame( PM2)
-    number2[,2]=number2[,2]-1
-    TSSD2=zoo(number2[,2],seq(as.Date(TS2[1]),as.Date(TS2[length(TS2)]),by="month") )
-    MVG2=dygraph(TSSD2) %>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
-
-    htmlwidgets::saveWidget(MVG2,  paste(input$label_MPNu2,".html"))
-    info("Download success")
-
-  })
-
-
-  observeEvent(input$PieNvD,{
-    pdf(paste(input$label_PieNvD,".pdf"),width = 15,height = 10)
-    dataPIE=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE))
-
-    Levels=dataPIE[,input$ttestPIEnames]
-    print( ggplot(dataPIE, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y") )
-
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$PieNvD2,{
-    pdf(paste(input$label_PieNvD2,".pdf"),width = 15,height = 10)
-
-    dataPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
-    dataPIE2N=dataPIE2[c(which(dataPIE2$LOGINUSER== USER$name)),]
-
-    Levels=dataPIE2N[,input$ttestPIEnames2]
-    print( ggplot(dataPIE2N, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y") )
-
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$MapD,{
-    pdf(paste(input$label_MapD,".pdf"),width = 15,height = 10)
-
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-
-    regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
-
-
-    Tab=sqldf("select CITY,SPECIES from  sam, town
-
-              where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
-    TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
-    TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
-    TabSl=as.data.frame(TabSl)
-    testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
-    TabOl=as.data.frame(testttttttt)
-
-    df2 <- data.frame(location = as.character(TabOl$CITY),
-                      values = TabOl$SPECIES.length,
-                      stringsAsFactors = FALSE)
-
-
-    locs_geo <- geocode(df2$location)
-    df2 <- cbind(df2, locs_geo)
-
-    mapK <- get_map(location = input$countriesshop, zoom = 6)
-    MO= ggmap(mapK) + geom_point(data = df2, aes(x = lon, y = lat, size = values,colour = values))
-    print(MO)
-
-    info("Download success")
-    dev.off()
-  })
-
-  observeEvent(input$MapD2,{
-    pdf(paste(input$label_MapD2,".pdf"),width = 15,height = 10)
-
-    mapK <- get_map(location = input$countriesshop, zoom = 6)
-
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER	 from sample"))
-    sam=sam[which(sam[,"LOGINUSER"]==USER$name),]
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-
-    regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
-
-
-    Tab=sqldf("select CITY,SPECIES from  sam, town
-
-              where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
-    TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
-    TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
-    TabSl=as.data.frame(TabSl)
-    testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
-    TabOl=as.data.frame(testttttttt)
-
-    df2 <- data.frame(location = as.character(TabOl$CITY),
-                      values = TabOl$SPECIES.length,
-                      stringsAsFactors = FALSE)
-
-
-    locs_geo <- geocode(df2$location)
-    df2 <- cbind(df2, locs_geo)
-
-
-    M= ggmap(mapK) + geom_point(data = df2, aes(x = lon, y = lat, size = values,colour = values))
-    print(M)
-
-    info("Download success")
-    dev.off()
-  })
-
 
   ##############################################################################################
   output$ttt= renderUI({
     vals=choice$value[which(choice$choiceCat==input$val)]
     selectInput("valL","Rak",choices = c(vals))
-
   })
-
   ##############################################################################################################################################################
   #                                                                     The END                                                                                #
   ##############################################################################################################################################################

@@ -50,7 +50,7 @@ shinyUI(
                 
                 mydashboardHeader(
                       title= tags$div(  tags$img(src="logologo.png",height=30,widht=100)
-                                        ,actionLink("selecthome2","Lesionia") )
+                                        ,actionLink("selecthome","Lesionia") )
                 ),
                 
                 
