@@ -588,8 +588,8 @@ shinyServer(function(input, output,session) {
                              Odontostomatology, University of Bamako) and the USA (Infectious Disease Research Institute). "),
                       br(),
                       h3("How to collaborate :"),
-                      p(" If you are interested in collaborating with us, please send an email to Dr. Ikram Guizani( ",a("ikram.Guizani@pasteur.tn"),
-                        " ) and/or to Dr. Insaf Bel Hadj Ali ( ",a(" insaf.belhadjali@pasteur.tn")," ), with the object: “Collaboration proposal on CL diagnosis”."),
+                      p(" If you are interested in collaborating with us, please send an email to Dr. Ikram Guizani(",a("ikram.Guizani@pasteur.tn"),
+                        ") and/or to Dr. Insaf Bel Hadj Ali (",a("insaf.belhadjali@pasteur.tn"),"), with the object: “Collaboration proposal on CL diagnosis”."),
                       br(),
                       h3("Get in touch :"),
                       p("  For more information on Lesionia and the data system management, please contact Dr. Emna HARIGUA at ",a("emna.harigua@pasteur.utm.tn")),
@@ -1479,10 +1479,11 @@ shinyServer(function(input, output,session) {
           ),
           tabPanel(h4(strong("Partition")),
                    uiOutput("PieChart")
-          ),
-          tabPanel(h4(strong("Patients map")),
-                   uiOutput("SpeciesMapView")
           )
+          #,
+          #tabPanel(h4(strong("Patients map")),
+          #         uiOutput("SpeciesMapView")
+          #)
         )
       }else{
         tabBox(
@@ -1704,37 +1705,20 @@ shinyServer(function(input, output,session) {
   #calandar#
   #############################################################################
   output$calendar=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup where DATE_MED!='1900-01-01'"))))
     dateMed$Var1=as.Date(dateMed$Var1)
     Cal <- gvisCalendar(dateMed,
                         datevar="Var1",
                         numvar="Freq",
                         options=list(
                           title="Daily Patients",
-                          height=320,
+                          height=5000,
+                          width=1000,
                           calendar="{yearLabel: { fontName: 'Times-Roman',
                           fontSize: 32, color: '#1A8763', bold: true},
-                          cellSize: 10,
+                          cellSize: 15,
                           cellColor: { stroke: 'red', strokeOpacity: 0.2 },
-                          focusedCellColor: {stroke:'red'}}")
-    )
-  })
-  ###############################################################################
-  output$calendar2=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED,LOGINUSER from medical_checkup"))))
-    dateMed$DATE_MED=as.Date(dateMed$DATE_MED)
-    dateMed=dateMed[which(dateMed$LOGINUSER==USER$name),]
-    Cal <- gvisCalendar(dateMed,
-                        datevar="DATE_MED",
-                        numvar="Freq",
-                        options=list(
-                          title="Daily Patients",
-                          height=320,
-                          calendar="{yearLabel: { fontName: 'Times-Roman',
-                          fontSize: 32, color: '#1A8763', bold: true},
-                          cellSize: 10,
-                          cellColor: { stroke: 'red', strokeOpacity: 0.2 },
-                          focusedCellColor: {stroke:'red'}}")
+                          focusedCellColor: {stroke:'yellow'}}")
     )
   })
 
@@ -1742,23 +1726,25 @@ shinyServer(function(input, output,session) {
   #Species MAP#
   ##########################################################################################
   output$CountriesShopUI=renderUI({
-    countrie= unique( sqlQuery(connect,paste("SELECT DISTINCT CITY from travel_residency")))
-    selectInput("countriesshop", "",choices=countrie$CITY)
+    countrie= unique( sqlQuery(connect,paste("SELECT NATIONALITY FROM patient where NATIONALITY not in ('OTHER','Other','other','N/A','N/a','n/A','n/a')")))
+    selectInput("countriesshop", "",choices=countrie$NATIONALITY)
   })
   output$especeUI=renderUI({
     espece= unique( sqlQuery(connect,paste("SELECT SPECIES from sample")))
     selectInput("especesshop", "",choices=espece$SPECIES)
   })
+
   output$SpeciesMAP=renderPlot ({
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
-    reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-    regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
-    Tab=sqldf("select CITY,SPECIES from  sam, town
-              where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
-    TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
-    TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
-    TabSl=as.data.frame(TabSl)
+    #sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER	 from sample"))
+    #reg=sqlQuery(connect,paste("SELECT COUNTRY_,CITY	 from region"))
+    #town=sqlQuery(connect,paste0("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency where CITY like '",input$countriesshop,",%'"))
+    #regC=reg[which(reg[,"COUNTRY_"]== input$countriesshop) ,]
+    Tab=sqlQuery(connect,paste0("select CITY,SPECIES from  sample as s, travel_residency as t
+              	where   s.PATIENT_IDENTIFIER=t.PATIENT_IDENTIFIER
+		and t.CITY like '",paste0(input$countriesshop),",%' and s.SPECIES='",paste0(input$especesshop),"' ") )
+    #TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
+    #TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
+    TabSl=as.data.frame(Tab)
     testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
     TabOl=as.data.frame(testttttttt)
     df2 <- data.frame(location = as.character(TabOl$CITY),
@@ -1797,53 +1783,6 @@ shinyServer(function(input, output,session) {
     }
   })
 
-  ###########################################################################################
-  output$SpeciesMAPN=renderPlot ({
-    mapK <- get_map(location = input$countriesshop, zoom = 6)
-    sam= sqlQuery(connect,paste("SELECT SPECIES,PATIENT_IDENTIFIER,LOGINUSER from sample"))
-    sam=sam[which(sam[,"LOGINUSER"]==USER$name),]
-    reg=sqlQuery(connect,paste("SELECT DISTINCT CITY from travel_residency"))
-    town=sqlQuery(connect,paste("SELECT CITY,PATIENT_IDENTIFIER	 from travel_residency"))
-    regC=reg[which(reg[,"CITY"]== input$countriesshop) ,]
-    Tab=sqldf("select CITY,SPECIES from  sam, town
-              where   sam.PATIENT_IDENTIFIER=town.PATIENT_IDENTIFIER ")
-    TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
-    TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
-    TabSl=as.data.frame(TabSl)
-    testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
-    TabOl=as.data.frame(testttttttt)
-    df2 <- data.frame(location = as.character(TabOl$CITY),
-                      values = TabOl$SPECIES.length,
-                      stringsAsFactors = FALSE)
-    locs_geo <- geocode(df2$location)
-    df2 <- cbind(df2, locs_geo)
-    ggmap(mapK) +
-      geom_point(data = df2, aes(x = lon, y = lat, size = values,colour = values))
-  })
-  output$SpeciesMapViewN=renderUI({
-    if(USER$Logged==TRUE ){
-      fluidRow(
-        box(width = 3, status = "info",solidHeader = TRUE,
-            title = "Choose Country",
-            tags$hr(),
-            uiOutput("CountriesShopUI")
-        ),
-        box(width = 3, status = "info",solidHeader = TRUE,
-            title = "Choose Species",
-            tags$hr(),
-            uiOutput("especeUI")
-        ),
-        box(width = 6, status = "info",solidHeader = FALSE,
-            plotOutput("SpeciesMAPN")
-        )
-      )
-    }else{  USER$Logged <- FALSE
-      USER$pass <- ""
-      newvalue <- "acc2"
-      updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")
-    }
-  })
   ##############################################################################################
   # Correlation plot#
   ##############################################################################################
@@ -1929,7 +1868,7 @@ shinyServer(function(input, output,session) {
                  ),
                  tabPanel(h5(strong("Clustring")),
                           plotOutput("clusr")
-                 ),
+                 )
                ))
       ))
     }else{  USER$Logged <- FALSE
