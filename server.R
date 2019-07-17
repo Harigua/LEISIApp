@@ -939,7 +939,7 @@ shinyServer(function(input, output,session) {
     datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',N/A) ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',N/A) ")
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
     }else if(input$Lesion_Number<(-1)){
@@ -1256,7 +1256,7 @@ shinyServer(function(input, output,session) {
     querySelectDataDiognosis=sqlQuery(connect,paste("SELECT * from diognosis"))
     queryInsertDiognosis <- paste0(
       "INSERT INTO  diognosis
-      VALUES ( '", toString(paste0("Diagnosis",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"','", toString(USER$name) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(querySelectDataDiognosis[,1])+1)) ,"','",toString( input$chemtest ) ,"','", toString(input$labname) ,"','", toString(USER$name) ,"', '",toString(input$sample) ,"','",toString( input$dattest) ,"','",toString( input$quantity) ,"','",toString( input$restest) ,"','", toString(input$susSpec) ,"') ")
     if(toString(input$chemtest) == ""){
       info("Error : Missing data test")
     }else if(toString(input$labname)==""){
@@ -1707,15 +1707,15 @@ shinyServer(function(input, output,session) {
   #calandar#
   #############################################################################
   output$calendar=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup where DATE_MED!='1900-01-01'"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup where year(DATE_MED) > year(date(now()) - date('6-00-00'))"))))
     dateMed$Var1=as.Date(dateMed$Var1)
     Cal <- gvisCalendar(dateMed,
                         datevar="Var1",
                         numvar="Freq",
                         options=list(
-                          title="Daily Patients",
-                          height=5000,
-                          width=1000,
+                          title="Daily Patients for the last five years",
+                          height=850,
+                          width=850,
                           calendar="{yearLabel: { fontName: 'Times-Roman',
                           fontSize: 32, color: '#1A8763', bold: true},
                           cellSize: 15,
