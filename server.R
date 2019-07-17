@@ -792,7 +792,7 @@ shinyServer(function(input, output,session) {
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
             selectInput("regvisit","Country and state*",choices = c('',cities[,3])),
             textInput("regvisitc","City"),
-            selectInput("Type","Urban/Rural",choices =  c("N/A", "Urban","Rural")),
+            selectInput("Type","Urban/Rural",choices =  c("N/A",'+4','-30',"Urban","Rural")),
             selectInput("resedent","Residency ",choices =  c("N/A", "Yes","No")),
             selectInput("bybyte","Bite Notion",choices =  c("N/A", "Yes","No")),
             dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE),
@@ -1390,7 +1390,7 @@ shinyServer(function(input, output,session) {
                           ))
               ,
               numericInput("voll","Quantity in nanogramme","-1"),
-              selectInput("val","Type",choices = c('N/A','Azote','R80')),
+              selectInput("val","Type",choices = c('N/A','+4','-30','Azote','R80')),
               selectInput("RakPFE","Container",choices = c('',1:4)),
               uiOutput("ttt"),
               selectInput("conserve","conserve",choices = c('N/A',"Boite")),
@@ -1447,7 +1447,7 @@ shinyServer(function(input, output,session) {
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
              # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) ,
              selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
-             selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid"),multiple=TRUE) ,
+             selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Populo modulaire"),multiple=TRUE) ,
              textInput("otherdescriptionlesion","If other please specify")
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
