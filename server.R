@@ -882,7 +882,7 @@ shinyServer(function(input, output,session) {
             textInput("otherClinstate","If other please specify") ,
             selectizeInput("HhostR","Surrounding human cases", c("N/A","No","Yes","Family","Neighbour","Colleague"), multiple = TRUE),
             selectizeInput("HhostL","Link with human cases", c("N/A","No","Other","Household","Neighborhood","Workplace","Travel"), multiple = TRUE),
-            selectizeInput("Ahost","Possible animal contact", c("N/A","No","Other","Bovines","Ovins","Caprins","Camels","Equids","Hares","Cats","Dogs","Foxs","Other Canids","Sandrats","Meriones","Other rodents","Gondis","Hedgehogs","Bates","Hyrax","Cattle"), multiple = TRUE),
+            selectizeInput("Ahost","Possible animal contact", c("N/A","No","Other","Bovines","Ovins","Caprins","Camels","Equids","Hares","Cats","Dogs","Foxs","Other Canids","Sandrats","Meriones","Other rodents","Gondis","Hedgehogs","Bats","Hyrax","Cattle"), multiple = TRUE),
             textInput("otherAhost","If other please specify") ,
             numericInput("Lesion_Number","Number of Lesions*",value = "-1"),
             selectInput("Lesion_Sites","Lesion localisation",choices = c("N/A","Other","Face", "Upper limbs","Lower limbs","Trunc"),multiple = TRUE)
@@ -939,7 +939,7 @@ shinyServer(function(input, output,session) {
     datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"',N/A) ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate) ,", ",toString(input$otherClinstate),"','",input$Lesion_Number ,"','",toString(input$Lesion_Sites) ,"','N/A') ")
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
     }else if(input$Lesion_Number<(-1)){
