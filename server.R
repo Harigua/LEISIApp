@@ -1461,8 +1461,7 @@ shinyServer(function(input, output,session) {
   })
   output$visualisation=renderUI({
     if (USER$Logged == TRUE) {
-      who=sqlQuery(connect ,paste("SELECT * from userdata "))
-      if (who[which(who[,1]== USER$name ),4]== "super" ){
+
         tabBox(
           id="viewdata",
           title = tagList( ""),
@@ -1487,16 +1486,7 @@ shinyServer(function(input, output,session) {
           #         uiOutput("SpeciesMapView")
           #)
         )
-      }else{
-        tabBox(
-          id="viewdata",
-          title = tagList( ""),
-          width = 10,
-          height = 4,
-          tabPanel(h4(strong("Tables View")),
-                   uiOutput("viewtable2"))#,
-        )
-      }
+
     }else{ USER$Logged <- FALSE
       USER$pass <- ""
       newvalue <- "acc2"
