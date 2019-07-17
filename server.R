@@ -1707,15 +1707,15 @@ shinyServer(function(input, output,session) {
   #calandar#
   #############################################################################
   output$calendar=renderGvis ({
-    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup where DATE_MED!='1900-01-01'"))))
+    dateMed=as.data.frame( table( sqlQuery(connect,paste("SELECT 	DATE_MED from medical_checkup where year(DATE_MED) > year(date(now()) - date('6-00-00'))"))))
     dateMed$Var1=as.Date(dateMed$Var1)
     Cal <- gvisCalendar(dateMed,
                         datevar="Var1",
                         numvar="Freq",
                         options=list(
-                          title="Daily Patients",
-                          height=5000,
-                          width=1000,
+                          title="Daily Patients for the last five years",
+                          height=850,
+                          width=850,
                           calendar="{yearLabel: { fontName: 'Times-Roman',
                           fontSize: 32, color: '#1A8763', bold: true},
                           cellSize: 15,
