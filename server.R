@@ -1118,8 +1118,7 @@ shinyServer(function(input, output,session) {
     querySelectDataSample=sqlQuery(connect,paste("SELECT  * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
-      "INSERT INTO  sample
-      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",paste0( input$sammeth,", ",input$othersammeth ) ,"','",paste0(input$samplsupport,", ",input$othersamplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+      "INSERT INTO  sample VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '', '",toString(input$sammeth),", ",toString(input$othersammeth) ,"','",toString(input$samplsupport),", ",toString(input$othersamplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
     if(toString(input$extractDay)==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1140,7 +1139,7 @@ shinyServer(function(input, output,session) {
                 , error = function(e) {an.error.occured <<- TRUE}
       )
       if(an.error.occured){
-        info("Error : INSERT INTO  sample")
+        info(paste0("Error : INSERT INTO  sample ",queryInsertSample ))
       }else{info(paste0("Sample successfully stored ", idSample))}
     }
     observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
@@ -1169,8 +1168,7 @@ shinyServer(function(input, output,session) {
     querySelectDataSample=sqlQuery(connect,paste("SELECT * from sample "))
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
-      "INSERT INTO  sample
-      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', 'N/A', '",paste0( input$sammeth,", ",input$othersammeth ) ,"','",paste0( input$samplsupport,", ",input$othersamplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
+      "INSERT INTO  sample  VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '', '", toString(input$sammeth),", ",toString(input$othersammeth) ,"','",toString(input$samplsupport),", ",toString(input$othersamplsupport),"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,", ",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
     if(input$extractDay==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1191,7 +1189,7 @@ shinyServer(function(input, output,session) {
                 , error = function(e) {an.error.occured <<- TRUE}
       )
       if(an.error.occured){
-        info("Error : INSERT INTO  sample")
+        info(paste0("Error : INSERT INTO  sample ",queryInsertSample ) )
       }else{info(paste0("Sample successfully stored",idSample))}
     }
     observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
