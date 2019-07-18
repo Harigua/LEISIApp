@@ -755,12 +755,14 @@ shinyServer(function(input, output,session) {
         id="formSample",
         box( width = 12, status = "info",solidHeader = TRUE,
              p("feilds with asterisk(*) are mandatory", style = "color:red"),
-             selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE),
-             selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE),
+             selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later","Other"),multiple = TRUE),
+             textInput("othersamplsupport","If other please specify"),
+             selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab","Other"),multiple = TRUE),
+             textInput("othersammeth","If other please specify"),
              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
              selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")),
              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
-             numericInput("Lesion_Age","Or leision age","-1") ,
+             numericInput("Lesion_Age","Or lesion age(in weeks)","-1") ,
              numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") ,
              numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") ,
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
@@ -977,7 +979,7 @@ shinyServer(function(input, output,session) {
     datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
-      VALUES ( '", toString(paste0("Treatment",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
@@ -997,7 +999,7 @@ shinyServer(function(input, output,session) {
     datamytreatment2=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
-      VALUES ( '", toString(paste0("Treatment",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(datamytreatment2[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
@@ -1117,7 +1119,7 @@ shinyServer(function(input, output,session) {
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
+      VALUES ('", paste0(idSample) ,"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', '",toString( input$Lesionsite) ,"', '",paste0( input$sammeth,", ",input$othersammeth ) ,"','",paste0(input$samplsupport,", ",input$othersamplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString( input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion),",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"') ")
     if(toString(input$extractDay)==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1141,7 +1143,7 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  sample")
       }else{info(paste0("Sample successfully stored ", idSample))}
     }
-    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
+    observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))  )})
     output$patdataout=renderUI ({
       div(
         DT::dataTableOutput("ViewTable"),
@@ -1168,7 +1170,7 @@ shinyServer(function(input, output,session) {
     idSample <- paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)
     queryInsertSample <- paste0(
       "INSERT INTO  sample
-      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', 'N/A', '",toString( input$sammeth ) ,"','",toString( input$samplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
+      VALUES ('",paste0(paste0(input$PatIdentifier,"-",length(querySelectDataSample[,1])+1)),"', '",toString( input$PatIdentifier ) ,"', '",toString("NotIdentified") ,"', '",toString( USER$name ) ,"', 'N/A', '",paste0( input$sammeth,", ",input$othersammeth ) ,"','",paste0( input$samplsupport,", ",input$othersamplsupport) ,"','",toString( input$directexam) ,"','",toString( input$abandance) ,"','",toString( input$apparitionlesion) ,"','",toString(input$Lesion_Age) ,"','",input$diamlesionMax,"','",input$diamlesionMin,"','",input$highlesion,"','-1','",toString( input$descriptionlesion) ,",",toString(input$otherdescriptionlesion) ,"','",as.character( input$extractDay),"')  ")
     if(input$extractDay==""){
       info("Error : Wrong value lesion Sampling date")
     }else if(is.na(input$diamlesionMax)){
@@ -1192,7 +1194,7 @@ shinyServer(function(input, output,session) {
         info("Error : INSERT INTO  sample")
       }else{info(paste0("Sample successfully stored",idSample))}
     }
-    observe({updateSelectInput(session,"sample","",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
+    observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
     output$AdddSample=renderUI({
       output$firsttimeID=renderUI({
       })
@@ -1203,12 +1205,14 @@ shinyServer(function(input, output,session) {
       div(
         box( width = 12, status = "info",solidHeader = TRUE,
               p("feilds with asterisk(*) are mandatory", style = "color:red"),
-              selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE), 
-              selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE), 
+              selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later","Other"),multiple = TRUE),
+              textInput("othersamplsupport","If other please specify"),
+              selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab","Other"),multiple = TRUE),
+              textInput("othersammeth","If other please specify"),
               selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")), 
               selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")), 
               dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
-              numericInput("Lesion_Age","Or leision age","-1") ,
+              numericInput("Lesion_Age","Or lesion age(in weeks)","-1") ,
               numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") , 
               numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") , 
               numericInput("highlesion","lesion Hight(millimeter)*","-1") , 
@@ -1342,7 +1346,7 @@ shinyServer(function(input, output,session) {
         div(
           id="FormUploadImage",
           box(width = 12, status = "info",solidHeader = TRUE,
-              selectInput("sampleIDD","Sample",
+              selectInput("sampleIDD","Sample*",
                           choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                           )),
               fileInput("MyImage","Image of lesion sampled",
@@ -1385,7 +1389,7 @@ shinyServer(function(input, output,session) {
         div(
           id="FormInsertAlliquotAndQuit",
           box(width = 12, status = "info",solidHeader = TRUE,
-              selectInput("sampleIDD","Sample",
+              selectInput("sampleIDD","Sample*",
                           choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))$ID_SAMPLE))
                           ))
               ,
@@ -1436,12 +1440,14 @@ shinyServer(function(input, output,session) {
         id="formInsertSample",
         box( width = 12, status = "info",solidHeader = TRUE,
              p("feilds with asterisk(*) are mandatory", style = "color:red"),
-             selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later"),multiple = TRUE),
-             selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab"),multiple = TRUE),
+             selectInput("samplsupport","Type of sample support",choices = c("N/A","TE","Slide", "Filter paper","Saline","RNA later","Other"),multiple = TRUE),
+             textInput("othersamplsupport","If other please specify"),
+             selectInput("sammeth","Sampling Method",choices = c("N/A","Scrapping","aspiration","biopsy","Dental broch","Swab","Other"),multiple = TRUE),
+              textInput("othersammeth","If other please specify"),
              selectInput("directexam","Direct examination result",choices = c("N/A","Positive","Negative")),
              selectInput("abandance","Abundance on the smear", c("N/A", "+","++","+++","++++","+++++","++++++")),
              dateInput("apparitionlesion","Lesion first appearence",value="1900-01-01") ,
-             numericInput("Lesion_Age","Or leision age","-1") ,
+             numericInput("Lesion_Age","Or lesion age(in weeks)","-1") ,
              numericInput("diamlesionMax","lesion Diameter Maximal(millimeter)*","-1") ,
              numericInput("diamlesionMin","lesion Diameter Minimal(millimeter)*","-1") ,
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
@@ -2618,7 +2624,7 @@ for(la in 1:dim(three)[1])
         textInput("directexamUP","Direct examination result",value = UPdatavalueSample()$DIRECT_EXAMINATION),
         textInput("abandanceUP","Abundance on the smear",value = UPdatavalueSample()$ABUDANCE_ON_THE_SMEAR),
         dateInput("apparitionlesionUP","Lesion first appearence",value = UPdatavalueSample()$Date_First_Apeard) ,
-        numericInput("Lesion_AgeUP","Or leision age(in weeks)",value = UPdatavalueSample()$Lesion_Age) ,
+        numericInput("Lesion_AgeUP","Or lesion age(in weeks)",value = UPdatavalueSample()$Lesion_Age) ,
         numericInput("diamlesionMaxUP","lesion Diameter Maximal(millimeter)*",value =UPdatavalueSample()$DIAMETREMax) ,
         numericInput("diamlesionMinUP","lesion Diameter Minimal(millimeter)*",value =UPdatavalueSample()$DIAMETREMin) ,
         numericInput("highlesionUP","lesion Hight(millimeter)*",value =UPdatavalueSample()$HIGHT) ,
