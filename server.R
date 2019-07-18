@@ -1529,7 +1529,7 @@ shinyServer(function(input, output,session) {
     }
   })
   output$monthview=renderDygraph({
-    totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup"))
+    totalChUp=sqlQuery(connect,paste("SELECT * from medical_checkup where DATE_MED!='1900-01-01' ORDER BY DATE_MED ASC"))
     TS=totalChUp[,"DATE_MED"]
     TS <- c(TS,seq(as.Date(TS[1]), as.Date(TS[length(TS)]), "month") )
     Month=as.yearmon(TS)
@@ -1540,18 +1540,7 @@ shinyServer(function(input, output,session) {
     MVG=dygraph(TSSD)%>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
     MVG
   })
-  output$monthview2=renderDygraph ({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TS2=totalChUp2[,"DATE_MED"][which(totalChUp2$LOGINUSER==USER$name  )]
-    TS2 <- c(TS2,seq(as.Date(TS2[1]), as.Date(TS2[length(TS2)]), "month") )
-    Month2=as.yearmon(TS2)
-    PM2=table(Month2)
-    number2=as.data.frame( PM2)
-    number2[,2]=number2[,2]-1
-    TSSD2=zoo(number2[,2],seq(as.Date(TS2[1]),as.Date(TS2[length(TS2)]),by="month") )
-    MVG2=dygraph(TSSD2) %>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
-    MVG2
-  })
+
   output$DataAnalysis=renderUI({
     if (USER$Logged == TRUE) {
       tabBox(
@@ -1578,27 +1567,6 @@ shinyServer(function(input, output,session) {
       updateTabItems(session, "tabs", newvalue)
       addClass(selector = "body", class = "sidebar-collapse")
     }
-  })
-  preddata=reactive({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TS=totalChUp2[,"DATE_MED"]
-    Month=as.yearmon(TS)
-    monthCal=as.data.frame(table(Month))
-    mod2=msts(monthCal$Freq ,seasonal.periods = c(12))
-    model=auto.arima(mod2)
-    fut= as.data.frame(predict(model,n.ahead = 12))
-    fut$pred
-  })
-  output$Predicted=renderTable({
-    preddataL=as.data.frame(preddata())
-    colnames(preddataL)="Predicted_monthly_patients_number"
-    preddataL
-  })
-  output$Timeseriesplot=renderDygraph({
-    totalChUp2=sqlQuery(connect,paste("SELECT * from medical_checkup"))
-    TSD=totalChUp2[,"DATE_MED"]
-    TSD2=ts(preddata(),start =as.numeric(format(as.Date(TSD[length(TSD)], format="%Y/%m/%d"),"%Y"))+1,frequency = 12)
-    dygraph(TSD2)%>% dyOptions(stackedGraph = TRUE) %>% dyRangeSelector()
   })
 
   ####################################################################################
