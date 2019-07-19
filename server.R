@@ -1561,7 +1561,7 @@ shinyServer(function(input, output,session) {
         tabPanel(h4(strong("Regression")),
                  uiOutput("Reg")
         ),
-        tabPanel(h4(strong("ACM")),
+        tabPanel(h4(strong("MCA")),
                  fluidRow( div( uiOutput("CAMM") ) )
         )
       )
