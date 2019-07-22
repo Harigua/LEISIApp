@@ -452,7 +452,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$btnInsertDiscrepancy , {
     queryInserDiscrepancy  <- paste0(
       "INSERT INTO discrepancy(idDiscrepancy,PATIENT_IDENTIFIER,DATE_MED,Description,user)
-      VALUES ('",paste0(input$idPatientDisc),"/",input$Med_check,"','",input$idPatientDisc,"','",input$Med_check,"','",input$text_Disc,"','",USER$name,"') ")
+      VALUES ('",paste0(input$idPatientDisc,"/",input$Med_check),"','",input$idPatientDisc,"','",input$Med_check,"','",input$text_Disc,"','",USER$name,"') ")
     if (input$idPatientDisc==""){
       info("Error : Missing data patient DB code")
     }else if(input$Med_check==""){
@@ -465,7 +465,7 @@ shinyServer(function(input, output,session) {
                 , error = function(e) {an.error.occured <<- TRUE}
       )
       if(an.error.occured){
-        info("Error : inserting Discrepancy ")
+        info(paste0("Error : inserting Discrepancy "))
       }else{
         info("Discrepancy  successfully added")
       }
@@ -1189,7 +1189,7 @@ shinyServer(function(input, output,session) {
                 , error = function(e) {an.error.occured <<- TRUE}
       )
       if(an.error.occured){
-        info(paste0("Error : INSERT INTO  sample ",queryInsertSample ) )
+        info(paste0("Error : INSERT INTO  sample ") )
       }else{info(paste0("Sample successfully stored",idSample))}
     }
     observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
@@ -1485,6 +1485,10 @@ shinyServer(function(input, output,session) {
           tabPanel(h4(strong("Partition")),
                    uiOutput("PieChart")
           )
+          ,
+          tabPanel(h4(strong("Data downloader")),
+                   uiOutput("downloader")
+          )
           #,
           #tabPanel(h4(strong("Patients map")),
           #         uiOutput("SpeciesMapView")
@@ -1576,6 +1580,87 @@ shinyServer(function(input, output,session) {
   ####################################################################################
   ##################                      PIE plot start                ##############
   ####################################################################################
+
+  output$downloader=renderUI({
+    if(USER$Logged==TRUE ){
+          three2= sqlQuery(connect,paste( "select mc.PATIENT_IDENTIFIER,AGE,DATE_MED,BIRTH_DATE from  medical_checkup as mc, patient as p where   mc.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER "))
+          age= round(as.numeric(as.Date(three2$DATE_MED) - as.Date(three2$BIRTH_DATE))/365)
+
+          for(p in 1:dim(three2)[1])
+          {
+            if(is.null(three2[p,]$AGE) | is.na(three2[p,]$AGE) | three2[p,]$AGE==""){
+              if(three2[p,]$BIRTH_DATE=="1900-01-01" | three2[p,]$DATE_MED=="1900-01-01"){
+                updateQuery=paste0("update patient set AGE='-1' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+              }else{
+                updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+              }
+            }else if(as.numeric(three2[p,]$AGE) < 0){
+              if(three2[p,]$BIRTH_DATE=="1900-01-01" | three2[p,]$DATE_MED=="1900-01-01"){
+                updateQuery=paste0("update patient set AGE='-1' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+              }else{
+                updateQuery=paste0("update patient set AGE='",age[p],"' where PATIENT_IDENTIFIER='",three2[p,]$PATIENT_IDENTIFIER,"';")
+              }
+            }
+              an.error.occured <- FALSE
+              tryCatch( {sqlExecute(connect, updateQuery)}
+                        , error = function(e) {an.error.occured <<- TRUE}
+              )
+              if(an.error.occured){
+                paste("Error in Update patient",p)
+              }else{paste("Patient",p,"age successfully Updated",age[p])}
+          }
+
+          q=sqlQuery(connect,paste("SELECT mc.DATE_MED, p.MEDICAL_FILE_NUMBER, p.PATIENT_IDENTIFIER, p.GENDER, p.AGE, s.DIRECT_EXAMINATION, s.ABUDANCE_ON_THE_SMEAR, p.CONSENT, tr.CITY
+                            FROM patient as p, medical_checkup as mc, sample as s, travel_residency as tr
+                            WHERE mc.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and s.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and tr.PATIENT_IDENTIFIER=p.PATIENT_IDENTIFIER and tr.FROMDATE=p.BIRTH_DATE"))
+
+          f = data.frame(matrix(NA,nrow=length(q[,1])),Annee=NA,Code=NA,Code_BD=NA,Gouvernorat=NA,Age=NA,Tranche_d_age=NA,ED=NA,Abondance=NA,Consentement=NA)
+
+          f$Consentement = q$CONSENT
+          f$Abondance = q$ABUDANCE_ON_THE_SMEAR
+          f$Age = q$AGE
+          f$Gouvernorat = q$CITY
+          f$Code_CIC = q$PATIENT_IDENTIFIER
+          f$Code = q$MEDICAL_FILE_NUMBER
+          f$Annee = format(as.Date(q$DATE_MED),format="%Y")
+          f[,1] = ""
+
+          for(i in 1:length(q[,1]) ){
+	          f$ED[i] = if(toString(q$DIRECT_EXAMINATION[i])=="Positive"){paste('+')}
+	          		else if(toString(q$DIRECT_EXAMINATION[i])=="Negative"){paste('-')}
+	          		else{paste('N/A')}
+          }
+
+          for(i in 1:length(q[,1]) ){
+          	f$Tranche_d_age[i] = if(q$AGE[i]<0){paste('N/A')}
+          				else if(q$AGE[i]<5){paste('inf5')}
+          				else if(q$AGE[i]<18){paste('5-18')}
+          				else if(q$AGE[i]<65){paste('18-65')}
+          				else {paste('sup65')}
+          }
+
+      output$downloadData <- downloadHandler(
+        filename = function() {
+          paste0("Lesionia-", Sys.Date(),".csv")
+        },
+        content = function(file) {
+          write.csv(f, file)
+        },
+        contentType = "text/csv"
+      )#https://shiny.rstudio.com/reference/shiny/0.11/downloadHandler.html
+      downloadButton("downloadData", "Download data")
+
+    }else{  USER$Logged <- FALSE
+      USER$pass <- ""
+      newvalue <- "acc2"
+      updateTabItems(session, "tabs", newvalue)
+      addClass(selector = "body", class = "sidebar-collapse")
+    }
+  })
+
+  ####################################################################################
+  ##################                      PIE plot start                ##############
+  ####################################################################################
   output$tableschartPIE=renderUI({
     taablesPIE=sqlTables(connect, errors = FALSE, as.is = TRUE,
                          catalog = NULL, schema = NULL, tableName = NULL,
@@ -1610,51 +1695,6 @@ shinyServer(function(input, output,session) {
         ),
         box(width = 6, status = "info",solidHeader = FALSE,
             plotOutput("pie")
-        )
-      )
-    }else{  USER$Logged <- FALSE
-      USER$pass <- ""
-      newvalue <- "acc2"
-      updateTabItems(session, "tabs", newvalue)
-      addClass(selector = "body", class = "sidebar-collapse")
-    }
-  })
-
-  #############################################
-  output$tableschartPIE2=renderUI({
-    taablesPIE2=sqlTables(connect, errors = FALSE, as.is = TRUE,
-                          catalog = NULL, schema = NULL, tableName = NULL,
-                          tableType = NULL, literal = FALSE)
-    selectInput("ttestPIE2", "",choices=taablesPIE2[c(1,3,4,10,8,6),3])
-  })
-  output$nameschartPIE2= renderUI({
-    AAllPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
-    is.fact11 <- sapply(AAllPIE2, is.factor)
-    AAllPIE2=data.frame( AAllPIE2[, is.fact11])
-    selectInput("ttestPIEnames2", "",choices=c(colnames(AAllPIE2)))
-  })
-  output$pie2=renderPlot({
-    dataPIE2=sqlQuery(connect,paste("SELECT * from ",input$ttestPIE2))
-    dataPIE2N=dataPIE2[c(which(dataPIE2$LOGINUSER== USER$name)),]
-    Levels=dataPIE2N[,input$ttestPIEnames2]
-    ggplot(dataPIE2N, aes(x = factor(1),fill =Levels )) + geom_bar(width = 1)+ coord_polar(theta = "y")
-  })
-  output$PieChart2=renderUI({
-    if(USER$Logged==TRUE ){
-      fluidRow(
-        box(width = 3, status = "info",solidHeader = TRUE,
-            title = "Choose table to View",
-
-            tags$hr(),
-            uiOutput("tableschartPIE2")
-        ),
-        box(width = 3, status = "info",solidHeader = TRUE,
-            title = "Choose table to View",
-            tags$hr(),
-            uiOutput("nameschartPIE2")
-        ),
-        box(width = 6, status = "info",solidHeader = FALSE,
-            plotOutput("pie2")
         )
       )
     }else{  USER$Logged <- FALSE

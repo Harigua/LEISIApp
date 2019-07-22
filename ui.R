@@ -19,9 +19,9 @@ mydashboardHeader <- function(..., title = NULL, disable = FALSE,title.navbar=NU
                               color: #B0C4DE;
                               }
                               
-                              ")),
-              
-              
+                              "
+              )),
+
               style = if (disable) "display: none;",
               uiOutput("userPanel"),
               span(class = "logo", title),
@@ -36,70 +36,38 @@ mydashboardHeader <- function(..., title = NULL, disable = FALSE,title.navbar=NU
                            )
                        )
               )
-              )
+  )
 }
 
 shinyUI(
   dashboardPage(
                 skin = "black",
                 title="Lesionia",
-#tags$link(rel='icon' type='image/gif/png' href='www/logologo.png'),
-                #tags$img(src="logologo.png",height=30,widht=100),
 
-
-                
                 mydashboardHeader(
                       title= tags$div(  tags$img(src="logologo.png",height=30,widht=100)
                                         ,actionLink("selecthome","Lesionia") )
                 ),
-                
-                
-                
-                
-                
-                
-                
-                
                 dashboardSidebar(
-                  
-                  
                   sidebarSearchForm(label = "insert subject", "searchText", "searchButton"),
-                  
-                  
                   sidebarMenu(
-                    
                     id= "tabs" ,
-                    
-                    
-                    
-                    
                     menuItem(h4("Home"),tabName = "acc2"),
-                    
                     menuItem( h4("Data Management"),tabName = "dataMang",
-                              
                               menuSubItem("Data Cleaning",tabName = "cleanD")),
-                    
                     menuItem( h4("Data Input"),tabName = "datain",
                               menuSubItem("Add data",tabName = "OTD"),
                               menuSubItem("Update data",tabName = "SD")),
-                    
-                    
-                    
                     menuItem(h4("Data Load"),tabName = "dataup",
                              menuSubItem("View Data",tabName = "VD"),
                              menuSubItem("Data General statistics  ",tabName = "DGS")),
-                    
                     menuItem(h4("Data Analysis"),tabName = "dataup",
                              menuSubItem("Analyse Data",tabName = "AnD")),
                     menuItem(h4("Professionals recommand"),tabName = "doc",
                              menuSubItem("upload publication",tabName = "UP"))
-                    
                     , disable = FALSE
-                    
-                    
-                  )),
-                
-                
+                  )
+                ),
                 
                 dashboardBody(
                   tags$style(".nav-tabs {
@@ -118,48 +86,28 @@ shinyUI(
                              
                              .nav-tabs-custom .nav-tabs li.active {
                              border-top-color: light-blue;
-                             }
-
-                                  
-                             "),
+                             }"
+                  ),
        
                   
                   tags$head(tags$style(HTML("
                                   .content-wrapper,
                                   .right-side {
                                   background-color: transparent ;
-                                  }
-                                  
-                                  
-                                  "))),
+                                  }"
+                  ))),
                   
                   useShinyjs(),
-                  
-                  
+
                   tabItems(
-                    
-                    
+
                     tabItem(tabName = "VD",
-                            
-                            
                             column("", uiOutput("visualisation"),style="margin:5px 400px 5px 5px",width = 12)
-                            # ,
-                            # column("",uiOutput("appkey2"),style="margin:5px 50px 100px 1065px",width = 6)
-                            # 
-                            
-                            
-                            
-                            
-                            
                     ),
                     
                     tabItem(tabName = "cleanD",
-                            
-                            
                             fluidRow (
                               uiOutput("Managementall",style="margin:5px 400px 5px 5px",width = 12)
-                               # ,
-                               # uiOutput("appkey5",style="margin:5px 50px 100px 1065px",width = 6)
                             )
                     ),
                     
@@ -181,15 +129,9 @@ shinyUI(
                                 column(10,uiOutput("mailcontent",style="margin:0px 0px 5px 120px;")),
                                 column(12, uiOutput("imgslide",style="margin:50px 0px 5px 100px;"))
                             ),
-                            
-                            
-                            
-                            
-                            
-                            
+
                             column(12, uiOutput("homenav"),style="margin:5px 28px 5px 150px;"),
-                            
-                            
+
                             div(
                               column(4,htmlOutput("map1"),style="margin:5px 380px 5px 150px;")
                             )
@@ -197,37 +139,19 @@ shinyUI(
                     
                     tabItem("OTD",
                             column("",uiOutput("Patient"),style="margin:50px 400px 5px 105px",width = 12)
-                            # ,
-                            # column("",uiOutput("appkey"),style="margin:390px 400px 5px 105px",width = 12)
-                            
-                            
+
                     ),
                     tabItem("AnD",
                             column("", uiOutput("DataAnalysis"),style="margin:5px 400px 5px 5px",width = 12)
-                            # ,
-                            # column("",uiOutput("appkey3"),style="margin:5px 50px 5px 1065px",width = 6)
-                            
-                            
-                    )
-                    ,
-                    
-                    
+
+                    ),
+
                     tabItem("UP",
-                            column("",uiOutput("appkey4"),style="margin:5px 0px 5px 1050px",width = 6)
-                            
-                            
+                            column("",uiOutput("appkey"),style="margin:5px 0px 5px 1050px",width = 6)
+
                     )
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                  ))))
 
-
-
+                  )
+                )
+  )
+)
