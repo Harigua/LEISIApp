@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `dbpfedev`
+-- Database: `db`
 --
 
 -- --------------------------------------------------------
@@ -341,11 +341,7 @@ CREATE TABLE `userdata` (
 --
 
 INSERT INTO `userdata` (`LOGINUSER`, `USE_LOGINUSER`, `MOTDPASS`, `LEVELSECURE`, `FROMINST`) VALUES
-('super', 'super', 'super1234', 'super', 'IPT'),
-('emna', 'super', 'emna', 'normal', 'IPT'),
-('zeineb', 'super', 'zeineb', 'normal', 'IPT'),
-('maaoui', 'super', 'maaoui', 'normal', 'ISI'),
-('hejer', 'super', 'hejer', 'normal', 'IPT');
+('super', 'super', 'super', 'super', 'IPT');
 
 --
 -- Indexes for dumped tables
