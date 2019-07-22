@@ -768,7 +768,7 @@ shinyServer(function(input, output,session) {
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
              # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45),multiple = TRUE) ,
              selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
-             selectizeInput("descriptionlesion","Lesion description",choices=c("","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Other","N/A"),multiple=TRUE) ,
+             selectizeInput("descriptionlesion","Lesion description",choices=c("","N/A","Other","Populo modulaire","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid"),multiple=TRUE) ,
              textInput("otherdescriptionlesion","If other please specify")
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
@@ -1216,7 +1216,7 @@ shinyServer(function(input, output,session) {
               numericInput("highlesion","lesion Hight(millimeter)*","-1") , 
               # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) , 
               selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
-              selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular"),multiple=TRUE) , 
+              selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Populo modulaire","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Papulo-nodular"),multiple=TRUE) ,
               textInput("otherdescriptionlesion","If other please specify")
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
@@ -1451,7 +1451,7 @@ shinyServer(function(input, output,session) {
              numericInput("highlesion","lesion Hight(millimeter)*","-1") ,
              # selectInput("locallesion","Lesion localisation*",choices = c("",-1,1:45)) ,
              selectInput("extractDay","Sampling date*",choices = c("",c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT DATE_MED from medical_checkup where PATIENT_IDENTIFIER = '%s'",as.character(input$PatIdentifier))))$DATE_MED))) ),
-             selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Populo modulaire"),multiple=TRUE) ,
+             selectizeInput("descriptionlesion","Lesion description",choices=c("N/A","Other","Populo modulaire","Ulcerative crusty","Dry","Wet","Surrounded by a hyperpigmented rim","Nodules pseudosporotrichoides","Pseudotumoral","Infected","Surrounded by a erythematouseruption","lupoid","Populo modulaire"),multiple=TRUE) ,
              textInput("otherdescriptionlesion","If other please specify")
         ),
         actionButton("btnAddSampleAndQuit","Submit and Quit"),
@@ -1795,8 +1795,8 @@ shinyServer(function(input, output,session) {
     cor3=sqlQuery(connect,paste("SELECT * from sample"))
     cordataall=sqldf("select * from  cor3, cor1
                      where   cor3.PATIENT_IDENTIFIER=cor1.PATIENT_IDENTIFIER ")
-    PAITIENT_AGE=as.numeric(cor1$AGE)
-    Lesion_Age=as.numeric(cor3$Lesion_Age)
+    PAITIENT_AGE=as.numeric(cordataall$AGE)
+    Lesion_Age=as.numeric(cordataall$Lesion_Age)
     datatot=data.frame(cordataall,PAITIENT_AGE,Lesion_Age)
     datatot$LOCALISATION=as.factor(datatot$LOCALISATION)
     datatot
