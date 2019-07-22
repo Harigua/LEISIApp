@@ -1836,7 +1836,9 @@ shinyServer(function(input, output,session) {
   })
   output$acmvars=renderUI({
     vecs=colnames(prepdata())
-    selectizeInput ("acmV",label = "Choose variables",choices = c("",vecs[vecs!="SPECIES"]) ,multiple=TRUE)
+    #vecs=colnames(cordata())
+    p("These tests perform correlation analysis between the variable species with other variables", style = "color:Black")
+    selectizeInput ("acmV",label = "Please choose the other variables",choices = c("",vecs[vecs!="SPECIES"]) ,multiple=TRUE)
   })
   output$ACM0=renderPlot({
     acm20 <- dudi.acm(prepdata()[,c(input$acmV)], scannf = FALSE, nf = 5)
