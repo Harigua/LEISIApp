@@ -345,10 +345,10 @@ shinyServer(function(input, output,session) {
                  uiOutput("firsttimeID"),
                  uiOutput("patdataout"),
                  uiOutput("patennt"),
-                 uiOutput("AdddSample"),
-                 uiOutput("AdddTreatment"),
-                 uiOutput("Adddcheckup"),
-                 uiOutput("AdddRegion"),
+                 uiOutput("AddSample"),
+                 uiOutput("AddTreatment"),
+                 uiOutput("Addcheckup"),
+                 uiOutput("AddRegion"),
                  uiOutput("alliquot")
         ),
         tabPanel(h3(strong("Diagnosis")),
@@ -535,7 +535,6 @@ shinyServer(function(input, output,session) {
     if(USER$Logged==FALSE ){
       div(
         column("", actionButton("mail", "About us ",width = 237
-                                #,icon("paper-plane"), style="yellow: #fff; background-color: white ; border-color: #2e6da4"
         ),width = 3),br(),br()
       )
     }
@@ -745,7 +744,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertSampleInt, {
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -782,7 +781,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertT_RInt, {
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -809,7 +808,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertTreatmentInt, {
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -837,7 +836,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertTreatmenthistoryInt, {
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -865,7 +864,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertCheckupInt , {
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -909,13 +908,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$othercheckAdd, {
@@ -967,13 +966,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$othertreatmentAdd, {
@@ -1046,13 +1045,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$otherregionAdd, {
@@ -1106,13 +1105,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$btnAddSampleAndQuit, {
@@ -1156,13 +1155,13 @@ shinyServer(function(input, output,session) {
       )
     })
 
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
   })
   observeEvent(input$btnAddSampleAndOther, {
@@ -1194,7 +1193,7 @@ shinyServer(function(input, output,session) {
       }else{info(paste0("Sample successfully stored",idSample))}
     }
     observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -1337,7 +1336,7 @@ shinyServer(function(input, output,session) {
   })
   observeEvent(input$btnUpImgInt, {
 
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
     output$alliquot=renderUI({
 
@@ -1381,7 +1380,7 @@ shinyServer(function(input, output,session) {
     }
   })
   observeEvent(input$btnInsertAlliquotInt, {
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
     output$alliquot=renderUI({
       if (USER$Logged == TRUE) {
@@ -1428,7 +1427,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$cansAddalliquot, {
     output$alliquot=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
