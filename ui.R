@@ -45,7 +45,7 @@ shinyUI(
                 title="Lesionia",
 
                 mydashboardHeader(
-                      title= tags$div(  tags$img(src="logologo.png",height=30,widht=100)
+                    title= tags$div(  tags$img(src="logologo.png",height=30,widht=100)
                                         ,actionLink("selecthome","Lesionia") )
                 ),
                 dashboardSidebar(

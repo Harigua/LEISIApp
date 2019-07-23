@@ -24,7 +24,7 @@ library(factoextra)
 library(FactoMineR)
 library(sqldf)
 library(doBy)
-library(ggmap)
+#library(ggmap)
 library(labelled)
 library(RColorBrewer)
 library(cluster)
@@ -286,13 +286,11 @@ shinyServer(function(input, output,session) {
       )
     }
   })
+
   output$homenav=renderUI({
     if(USER$Logged==TRUE ){
       div(
         fluidRow(
-          box(width = 2, status = "info",solidHeader = TRUE,
-              column(3,  h3(actionLink("selectDatMang",strong("Data Management"),icon = icon("fa fa-american-sign-language-interpreting"))))
-          ),
           box(width = 2, status = "info",solidHeader = TRUE,
               column(3,  h3(actionLink("selectDatAdd",strong("Data Entry"),icon = icon("list-alt"))))
           ),
@@ -301,6 +299,9 @@ shinyServer(function(input, output,session) {
           ),
           box(width = 2, status = "info",solidHeader = TRUE,
               column(3,  h3(actionLink("selectDatAna",strong("Data Analysor"),icon = icon("bar-chart-o"))))
+          ),
+          box(width = 2, status = "info",solidHeader = TRUE,
+              column(3,  h3(actionLink("selectDatMang",strong("Data Management"),icon = icon("fa fa-american-sign-language-interpreting"))))
           )
         )
       )
@@ -344,10 +345,10 @@ shinyServer(function(input, output,session) {
                  uiOutput("firsttimeID"),
                  uiOutput("patdataout"),
                  uiOutput("patennt"),
-                 uiOutput("AdddSample"),
-                 uiOutput("AdddTreatment"),
-                 uiOutput("Adddcheckup"),
-                 uiOutput("AdddRegion"),
+                 uiOutput("AddSample"),
+                 uiOutput("AddTreatment"),
+                 uiOutput("Addcheckup"),
+                 uiOutput("AddRegion"),
                  uiOutput("alliquot")
         ),
         tabPanel(h3(strong("Diagnosis")),
@@ -534,7 +535,6 @@ shinyServer(function(input, output,session) {
     if(USER$Logged==FALSE ){
       div(
         column("", actionButton("mail", "About us ",width = 237
-                                #,icon("paper-plane"), style="yellow: #fff; background-color: white ; border-color: #2e6da4"
         ),width = 3),br(),br()
       )
     }
@@ -744,7 +744,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertSampleInt, {
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -781,7 +781,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertT_RInt, {
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -808,7 +808,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertTreatmentInt, {
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -836,7 +836,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertTreatmenthistoryInt, {
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -864,7 +864,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$btnInsertCheckupInt , {
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -908,13 +908,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$othercheckAdd, {
@@ -966,13 +966,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$othertreatmentAdd, {
@@ -1045,13 +1045,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$otherregionAdd, {
@@ -1105,13 +1105,13 @@ shinyServer(function(input, output,session) {
         actionButton("gotofirst","Quit")
       )
     })
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
   })
   observeEvent(input$btnAddSampleAndQuit, {
@@ -1155,13 +1155,13 @@ shinyServer(function(input, output,session) {
       )
     })
 
-    output$Adddcheckup=renderUI({
+    output$Addcheckup=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
-    output$AdddTreatment=renderUI({
+    output$AddTreatment=renderUI({
     })
-    output$AdddRegion=renderUI({
+    output$AddRegion=renderUI({
     })
   })
   observeEvent(input$btnAddSampleAndOther, {
@@ -1193,7 +1193,7 @@ shinyServer(function(input, output,session) {
       }else{info(paste0("Sample successfully stored",idSample))}
     }
     observe({updateSelectInput(session,"sample","Sample*",choices =  c(as.character(data.frame( sqlQuery(connect,sprintf("SELECT ID_SAMPLE from sample where PATIENT_IDENTIFIER='%s'",paste(input$PatIdentifier))))[,"ID_SAMPLE"]))  )})
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -1319,7 +1319,7 @@ shinyServer(function(input, output,session) {
               box(width = 2, status = "info",solidHeader = TRUE,
                   column(3,  h5(actionLink("selecthome","Home page",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
-                  column(3,  h5(actionLink("selectMang","Data Management",icon = icon("list-alt"))))),
+                  column(3,  h5(actionLink("selectDatMang","Data Management",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
                   column(3,  h5(actionLink("selectDatAdd","Data Entry",icon = icon("list-alt"))))),
               box(width = 2, status = "info",solidHeader = TRUE,
@@ -1336,7 +1336,7 @@ shinyServer(function(input, output,session) {
   })
   observeEvent(input$btnUpImgInt, {
 
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
     output$alliquot=renderUI({
 
@@ -1380,7 +1380,7 @@ shinyServer(function(input, output,session) {
     }
   })
   observeEvent(input$btnInsertAlliquotInt, {
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
     })
     output$alliquot=renderUI({
       if (USER$Logged == TRUE) {
@@ -1394,7 +1394,7 @@ shinyServer(function(input, output,session) {
               numericInput("voll","Quantity in nanogramme","-1"),
               selectInput("val","Type",choices = c('N/A','+4','-30','Azote','R80')),
               selectInput("RakPFE","Container",choices = c('',1:4)),
-              uiOutput("ttt"),
+              uiOutput("valL"),
               selectInput("conserve","conserve",choices = c('N/A',"Boite")),
               selectInput("Position","Position",choices = c('',1:100))
           ),
@@ -1427,7 +1427,7 @@ shinyServer(function(input, output,session) {
   observeEvent(input$cansAddalliquot, {
     output$alliquot=renderUI({
     })
-    output$AdddSample=renderUI({
+    output$AddSample=renderUI({
       output$firsttimeID=renderUI({
       })
       output$patennt=renderUI({
@@ -1749,8 +1749,8 @@ shinyServer(function(input, output,session) {
     #TabPl=Tab[which(Tab$CITY %in% regC$CITY),]
     #TabSl=TabPl[which(TabPl[,"SPECIES"]== input$especesshop),]
     TabSl=as.data.frame(Tab)
-    testttttttt=summaryBy(SPECIES~.,data =TabSl, FUN = length )
-    TabOl=as.data.frame(testttttttt)
+    speciesSummaryBy=summaryBy(SPECIES~.,data =TabSl, FUN = length )
+    TabOl=as.data.frame(speciesSummaryBy)
     df2 <- data.frame(location = as.character(TabOl$CITY),
                       values = TabOl$SPECIES.length,
                       stringsAsFactors = FALSE)
@@ -2153,13 +2153,13 @@ for(la in 1:dim(three)[1])
                    id="formCleaningtool",
                    fluidRow (
                      div(box(width = 3, status = "info",solidHeader = TRUE,
-                             uiOutput("DatadelF666table"),
-                             uiOutput("DatadelF666Fil"),
-                             uiOutput("DatadelF666tableval"),
+                             uiOutput("DataDelTable"),
+                             uiOutput("DataDelFil"),
+                             uiOutput("DataDelTableVal"),
                              actionButton("DatadelDone","Delete")
                      ),
                      box(width = 8, status = "info",
-                         DT::dataTableOutput("DatadelF666doooooon")
+                         DT::dataTableOutput("DataDelDataTable")
                      )
                      )
                    )
@@ -2168,15 +2168,15 @@ for(la in 1:dim(three)[1])
                    id="formDownLoadtool",
                    fluidRow (
                      div(box(width = 3, status = "info",solidHeader = TRUE,
-                             uiOutput("DataDowLF666table"),
-                             uiOutput("DataDowLF666Fil"),
-                             uiOutput("DataDowLF666value"),
+                             uiOutput("DataDowTable"),
+                             uiOutput("DataDowFil"),
+                             uiOutput("DataDowValue"),
                              textInput("naamebase","File name",""),
-                             actionButton("DataLowLDone","Download"),
-                             actionButton("DataLowLDoneAll","Download all table")
+                             actionButton("DataDowDone","Download"),
+                             actionButton("DataDowDoneAll","Download all table")
                      ),
                      box(width = 8, status = "info",
-                         DT::dataTableOutput("DataDowLF666doooooon")
+                         DT::dataTableOutput("DataDowDataTable")
                      )
                      )
                    )
@@ -2239,13 +2239,13 @@ for(la in 1:dim(three)[1])
   ##########################################################
   #                         tables                         #
   ##########################################################
-  output$DatadelF666table=renderUI ({
+  output$DataDelTable=renderUI ({
     taablesDel=sqlTables(connect, errors = FALSE, as.is = TRUE,
                          catalog = NULL, schema = NULL, tableName = NULL,
                          tableType = NULL, literal = FALSE)
     selectInput("tableNameDelete","Select Table",choices = taablesDel[,3]  )
   })
-  output$DataDowLF666table=renderUI ({
+  output$DataDowTable=renderUI ({
     taablesDowL=sqlTables(connect, errors = FALSE, as.is = TRUE,
                           catalog = NULL, schema = NULL, tableName = NULL,
                           tableType = NULL, literal = FALSE)
@@ -2256,11 +2256,11 @@ for(la in 1:dim(three)[1])
   ##########################################################
   #                         Filters                        #
   ##########################################################
-  output$DatadelF666Fil=renderUI ({
+  output$DataDelFil=renderUI ({
     AAllDel=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     selectInput("filNameDelete","Select Filter",choices =  c(colnames(AAllDel)))
   })
-  output$DataDowLF666Fil=renderUI ({
+  output$DataDowFil=renderUI ({
     AAllDowL=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     selectInput("filNameDown","Select Filter",choices =  c( colnames(AAllDowL) ))
   })
@@ -2268,12 +2268,12 @@ for(la in 1:dim(three)[1])
   #################################################################
   #                            Values                             #
   #################################################################
-  output$DatadelF666tableval=renderUI ({
+  output$DataDelTableVal=renderUI ({
     AAllDel1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDelete))
     AAllDel2=AAllDel1[,input$filNameDelete]
     selectInput("valNameDelete","Select Value",choices =  c( unique(as.character(AAllDel2) )))
   })
-  output$DataDowLF666value=renderUI ({
+  output$DataDowValue=renderUI ({
     AAllDown1=sqlQuery(connect,paste("SELECT * from ",input$tableNameDown))
     AAllDown2=AAllDown1[,input$filNameDown]
     selectInput("valNameDown","Select Value",choices =  c(unique(as.character(AAllDown2))))
@@ -2298,10 +2298,10 @@ for(la in 1:dim(three)[1])
   output$DataDiscrepancys=DT::renderDataTable ({
     DT::datatable(sqlQuery(connect,paste("SELECT * from discrepancy")), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
   })
-  output$DataDowLF666doooooon=DT::renderDataTable ({
+  output$DataDowDataTable=DT::renderDataTable ({
     DT::datatable(humDown(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
   })
-  output$DatadelF666doooooon=DT::renderDataTable({
+  output$DataDelDataTable=DT::renderDataTable({
     DT::datatable(humDel(), options = list(scrollX = TRUE,lengthMenu = c(5, 10,15) ,pageLength = 5))
   })
   #####################################################################################################
@@ -2328,11 +2328,11 @@ for(la in 1:dim(three)[1])
   #####################################################################################################
   #                                           button Download DATA                                      #
   #####################################################################################################
-  observeEvent(input$DataLowLDone, {
+  observeEvent(input$DataDowDone, {
     write.csv2( data.frame(humDown()),file =paste(as.character(input$naamebase),".csv"), fileEncoding = "UTF-16LE")
     info("Data successfully stored")
   })
-  observeEvent(input$DataLowLDoneAll, {
+  observeEvent(input$DataDowDoneAll, {
     write.csv2( data.frame(humDownallall()),file =paste(as.character(input$naamebase),".csv"), fileEncoding = "UTF-16LE")
     info("Data successfully stored")
   })
@@ -2841,7 +2841,7 @@ for(la in 1:dim(three)[1])
   })
 
   ##############################################################################################
-  output$ttt= renderUI({
+  output$valL= renderUI({
     vals=choice$value[which(choice$choiceCat==input$val)]
     selectInput("valL","Rak",choices = c(vals))
   })
