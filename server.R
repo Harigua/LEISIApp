@@ -794,8 +794,8 @@ shinyServer(function(input, output,session) {
             p("feilds with asterisk(*) are mandatory", style = "color:red"),
             selectInput("regvisit","Country and state*",choices = c('',cities[,3])),
             textInput("regvisitc","City"),
-            selectInput("Type","Urban/Rural",choices =  c("N/A",'+4','-30',"Urban","Rural")),
-            selectInput("resedent","Residency ",choices =  c("N/A", "Yes","No")),
+            selectInput("Type","Urban/Rural",choices =  c("N/A","Urban","Rural")),
+            selectInput("resedent","Residency ",choices =  c("No", "Yes","N/A")),
             selectInput("bybyte","Bite Notion",choices =  c("N/A", "Yes","No")),
             dateInput("datedatevisit","Visit Date*",value = data.frame(sqlQuery(connect,sprintf("SELECT 	BIRTH_DATE from patient where PATIENT_IDENTIFIER='%s'",as.character(input$PatIdentifier))))$BIRTH_DATE),
             textInput("dateleavevisit","Duration (In weeks, one year = 52 weeks)*","-1")
@@ -921,7 +921,7 @@ shinyServer(function(input, output,session) {
     datacheck=sqlQuery(connect,paste("SELECT * from medical_checkup"))
     querycheckinpfe <- paste0(
       "INSERT INTO  medical_checkup
-      VALUES ('", toString(paste0("Medical-check",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','N/A') ")
+      VALUES ('", toString(paste0(input$PatIdentifier,"-",length(datacheck[,1])+1)) ,"', '",toString( input$datecheck ) ,"','",toString(input$interrID)  ,"', '",toString( input$PatIdentifier) ,"','",toString( USER$name ) ,"','",toString( input$hospital) ,"', '",toString( input$pysicien ) ,"','",toString( input$sampler) ,"','",toString( input$Ahost) ,", ",toString(input$otherAhost),"','",toString( input$HhostR) ,"','",toString( input$HhostL) ,"','",toString( input$clinstate),", ",toString(input$otherClinstate),"','",toString( input$Lesion_Number) ,"','",toString(input$Lesion_Sites) ,"','N/A') ")
     if(is.na(input$Lesion_Number)){
       info("Error : Missing value Number of Lesions")
     }else if(input$Lesion_Number<(-1)){
@@ -1019,7 +1019,7 @@ shinyServer(function(input, output,session) {
     treatmenthistory=sqlQuery(connect,paste("SELECT * from treatmenthistory"))
     querytreatpfe <- paste0(
       "INSERT INTO  treatmenthistory
-      VALUES ( '", toString(paste0("Treatment",length(treatmenthistory[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
+      VALUES ( '", toString(paste0(input$PatIdentifier,"-",length(treatmenthistory[,1])+1)) ,"','", toString(input$PatIdentifier) ,"', '",toString( input$treattype),", ",toString( input$otherTreattype),"', '",if(toString( input$prescribed)=="other"){toString( input$otherPrescribed)}else{toString( input$prescribed)} ,"', '",as.character( input$datetreatbeg) ,"', '",toString( input$Posology) ,"', '",toString( input$admin) ,"','",input$injectionnumber ,"','",as.character( input$datetreatend) ,"','",as.character( input$healing) ,"') ")
     if(is.na(input$injectionnumber)){
       info("Error : Missing value Number of injections")
     }else if(input$injectionnumber<(-1)){
