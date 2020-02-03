@@ -1,15 +1,13 @@
-# LEISIApp
-
-## About us
+# About us
 Lesionia is an open-source software/Web applications for the collection, management and analysis of clinical and epidemiological data related to patients suspected for cutaneous leishmaniasis (CL). It was initially conceived and developed in the frame of the PEER518 project, funded by the USAID-NAS. It is meant to enable researchers within the project consortium to enter and access the data with respect to the FAIR criteria. It offers a remote and secured access via a web-based interface to all users that are based in different countries and acting at different stages of the data life cycle. Lesionia can be useful for researchers working on CL cases and who need a data management system for their research activities. The system can easily be tuned to be used for other diseases correlated to cutaneous lesions.
 
-### Requirements:
+## Requirements:
 - LEMP software stack (i.e. a variation on the LAMP software bundle that uses Nginx rather than Apache, also known as LNMP : Linux Nginx MySql Php)
 - R (why not Rstudio or any other R IDE)
 - Shiny and Shiny-server
 - Basic knowledge of linux command lines 
 
-#### Installation using Rstudio (graphical mode) suitable for both Linux and Windows [Coming soon]
+### Installation using Rstudio (graphical mode) suitable for both Linux and Windows [Coming soon]
 
 - Set up the DataBase with either wampServer(Window, Apache, MySql, Php) see [here](http://www.wampserver.com/en/) or with EasyPHP see [here](https://www.easyphp.org/)
 - Go to [127.0.0.1/phpmyadmin](127.0.0.1/phpmyadmin) in your browser and create a new DataBase
@@ -33,7 +31,7 @@ Lesionia is an open-source software/Web applications for the collection, managem
 - If a “there is no package called ‘packageName’ ” error occurred try installing them with “install.packages("packageName")” or see section 8 of “Installation using command-lines under Ubuntu 16.04.”
 
 
-#### Installation using command-lines under Ubuntu 16.04. This section also includes the R packages and their dependencies
+### Installation using command-lines under Ubuntu 16.04. This section also includes the R packages and their dependencies
 
 1. Supposing that you have a linux base OS (you can Download UBUNTU 16.04 from [here](http://releases.ubuntu.com/16.04/)).
 2. Setting up MySql from [here](https://linuxize.com/series/how-to-install-lemp-stack-on-ubuntu-18-04/).
@@ -110,9 +108,12 @@ Lesionia is an open-source software/Web applications for the collection, managem
       }
       ```
     - Restart shinyServer `sudo systemctl restart shiny-server.service`
-#### Miscellaneous
-#### Citing Lesionia
+### Miscellaneous
+## Citing Lesionia
 If you have used Lesionia or parts of it in the course of your research, 
 we ask that you cite us as follows:
 XXXXXXX
+
+## Licence
+Lesionia is licenced under a [GNU GPL 3.0 licence](https://github.com/Harigua/LEISIApp/blob/master/LICENSE/)
 
