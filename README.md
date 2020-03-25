@@ -112,7 +112,9 @@ Lesionia is an open-source software/Web applications for the collection, managem
 ## Citing Lesionia
 If you have used Lesionia or parts of it in the course of your research, 
 we ask that you cite us as follows:
-XXXXXXX
+Harigua-Souiai, E.(*), Ben Salem, Y., Hariga, M., Saadi, Y., Souguir, H. Chouaieb, H., Mkada, I., Moussa, Z., Fathallah-Mili, A., Lemrani, M., Haddad, N., Souiai, O., Bel Hadj Ali, I., Guizani, I. 03 February 2020, PREPRINT (Version 1) available at Research Square [+https://doi.org/10.21203/rs.2.22461/v1+]
+
+You can access this publication as a preprint through [research square platform](https://www.researchsquare.com/article/rs-13036/v1)
 
 ## Licence
 Lesionia is licenced under a [GNU GPL 3.0 licence](https://github.com/Harigua/LEISIApp/blob/master/LICENSE/)
